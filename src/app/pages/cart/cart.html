@@ -1,0 +1,115 @@
+<div class="bg-gray-50 min-h-screen py-4">
+  <div class="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-6">
+
+    <!-- Left: Cart Items -->
+    <div class="flex-1 bg-white rounded-lg shadow p-4">
+      <h1 class="text-2xl font-semibold mb-4">Shopping Cart</h1>
+
+      @if (cart.items.length > 0) {
+      @for (item of cart.items; track item.productId) {
+      <div class="flex flex-col border-b border-gray-200 py-4">
+
+        <!-- Top Row: Image + Details -->
+        <div class="flex gap-3">
+          <!-- Product Image -->
+          <div class="w-24 h-24 flex-shrink-0 bg-gray-100 rounded flex items-center justify-center">
+            <img [src]=item.imageUrl alt="{{ item.productName }}" 
+              class="max-w-full max-h-full object-contain">
+          </div>
+
+          <!-- Product Info -->
+          <div class="flex-1">
+            <p class="font-medium text-sm sm:text-base">{{ item.productName }}</p>
+            <p class="text-green-600 text-xs">In stock</p>
+            <p class="text-xs text-gray-500">Size: {{ item.productId }}</p>
+            <p class="text-xs text-gray-500">SKU: {{ item.price }}</p>
+            <p class="text-xs text-gray-500">Brand: {{ item.productName }}</p>
+            <p class="text-xs text-gray-500">Rs. {{ item.price }}</p>
+            <p class="text-xs text-gray-500">Eligible for FREE Shipping</p>
+          </div>
+        </div>
+
+        <!-- Below Image: Quantity + Total -->
+        <div class="flex items-center justify-between mt-3">
+          <!-- Quantity Selector -->
+          <div class="flex items-center border border-gray-300 rounded">
+            <button class="px-2 py-1" (click)="decreaseQuantity(item)">−</button>
+            <span class="px-3 text-sm">{{ item.quantity }}</span>
+            <button class="px-2 py-1" (click)="increaseQuantity(item)">+</button>
+          </div>
+          <!-- Price -->
+          <div class="font-semibold text-sm">
+            ₹{{ item.price * item.quantity | number:'1.2-2' }}
+          </div>
+        </div>
+
+
+
+      </div>
+      }
+      } @else {
+      <p class="text-gray-500">Your cart is empty.</p>
+      }
+    </div>
+
+    <!-- Right: Summary -->
+    <div class="lg:w-72 flex-shrink-0">
+      <div class="bg-white rounded-lg shadow p-4">
+
+        <p class="text-base font-medium">
+          Subtotal ({{ cart.items.length }} items):
+          <span class="font-semibold">₹{{ getCartTotal() | number:'1.2-2' }}</span>
+        </p>
+
+        <button class="bg-yellow-400 hover:bg-yellow-500 w-full py-2 rounded-lg text-sm font-medium">
+          Proceed to Buy
+        </button>
+      </div>
+
+      <!-- Related Products Section -->
+      <div class="bg-white rounded-lg shadow p-4 mt-4">
+        <h2 class="text-sm font-semibold mb-3">Products related to items in your cart</h2>
+        <small class="text-gray-500 mb-3 block">Sponsored</small>
+
+        @for (product of relatedProducts; track product.id) {
+        <div class="flex gap-3 mb-4 pb-4 border-b border-gray-200">
+          <!-- Product Image -->
+          <!-- <div class="w-20 h-20 flex-shrink-0 bg-gray-100 rounded flex items-center justify-center">
+            <img [src]="product.imageUrls[0]" alt="{{ product.name }}" class="max-w-full max-h-full object-contain">
+          </div> -->
+
+          <!-- Product Info -->
+          <div class="flex flex-col flex-1">
+            <!-- Product Name -->
+            <p class="text-xs font-medium line-clamp-2">{{ product.name }}</p>
+
+            <!-- Ratings -->
+            <div class="flex items-center gap-1 text-xs text-yellow-500">
+              @for (star of [].constructor(product.rating); track star) {
+              <i class="pi pi-star-fill"></i>
+              }
+              <span class="text-gray-500 ml-1">{{ product.rating }} ratings</span>
+            </div>
+
+            <!-- Price -->
+            <!-- <p class="font-semibold text-sm">₹{{ product.price | number:'1.0-0' }}</p> -->
+
+            <!-- Button -->
+            <p-button
+  label="Add"
+  icon="pi pi-shopping-bag"
+  styleClass="custom-cart-btn w-full sm:w-auto"
+  severity="secondary"
+  raised
+  rounded
+  (onClick)="addToCart(product, $event)">
+</p-button>
+
+          </div>
+        </div>
+        }
+      </div>
+
+    </div>
+  </div>
+</div>

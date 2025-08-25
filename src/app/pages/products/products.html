@@ -1,0 +1,95 @@
+<div class="container mx-auto p-4">
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 cursor-pointer">
+
+        @for (product of products; track product.productId) {
+        <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition duration-300 relative"
+             (click)="onCardClick(product)">
+
+            <!-- Admin Edit/Delete Icons -->
+            @if (isAdmin) {
+            <div class="absolute top-2 right-2 flex space-x-2 z-10">
+                <!-- Edit -->
+                <p-button 
+                    pTooltip="Edit" 
+                    tooltipPosition="left" 
+                    icon="pi pi-pencil" 
+                    severity="info" 
+                    raised rounded outlined
+                    (onClick)="editProduct(product)">
+                </p-button>
+
+                <!-- Delete -->
+                <p-button 
+                    pTooltip="Delete" 
+                    icon="pi pi-trash" 
+                    severity="danger" 
+                    raised rounded outlined
+                    (onClick)="deleteProduct(product)">
+                </p-button>
+            </div>
+            }
+
+            <!-- Product Image -->
+            <div class="relative w-full h-44 sm:h-56 md:h-64">
+                <img class="w-full h-full object-cover" [src]="getFrontImage(product)" [alt]="product.name" />
+            </div>
+
+            <!-- Product Details -->
+            <div class="p-3 sm:p-4">
+                <!-- Product Name -->
+                <p class="text-base sm:text-lg text-gray-700 font-medium line-clamp-2 w-full block"
+                   title="{{ product.name }}">
+                    {{ product.name }}
+                </p>
+
+                <!-- Price & Discount -->
+                <div class="flex justify-between items-center mt-1">
+                    <div class="flex flex-col">
+                        <!-- Final Price -->
+                        <span class="price text-green-800 font-semibold">
+                            ₹{{ getFinalPrice(product) | number:'1.0-0' }}
+                        </span>
+
+                        <!-- Original Price -->
+                        @if (product.variants[0].sizes[0].discountPercentage > 0) {
+                        <span class="text-xs sm:text-sm text-red-500 line-through">
+                            ₹{{ product.variants[0].sizes[0].price }}
+                        </span>
+                        }
+                    </div>
+
+                    <!-- Rating -->
+                    <div class="flex justify-start items-center mt-2">
+                        <p-badge [value]="'⭐ ' + product.rating" severity="secondary"
+                                 class="text-sm sm:text-base px-3 py-2 font-medium rounded-lg">
+                        </p-badge>
+                    </div>
+                </div>
+
+                <!-- Discount Badge with Savings -->
+                @if (product.variants[0].sizes[0].discountPercentage > 0) {
+                <p-badge [value]="getSavings(product)" severity="success"></p-badge>
+                }
+
+                <!-- Delivery Info -->
+                <div class="mt-2 text-xs sm:text-sm text-gray-500">
+                    Get it by {{ getDeliveryDate() }}
+                </div>
+
+                <!-- Full width Add to Cart Button -->
+                <div class="mt-3">
+                    <p-button 
+                        label="Add" 
+                        icon="pi pi-shopping-bag" 
+                        styleClass="boutique-button w-full" 
+                        severity="warn"
+                        raised 
+                        (onClick)="addToCart(product); $event.stopPropagation()">
+                    </p-button>
+                </div>
+            </div>
+        </div>
+        }
+
+    </div>
+</div>

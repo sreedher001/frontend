@@ -1,0 +1,31 @@
+/* You can add global styles to this file, and also import other style files */
+@use './tailwind.css';
+@use './layout/layout.scss';
+@use 'primeicons/primeicons.css';
+@use './demo/demo.scss';
+
+
+:host ::ng-deep .custom-cart-btn.p-button {
+  font-size: 0.75rem;        /* text-xs */
+  padding: 0.25rem 0.75rem;  /* px-3 py-1 */
+  border-radius: 9999px;     /* rounded-full */
+  border: 1px solid #d1d5db; /* border-gray-300 */
+}
+
+:host ::ng-deep .custom-cart-btn.p-button:hover {
+  background-color: #f3f4f6; /* hover:bg-gray-100 */
+}
+
+
+// .boutique-button {
+//   background-color: #ed750c !important; /* Muted Rose */
+//   border-color: #EAC7C7 !important;
+//   color: #EAC7C7 !important;
+//   font-weight: 500;
+//   transition: background-color 0.3s ease;
+// }
+
+// .boutique-button:hover {
+//   background-color: #d8b3b3 !important;
+//   border-color: #d8b3b3 !important;
+// }
