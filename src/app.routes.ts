@@ -8,6 +8,7 @@ import { Products } from './app/pages/products/products';
 import { Productdetails } from '@/pages/productdetails/productdetails';
 import { Cart } from '@/pages/cart/cart';
 import { EditVariant } from '@/pages/edit-variant/edit-variant';
+import { Addproduct } from '@/pages/admin/addproduct/addproduct';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -17,6 +18,7 @@ export const appRoutes: Routes = [
             { path: 'products', component: Products },
             { path: 'product-details/:id', component: Productdetails },
             { path: 'admin/products/edit', component: EditVariant},
+            { path: 'admin/products/add', component: Addproduct},
             { path: 'cart', component: Cart},
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },

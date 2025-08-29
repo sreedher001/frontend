@@ -41,6 +41,7 @@ import { ColorService } from '../service/color.service';
 import { TableModule } from 'primeng/table';
 import { GalleriaModule } from 'primeng/galleria';
 import { Tooltip, TooltipModule } from "primeng/tooltip";
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-input-demo',
@@ -75,7 +76,7 @@ import { Tooltip, TooltipModule } from "primeng/tooltip";
     ListboxModule,
     InputGroupAddonModule,
     TextareaModule, FileUploadModule, GalleriaModule,
-    Tooltip
+    Tooltip,DialogModule
 ],
   templateUrl: './edit-variant.html',
   providers: [ NodeService]
@@ -107,6 +108,7 @@ uploadedFiles: any[] = [];
 images:any[]=[];
 deletedImageIds: number[] = [];
 filteredStatuses: any[] = [];
+displayConfirmation:boolean=false;
   ngOnInit() {
     // this.product=this.getEmptyProduct();
     // const variantId = +this.route.snapshot.paramMap.get('variantId')!;
@@ -195,14 +197,14 @@ removeSize(sizeId: number) {
             this.uploadedFiles.push(file);
         }
 
-        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
+        this.messageService.add({ key: 'global',severity: 'info', summary: 'Success', detail: 'File Uploaded' });
     }
     onFileSelect(event: any) {
         for (const file of event.files) {
             this.uploadedFiles.push(file);
         }
 
-        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
+        this.messageService.add({ key: 'global',severity: 'info', summary: 'Success', detail: 'File Uploaded' });
     }
     responsiveOptions = [
     { breakpoint: '1024px', numVisible: 3 },
@@ -261,20 +263,6 @@ updateVariant() {
   this.uploadedFiles.forEach((file: File) => {
     formData.append('file', file, file.name);
   });
-// ✅ Debug log JSON metadata
-  console.log("Metadata JSON:", metadata);
-
-  // ✅ Debug log files
-  console.log("Uploaded files:", this.uploadedFiles);
-
-  // ✅ Debug log full FormData contents
-  formData.forEach((value, key) => {
-    if (value instanceof File) {
-      console.log(`FormData → ${key}: File name = ${value.name}, size = ${value.size}, type = ${value.type}`);
-    } else {
-      console.log(`FormData → ${key}:`, value);
-    }
-  });
 
   // --- Call API via service ---
   this.productService.updateVariant(variantId, formData).subscribe({
@@ -296,5 +284,11 @@ updateVariant() {
     }
   });
 }
+openConfirmation() {
+        this.displayConfirmation = true;
+    }
 
+    closeConfirmation() {
+        this.displayConfirmation = false;
+    }
 }

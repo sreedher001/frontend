@@ -52,6 +52,13 @@ getProductByVariantId(variantId: number): Observable<Product> {
   );
 }
 
+upload(formData: FormData) {
+  return this.http.post<any>(
+    `${this.apiUrl}/admin/products/images/upload`,  
+    formData
+  );
+}
+
   
 
 

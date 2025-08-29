@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, NgModule, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -10,12 +10,17 @@ import { CartService } from '@/pages/cart/cart.service';
 import { Cart } from '@/pages/cart/cart';
 import { CartResponse } from '@/pages/cart/cart.model';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
+import { ButtonModule } from 'primeng/button';
+import { MenuModule } from 'primeng/menu';
+import { TooltipModule } from 'primeng/tooltip';
+import { JwtHelper } from '@/jwt/jwt-helper';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, BadgeModule, OverlayBadgeModule],
-    template: ` <div class="layout-topbar">
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, BadgeModule,
+        MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule],
+    template: `<div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
                 <i class="pi pi-bars"></i>
@@ -54,49 +59,112 @@ import { OverlayBadgeModule } from 'primeng/overlaybadge';
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
+                    <button type="button" class="layout-topbar-action raised">
                         <i class="pi pi-inbox"></i>
                         <span>Messages</span>
                     </button>
-                    <button type="button" class="layout-topbar-action" (click)="viewCart()">
-                        <p-overlayBadge *ngIf="cartCount > 0" severity="danger" [value]="cartCount" styleClass="p-overlay-badge-cart">
-                            <i class="pi pi-shopping-bag" style="font-size: 1.5rem"></i>
-                        </p-overlayBadge>
-                        <span>Cart</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
+                    
+                <button 
+  type="button" 
+  class="relative flex items-center justify-center bg-pink-100 dark:bg-pink-400/10 rounded-border" 
+  style="width: 2.5rem; height: 2.5rem;" 
+  (click)="viewCart()"
+  pTooltip="View items in your bag" tooltipPosition="top"
+>
+  <i class="cart-button pi pi-shopping-bag text-pink-500 text-xl"></i>
+
+  @if(cartCount>0){
+    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none z-10">
+    {{ cartCount }}
+  </span>}
+</button>
+
+
+
+<button 
+  type="button" 
+  class="flex items-center justify-center bg-orange-100 dark:bg-blue-400/10 rounded-border" 
+  style="width: 2.5rem; height: 2.5rem;" 
+  (mouseenter)="menu.toggle($event)" 
+  (mouseleave)="menu.hide()"
+  #menuButton
+>
+  <i class="pi pi-user text-orange-500 text-xl"></i>
+</button>
+
+<!-- Overlay Menu -->
+<p-menu  #menu [popup]="true" [model]="overlayMenuItems" [baseZIndex]="1000" [appendTo]="menuButton"></p-menu>
                 </div>
             </div>
         </div>
     </div>`
 })
-export class AppTopbar {
-    
+export class AppTopbar implements OnInit {
+
     items!: MenuItem[];
     cart: CartResponse = {
         cartId: 0,
         items: []
+
     };
+    isLoggedIn: boolean = false;
     cartCount: number = 0;
-    constructor(public layoutService: LayoutService, private cartService: CartService,
-        private router: Router) {
-        //this.cartCount = this.loadCartCount();
+    userName:any ='';
+    overlayMenuItems: MenuItem[] = [];
+     ngOnInit(): void {
+        this.setUserMenuItem();
 
     }
-    loadCartCount(): number {
-        this.cartService.getCart().subscribe({
-            next: (res) => {
-                this.cart = res;
-                this.cartCount = res.items.length;
-            },
-            error: (err) => {
-                console.error('Failed to load cart', err);
-            }
-        });
-        return this.cartCount
+     constructor(public layoutService: LayoutService, private cartService: CartService,
+        private router: Router,private jwtHelper:JwtHelper) {
+
+
+    }
+    setUserMenuItem(){
+const loggedIn = localStorage.getItem('isLoggedIn');
+        if (loggedIn === "true") {
+            this.isLoggedIn = true;
+            const name= localStorage.getItem('userName')?localStorage.getItem('userName'):"";
+           this.userName = name;
+        
+        this.overlayMenuItems = [
+        { label: 'Hello, '+this.userName, icon: 'pi pi-user' },
+        { separator: true },
+        {
+            label: 'My Profile',
+            icon: 'pi pi-id-card'
+        },
+        {
+            label: 'My Orders',
+            icon: 'pi pi-box'
+        },
+        {
+            label: 'Wishlist',
+            icon: 'pi pi-heart'
+        },
+        {
+            label: 'Settings',
+            icon: 'pi pi-cog'
+        },
+        {
+            separator: true
+        },
+        { label: 'Logout',icon: 'pi pi-sign-out', command: () => this.logout()}
+    ];}
+    else{
+        this.overlayMenuItems = [
+        { label: 'Login', icon: 'pi pi-sign-in', command: () => this.login() },
+        { label: 'Sign Up', icon: 'pi pi-user-plus', command: () => this.signup() }
+      ];
+    }}
+
+    logout() {
+        this.router.navigate(['/auth/login']);
+        this.isLoggedIn = false;
+        localStorage.setItem('isLoggedIn', "false");
+
+        localStorage.removeItem('username');
+       this.jwtHelper.logout();
     }
 
     toggleDarkMode() {
@@ -105,4 +173,11 @@ export class AppTopbar {
     viewCart() {
         this.router.navigate(['/cart']);
     }
+    signup() {
+        
+    }
+    login() {
+        this.router.navigate(['/auth/login']);
+    }
 }
+

@@ -1,0 +1,253 @@
+<p-fluid class="flex flex-wrap items-center justify-between gap-4">
+  <div class="card flex flex-wrap items-center justify-between w-full">
+    <div class="flex-1 min-w-[150px]">
+      <h4 class="font-bold">Add New Product</h4>
+    </div>
+
+    <div class="flex justify-end">
+      <p-button pTooltip="save" tooltipPosition="left" label="Save Product" icon="pi pi-save" raised type="button"
+        (click)="onSubmit(formRef)" severity="warn" size="large">
+      </p-button>
+
+      <!-- Confirmation Dialog -->
+      <p-dialog header="Confirmation" [(visible)]="displayConfirmation" [style]="{ width: '350px' }" [modal]="true">
+        <div class="flex items-center justify-center">
+          <i class="pi pi-info-circle mr-4" style="font-size: 3rem"> </i>
+          <span>Are you sure you want to save this product?</span>
+        </div>
+        <ng-template #footer>
+          <p-button label="No" icon="pi pi-times" (click)="closeConfirmation()" text severity="secondary" raised />
+          <p-button label="Yes" icon="pi pi-check" (click)="saveProduct()" severity="warn" raised autofocus />
+        </ng-template>
+      </p-dialog>
+    </div>
+  </div>
+</p-fluid>
+<form #formRef="ngForm" id="productForm" (ngSubmit)="onSubmit(formRef)" novalidate>
+  <!-- Product Details -->
+  <p-fluid class="flex mt-5">
+    <div class="card flex flex-col gap-6 w-full">
+      <div class="font-semibold text-xl">Enter Product Details
+        @if(showeErrorSuggestion){<span class="p-error text-red-800 ">(NOTE : All fields are mandatory to be
+          filled)</span>}
+      </div>
+
+      <div class="flex flex-wrap w-full">
+        <!-- Name -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <input pInputText id="name" name="productName" type="text" [(ngModel)]="product.name" #name="ngModel"
+              required class="w-full" />
+            <label for="name">Product Name</label>
+          </p-floatlabel>
+          @if(name.invalid && name.touched){<small class="p-error text-red-800">Product name is required</small>}
+        </div>
+
+        <!-- Category -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <p-autocomplete [(ngModel)]="product.category" name="category" #category="ngModel" required
+              [suggestions]="autoFilteredCategoryValue" optionLabel="category" field="category" dropdown
+              (completeMethod)="filterCategory($event)" (onSelect)="onCategorySelect($event)" inputId="category"
+              class="w-full">
+            </p-autocomplete>
+            <label for="Category">Category</label>
+          </p-floatlabel>
+          @if(category.invalid && category.touched){<small class="p-error text-red-800">Product category is
+            required</small>}
+        </div>
+
+        <!-- Gender -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <p-autocomplete [(ngModel)]="product.genderCategory" name="genderCategory" #genderCategory="ngModel"
+              required [suggestions]="autoFilteredGenderCategoryValue" optionLabel="genderCategory"
+              field="genderCategory" dropdown (completeMethod)="filterGenderCategory($event)"
+              (onSelect)="onGenderCategorySelect($event)" [disabled]="!hasGenderCategory" inputId="genderCategory"
+              class="w-full">
+            </p-autocomplete>
+            <label for="genderCategory">Gender Category</label>
+          </p-floatlabel>
+          @if(genderCategory.invalid && genderCategory.touched){<small class="p-error text-red-800">Product gender
+            category is required</small>}
+        </div>
+
+        <!-- Sub Category -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <p-autocomplete [(ngModel)]="product.subcategory" name="subcategory" #subCategory="ngModel" required
+              [suggestions]="autoFilteredSubCategoryValue" optionLabel="subCategory" field="subCategory" dropdown
+              (completeMethod)="filterSubCategory($event)" [disabled]="!hasSubCategory" inputId="subCategory"
+              class="w-full">
+            </p-autocomplete>
+            <label for="subCategory">Sub Category</label>
+          </p-floatlabel>
+          @if(subCategory.invalid && subCategory.touched){<small class="p-error text-red-800">Product sub category is
+            required</small>}
+        </div>
+
+        <!-- Color -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <p-autocomplete [(ngModel)]="product.color" name="color" #color="ngModel" required
+              [suggestions]="autoFilteredValue" optionLabel="name" field="name" dropdown
+              (completeMethod)="filterItem($event)" inputId="variantColor" class="w-full">
+            </p-autocomplete>
+            <label for="variantColor">Color</label>
+          </p-floatlabel>
+          @if(color.invalid && color.touched){<small class="p-error text-red-800">Product color is required</small>}
+        </div>
+
+        <!-- Featured Checkbox -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mt-2 mb-4 flex items-center">
+          <p-checkbox [(ngModel)]="product.isFeatured" name="Featured" binary="true" inputId="isFeatured"></p-checkbox>
+          <label for="isFeatured" class="ml-2">Featured?</label>
+        </div>
+      </div>
+
+
+      <!-- Description -->
+      <div class="flex w-full mt-3">
+        <div class="basis-3/4 px-2">
+          <p-floatlabel variant="on">
+            <textarea pTextarea id="description" name="description" [(ngModel)]="product.description"
+              #description="ngModel" required [autoResize]="true" rows="3" class="w-full"></textarea>
+            <label for="description">Description of the product</label>
+          </p-floatlabel>
+          @if(description.invalid && description.touched){<small class="p-error text-red-800">Product description is
+            required</small>}
+        </div>
+      </div>
+    </div>
+  </p-fluid>
+</form>
+<!-- Sizes Table -->
+<p-fluid class="flex flex-col md:flex-row gap-8 mt-5">
+  <div class="md:w-2/2">
+    <div class="card flex flex-col gap-4">
+      <div class="flex justify-between items-center">
+        <div class="font-semibold text-xl">Product Sizes</div>
+        @if(showeErrorSuggestionSize){<span class="p-error text-red-800 ">(NOTE : All fields are mandatory to be
+          filled)</span>}
+        <div>
+          <p-button label="Add Size" icon="pi pi-plus" severity="warn" raised (click)="addSize()"
+            pTooltip="Add new size" tooltipPosition="left"></p-button>
+        </div>
+      </div>
+
+      <p-table [value]="product.sizes" dataKey="sku" editMode="row" [responsiveLayout]="'scroll'" class="w-full">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Size</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Discount %</th>
+            <th>SKU</th>
+            <th>HSN</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-size let-editing="editing">
+          <tr [pEditableRow]="size">
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input"><input pInputText [(ngModel)]="size.size" /></ng-template>
+                <ng-template pTemplate="output">{{ size.size }}</ng-template>
+              </p-cellEditor>
+            </td>
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input"><p-inputnumber [(ngModel)]="size.price" mode="decimal" /></ng-template>
+                <ng-template pTemplate="output">{{ size.price }}</ng-template>
+              </p-cellEditor>
+            </td>
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input"><p-inputnumber [(ngModel)]="size.quantity" /></ng-template>
+                <ng-template pTemplate="output">{{ size.quantity }}</ng-template>
+              </p-cellEditor>
+            </td>
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input"><p-inputnumber [(ngModel)]="size.discountPercentage"
+                    suffix="%" /></ng-template>
+                <ng-template pTemplate="output">{{ size.discountPercentage }}%</ng-template>
+              </p-cellEditor>
+            </td>
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input"><input pInputText [(ngModel)]="size.sku" /></ng-template>
+                <ng-template pTemplate="output">{{ size.sku }}</ng-template>
+              </p-cellEditor>
+            </td>
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input"><input pInputText [(ngModel)]="size.hsnCode" /></ng-template>
+                <ng-template pTemplate="output">{{ size.hsnCode }}</ng-template>
+              </p-cellEditor>
+            </td>
+
+            <td>
+              <div class="flex gap-2">
+                @if(!editing){<p-button icon="pi pi-pencil" severity="info" outlined rounded raised
+                  pInitEditableRow></p-button>}
+                @if(editing){<p-button icon="pi pi-check" severity="success" outlined rounded raised
+                  pSaveEditableRow></p-button>}
+                @if(editing){<p-button icon="pi pi-times" severity="secondary" outlined rounded raised
+                  pCancelEditableRow></p-button>}
+                <p-button icon="pi pi-trash" severity="danger" outlined rounded raised
+                  (click)="removeSize(size)"></p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</p-fluid>
+
+<p-fluid class="w-full mt-5">
+  <div class="w-full">
+    <div class="card flex flex-col gap-4 p-4">
+      <h5 class="text-lg font-semibold">Upload Product Images</h5>
+
+      @if(showeErrorSuggestionFile){
+        <span class="p-error text-red-800 text-sm">
+          (NOTE : All fields are mandatory to be filled)
+        </span>
+      }
+
+      <p-fileupload
+        name="files[]"
+        (onSelect)="onFileSelect($event)"
+        (onRemove)="onFileRemove($event)"
+        (onClear)="onClearFiles()"
+        [multiple]="true"
+        accept="image/*"
+        maxFileSize="1000000"
+        mode="advanced"
+        styleClass="w-full"
+        chooseLabel="Choose"
+        uploadLabel="Upload"
+        cancelLabel="Cancel"
+      >
+        <ng-template #empty>
+          <div class="text-center text-gray-500">
+            Drag and drop files here to upload.
+          </div>
+        </ng-template>
+      </p-fileupload>
+    </div>
+  </div>
+</p-fluid>
+
+<p-fluid class="flex flex-col md:flex-row gap-6 mt-5">
+  <div class="w-full md:w-1/2 flex ">
+    <div class="card flex flex-col gap-4 p-4 justify-end">
+      <p-button pTooltip="save" tooltipPosition="left" label="Save Product" icon="pi pi-save" raised type="button"
+        (click)="onSubmit(formRef)" severity="warn" size="large">
+      </p-button>
+    </div>
+  </div>
+</p-fluid>

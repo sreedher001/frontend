@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class JwtHelper {
+    
   decodeToken(token: string): any {
     if (!token) return null;
 
@@ -30,6 +31,11 @@ export class JwtHelper {
   getUserRoles(): string[] {
     const user = this.getUserDetails();
     return user?.roles || [];
+  }
+
+   getUserInfo(): any {
+    const user = this.getUserDetails();
+    return user;
   }
 
   isTokenExpired(): boolean {

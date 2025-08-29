@@ -8,6 +8,7 @@ import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
 import { LoginRequest, LoginService } from './login.service';
+import { JwtHelper } from '@/jwt/jwt-helper';
 
 @Component({
     selector: 'app-login',
@@ -15,7 +16,7 @@ import { LoginRequest, LoginService } from './login.service';
     imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator],
     template: `
         <app-floating-configurator />
-        <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
+        <div class="bg-surface-50 dark:bg-surface-950 animated-bg flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
             <div class="flex flex-col items-center justify-center">
                 <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                     <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
@@ -47,12 +48,12 @@ import { LoginRequest, LoginService } from './login.service';
                                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
                             </div>
                             <p-button label="Sign In" styleClass="w-full" (onClick)="onLogin()"></p-button>
+
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    `
+        </div>`
 })
 export class Login {
     email: string = '';
@@ -61,7 +62,7 @@ export class Login {
 
     checked: boolean = false;
 
-    constructor(private loginService: LoginService, private router: Router) { }
+    constructor(private loginService: LoginService, private router: Router,private jwtHelper:JwtHelper) { }
 
     onLogin() {
         const loginPayload: LoginRequest = {
@@ -75,6 +76,9 @@ export class Login {
                 const token = res?.token; // Make sure `res.token` contains the JWT
                 if (token) {
                     localStorage.setItem('authToken', token);
+                    localStorage.setItem('isLoggedIn',"true");
+                    const userInfo =  this.jwtHelper.getUserInfo();
+                    localStorage.setItem('userName', userInfo?.name);
                 }
 
                 this.router.navigate(['/products']);
