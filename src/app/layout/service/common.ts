@@ -25,19 +25,19 @@ export class CommonService {
             this.domain = 'http://localhost:8080/dev';
             break;
       case 'dev':
-        this.domain = 'https://o0y0tzrazj.execute-api.eu-north-1.amazonaws.com';
+        this.domain = 'https://o0y0tzrazj.execute-api.eu-north-1.amazonaws.com/dev';
         break;
       case 'qa':
-        this.domain = 'https://qa-api.example.com';
+        this.domain = 'https://qa-api.example.com/qa';
         break;
       case 'stage':
-        this.domain = 'https://stage-api.example.com';
+        this.domain = 'https://stage-api.example.com/stage';
         break;
       case 'prod':
-        this.domain = 'https://prod-api.example.com';
+        this.domain = 'https://prod-api.example.com/prod';
         break;
       default:
-        this.domain = 'https://o0y0tzrazj.execute-api.eu-north-1.amazonaws.com';
+        this.domain = 'https://o0y0tzrazj.execute-api.eu-north-1.amazonaws.com/dev';
         break;
     }
 
