@@ -29,12 +29,12 @@ export class LoginService {
     return this.http.post<LoginResponse>(
      this.baseUrl+"/auth/signin",
       loginRequest,
-      {
-       // withCredentials: true, // ensures cookies like JWT are sent/received
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json'
-        })
-      }
+      // {
+      //  // withCredentials: true, // ensures cookies like JWT are sent/received
+      //   headers: new HttpHeaders({
+      //     'Content-Type': 'application/json'
+      //   })
+      // }
     );
   }
 }
