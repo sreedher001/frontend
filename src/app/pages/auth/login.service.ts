@@ -30,7 +30,7 @@ export class LoginService {
      this.baseUrl+"/auth/signin",
       loginRequest,
       {
-        withCredentials: true, // ensures cookies like JWT are sent/received
+       // withCredentials: true, // ensures cookies like JWT are sent/received
         headers: new HttpHeaders({
           'Content-Type': 'application/json'
         })

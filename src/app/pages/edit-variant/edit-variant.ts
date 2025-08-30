@@ -109,9 +109,11 @@ images:any[]=[];
 deletedImageIds: number[] = [];
 filteredStatuses: any[] = [];
 displayConfirmation:boolean=false;
+maxFilesize:any;
   ngOnInit() {
     // this.product=this.getEmptyProduct();
     // const variantId = +this.route.snapshot.paramMap.get('variantId')!;
+    this.maxFilesize=1000000;
     const variantId = 3;
     this.loadProductByVariantId(variantId);
 
@@ -200,11 +202,16 @@ removeSize(sizeId: number) {
         this.messageService.add({ key: 'global',severity: 'info', summary: 'Success', detail: 'File Uploaded' });
     }
     onFileSelect(event: any) {
-        for (const file of event.files) {
-            this.uploadedFiles.push(file);
-        }
-
-        this.messageService.add({ key: 'global',severity: 'info', summary: 'Success', detail: 'File Uploaded' });
+         for (const file of event.files) {
+      
+      if(! (file.size > this.maxFilesize)){
+       
+      this.uploadedFiles.push(file);
+       this.messageService.add({ key: 'global', severity: 'info', summary: 'Success!', detail: file.name+' selected',sticky:true });
+      }else{
+        this.messageService.add({ key: 'global', severity: 'warn', summary: 'Too Large!', detail: file.name+' not selected',sticky:true });
+      }
+    }
     }
     responsiveOptions = [
     { breakpoint: '1024px', numVisible: 3 },

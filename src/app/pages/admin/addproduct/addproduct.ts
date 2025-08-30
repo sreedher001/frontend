@@ -93,6 +93,7 @@ export class Addproduct implements OnInit {
   loading: boolean = true;
   hasGenderCategory:boolean=false;
   hasSubCategory:boolean=false;
+  maxFilesize:any;
   hasInvalidSizes(): boolean {
     if (this.product.sizes === null || this.product.sizes.length === 0) return false;
     return this.product.sizes.some((size: any) =>
@@ -169,6 +170,7 @@ export class Addproduct implements OnInit {
   constructor(private route: ActivatedRoute, private productService: ProductService, private addProductService: Addproductservice,
     private messageService: MessageService) { }
   ngOnInit(): void {
+    this.maxFilesize=1000000;
     this.loading = true;
     this.getColor();
     this.getcategory();
@@ -315,11 +317,19 @@ onGenderCategorySelect(event: any) {
     this.messageService.add({ key: 'global', severity: 'info', summary: 'Success', detail: 'File Uploaded' });
   }
   onFileSelect(event: any) {
+    
     for (const file of event.files) {
+      
+      if(! (file.size > this.maxFilesize)){
+       
       this.uploadedFiles.push(file);
+       this.messageService.add({ key: 'global', severity: 'info', summary: 'Success!', detail: file.name+' selected',sticky:true });
+      }else{
+        this.messageService.add({ key: 'global', severity: 'warn', summary: 'Too Large!', detail: file.name+' not selected',sticky:true });
+      }
     }
     console.log("==", this.uploadedFiles)
-    this.messageService.add({ key: 'global', severity: 'info', summary: 'Success', detail: 'File selected' });
+   
   }
   onFileRemove(event: any) {
     const fileToRemove = event.file;
