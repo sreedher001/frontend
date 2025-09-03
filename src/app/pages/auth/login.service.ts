@@ -37,4 +37,9 @@ export class LoginService {
       // }
     );
   }
+
+
+   signup(payload: any): Observable<any> {
+    return this.http.post(this.baseUrl+"/auth/signup", payload);
+  }
 }

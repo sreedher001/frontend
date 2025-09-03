@@ -1,0 +1,173 @@
+<p-fluid class="flex flex-wrap items-center justify-between gap-4">
+  <div class="card flex flex-wrap items-center justify-between w-full">
+    <!-- Interactive heading -->
+    <div class="flex-1 min-w-[150px]">
+      <h2 class="font-bold text-2xl text-orange-500 flex items-center gap-2">
+        <i class="pi pi-user-plus text-orange-500"></i>
+        Create Your Account
+      </h2>
+      <p class="text-sm text-gray-600 mt-1">
+        Join us today — it only takes a minute to get started!
+      </p>
+    </div>
+
+    <!-- Sign Up button on right corner -->
+    <div class="flex justify-end items-center">
+      <button pButton type="submit" form="signupForm" label="Sign Up" icon="pi pi-check" iconPos="right"
+        class="p-button-raised p-button-success" [disabled]="loading"></button>
+    </div>
+  </div>
+</p-fluid>
+
+<form #formRef="ngForm" id="signupForm" (ngSubmit)="onSubmit(formRef)" novalidate>
+  <p-fluid class="flex mt-5">
+    <div class="card flex flex-col gap-6 w-full">
+      <div class="font-semibold text-xl">
+        Enter Signup Details
+
+      </div>
+
+      <div class="flex flex-wrap w-full">
+        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <input pInputText id="username" name="username" [(ngModel)]="user.username" #username="ngModel" required
+              class="w-full" />
+            <label for="username">Username</label>
+          </p-floatlabel>
+          @if(username.invalid && username.touched){
+          <small class="p-error text-red-800">Username is required</small>
+          }
+        </div>
+
+        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <input pInputText type="email" id="email" name="email" [(ngModel)]="user.email" #email="ngModel" required
+              email class="w-full" />
+            <label for="email">Email</label>
+          </p-floatlabel>
+          @if(email.invalid && email.touched){
+          <small class="p-error text-red-800">Valid email is required</small>
+          }
+        </div>
+
+        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <input pInputText pInputMask id="phone" name="phone" [(ngModel)]="user.phoneNumber" #phone="ngModel" required
+              class="w-full" />
+            <label for="phone">Phone Number</label>
+          </p-floatlabel>
+          @if(phone.invalid && phone.touched){
+          <small class="p-error text-red-800">Phone number is required</small>
+          }
+        </div>
+
+        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <input pInputText id="country" name="country" [(ngModel)]="user.country" #country="ngModel" required
+              class="w-full" />
+            <label for="country">Country</label>
+          </p-floatlabel>
+          @if(country.invalid && country.touched){
+          <small class="p-error text-red-800">Country is required</small>
+          }
+        </div>
+
+        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <input pInputText id="state" name="state" [(ngModel)]="user.state" #state="ngModel" required
+              class="w-full" />
+            <label for="state">State</label>
+          </p-floatlabel>
+          @if(state.invalid && state.touched){
+          <small class="p-error text-red-800">State is required</small>
+          }
+        </div>
+        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <input pInputText pInputMask id="pinCode" name="pinCode" [(ngModel)]="user.pinCode" #pinCode="ngModel"
+              required class="w-full" />
+            <label for="pinCode">Pin Code</label>
+          </p-floatlabel>
+          @if(pinCode.invalid && pinCode.touched){
+          <small class="p-error text-red-800">Pin code is required</small>
+          }
+        </div>
+
+        <div class="w-full px-2 mb-4">
+          <p-floatlabel variant="on">
+            <textarea pTextarea id="address" name="address" [(ngModel)]="user.address" #address="ngModel" required
+              rows="3" class="w-full"></textarea>
+            <label for="address">Address</label>
+          </p-floatlabel>
+          @if(address.invalid && address.touched){
+          <small class="p-error text-red-800">Address is required</small>
+          }
+        </div>
+
+        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <p-password [(ngModel)]="user.password" name="password" #password="ngModel" required inputId="password"
+              [toggleMask]="true" class="w-full">
+              <ng-template #header>
+                <div class="font-semibold text-sm mb-2">Password Strength</div>
+              </ng-template>
+              <ng-template #footer>
+                <p-divider />
+                <ul class="pl-2 my-0 leading-normal text-xs">
+                  <li>At least one lowercase</li>
+                  <li>At least one uppercase</li>
+                  <li>At least one numeric</li>
+                  <li>Minimum 8 characters</li>
+                </ul>
+              </ng-template>
+            </p-password>
+            <label for="password">Password</label>
+          </p-floatlabel>
+          @if(password.invalid && password.touched){
+          <small class="p-error text-red-800">Password is required</small>
+          }
+        </div>
+        <!-- Confirm Password -->
+        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <p-password [(ngModel)]="user.confirmPassword" name="confirmPassword" #confirmPassword="ngModel" required
+              inputId="confirmPassword" [toggleMask]="false" class="w-full"></p-password>
+            <label for="confirmPassword">Confirm Password</label>
+          </p-floatlabel>
+
+          @if(confirmPassword.invalid && confirmPassword.touched){
+          <small class="p-error text-red-800">Confirm Password is required</small>
+          }
+          @if(user.password && user.confirmPassword && user.password !== user.confirmPassword){
+          <small class="p-error text-red-800">Passwords do not match</small>
+          }
+        </div>
+
+       @if(isAdmin){ <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
+  <p-floatLabel variant="on">
+    <p-multiSelect
+      id="roles" name="roles"
+      [options]="roleOptions"
+      [(ngModel)]="user.roles"
+      optionLabel="label"
+      optionValue="value"
+      display="chip"
+      class="w-full" #roles="ngModel"
+    ></p-multiSelect>
+    <label for="roles">Roles</label>
+  </p-floatLabel>
+</div>}
+
+      </div>
+    </div>
+
+  </p-fluid>
+
+  <div class="card w-full mt-6">
+    <div class="flex justify-end p-4">
+      <p-button pTooltip="Create Account" tooltipPosition="left" label="Create My Account" icon="pi pi-check" raised
+        type="submit" severity="warn" size="large" [disabled]="loading">
+      </p-button>
+    </div>
+  </div>
+</form>
