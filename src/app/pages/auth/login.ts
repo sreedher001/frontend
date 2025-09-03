@@ -9,6 +9,7 @@ import { RippleModule } from 'primeng/ripple';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
 import { LoginRequest, LoginService } from './login.service';
 import { JwtHelper } from '@/jwt/jwt-helper';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-login',
@@ -62,7 +63,7 @@ export class Login {
 
     checked: boolean = false;
 
-    constructor(private loginService: LoginService, private router: Router,private jwtHelper:JwtHelper) { }
+    constructor(private loginService: LoginService, private router: Router, private jwtHelper: JwtHelper, private messageService: MessageService) { }
 
     onLogin() {
         const loginPayload: LoginRequest = {
@@ -72,23 +73,40 @@ export class Login {
 
         this.loginService.loginUser(loginPayload).subscribe({
             next: (res) => {
+                this.messageService.add({
+                    key: 'global',
+                    severity: 'success',
+                    summary: 'TADA! You’re in!',
+                    //detail: err.error?.message || 'Username/password is incorrect'
+                    detail:'Welcome to ZFC — ready to shop? Let’s go!',
+                    sticky:false
+                });
                 console.log('Login success', res);
                 const token = res?.token; // Make sure `res.token` contains the JWT
                 if (token) {
                     localStorage.setItem('authToken', token);
-                    localStorage.setItem('isLoggedIn',"true");
-                    const userInfo =  this.jwtHelper.getUserInfo();
+                    localStorage.setItem('isLoggedIn', "true");
+                    const userInfo = this.jwtHelper.getUserInfo();
                     localStorage.setItem('userName', userInfo?.name);
                 }
 
-                this.router.navigate(['/products']);
-                this.email="";
-                this.password="";
+                this.router.navigate(['/']);
+                this.email = "";
+                this.password = "";
             },
             error: (err) => {
-                console.error('Login failed', err);
-                this.email="";
-                this.password="";
+
+                this.email = "";
+                this.password = "";
+                this.messageService.add({
+                    key: 'global',
+                    severity: 'error',
+                    summary: 'Login Failed',
+                    //detail: err.error?.message || 'Username/password is incorrect'
+                    detail:'Username/password is incorrect',
+                    sticky:true
+                });
+
             }
         });
     }

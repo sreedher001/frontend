@@ -110,12 +110,19 @@ deletedImageIds: number[] = [];
 filteredStatuses: any[] = [];
 displayConfirmation:boolean=false;
 maxFilesize:any;
+constructor(private route: ActivatedRoute, private productService: ProductService,
+    private messageService: MessageService) { }
   ngOnInit() {
     // this.product=this.getEmptyProduct();
-    // const variantId = +this.route.snapshot.paramMap.get('variantId')!;
+     
     this.maxFilesize=1000000;
-    const variantId = 3;
-    this.loadProductByVariantId(variantId);
+   // const variantId = 3;
+   this.route.queryParams.subscribe(params => {
+      const variantId = params['variantId'];
+      if (variantId) {
+        this.loadProductByVariantId(variantId);
+      }
+    });
 
     this.getColor();
 
@@ -133,8 +140,7 @@ maxFilesize:any;
   );
 }
 
-  constructor(private route: ActivatedRoute, private productService: ProductService,
-    private messageService: MessageService) { }
+  
 
 
   loadProductByVariantId(variantId: number): void {

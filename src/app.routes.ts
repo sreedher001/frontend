@@ -10,16 +10,18 @@ import { Cart } from '@/pages/cart/cart';
 import { EditVariant } from '@/pages/edit-variant/edit-variant';
 import { Addproduct } from '@/pages/admin/addproduct/addproduct';
 import { Signup } from '@/pages/auth/signup/signup';
+import { Manageproducts } from '@/pages/admin/manageproducts/manageproducts';
 export const appRoutes: Routes = [
     {
         path: '',
         component: AppLayout,
         children: [
-            { path: '', component: Dashboard },
-            { path: 'products', component: Products },
+            { path: 'admin/dashboard', component: Dashboard },
+            { path: '', component: Products },
             { path: 'product-details/:id', component: Productdetails },
             { path: 'admin/products/edit', component: EditVariant},
             { path: 'admin/products/add', component: Addproduct},
+            { path: 'admin/products/manageproducts', component: Manageproducts},
             { path: 'cart', component: Cart},
             { path: 'auth/signup', component: Signup},
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },

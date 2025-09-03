@@ -60,10 +60,22 @@ export class Products implements OnInit {
       next: (res) => {
         this.products = res.content;
         this.loading = false;
+        this.messageService.add({
+          key: 'global',
+          severity: 'success',
+          summary: 'TADA!',
+          detail: 'Enjoy shopping with ZFC!'
+        });
       },
       error: (err) => {
         console.error('Failed to fetch products:', err);
         this.loading = false;
+         this.messageService.add({
+          key: 'global',
+          severity: 'error',
+          summary: 'Oops!',
+          detail: 'Failed to fetch the products'
+        });
       }
     });
 
