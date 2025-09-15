@@ -42,6 +42,11 @@ import { TableModule } from 'primeng/table';
 import { GalleriaModule } from 'primeng/galleria';
 import { Tooltip, TooltipModule } from "primeng/tooltip";
 import { DialogModule } from 'primeng/dialog';
+import { SeasonService } from '../service/season.service';
+import { FitService } from '../service/fit.service';
+import { PatternService } from '../service/pattern.service';
+import { OccasionService } from '../service/occation.service';
+import { Addproductservice } from '../admin/addproduct/addproductservice';
 
 @Component({
   selector: 'app-input-demo',
@@ -93,12 +98,25 @@ export class EditVariant implements OnInit {
 
   switchValue: boolean = false;
 
+  autoFitValue: any[] | undefined;
+  autoPatternValue: any[] | undefined;
+  autoSeasonValue: any[] | undefined;
+  autoOccasionValue: any[] | undefined;
+autoFilteredSeasonValue: any[] = [];
+  autoFilteredOccasionValue: any[] = [];
+  autoFilteredStyleCategoryValue: any[] = [];
 
+  autoFilteredFitValue: any[] = [];
+  autoFilteredPatternValue: any[] = [];
 
 statuses: string[] = ['IN_STOCK', 'OUT_OF_STOCK', 'LOW_STOCK'];
 
   
   colorService = inject(ColorService)
+    fitService = inject(FitService);
+    patternService = inject(PatternService);
+    seasonService = inject(SeasonService);
+    occasionService = inject(OccasionService);
 
   nodeService = inject(NodeService);
 productResponse !: ProductResponse;
@@ -109,12 +127,21 @@ images:any[]=[];
 deletedImageIds: number[] = [];
 filteredStatuses: any[] = [];
 displayConfirmation:boolean=false;
+styleCategory:any[] =[];
 maxFilesize:any;
-constructor(private route: ActivatedRoute, private productService: ProductService,
+rawStyleCategory: string='';
+isStyleCategoryLoaded = false;
+isProductLoaded = false;
+
+constructor(private route: ActivatedRoute, private productService: ProductService,private addProductService: Addproductservice,
     private messageService: MessageService) { }
   ngOnInit() {
-    // this.product=this.getEmptyProduct();
-     
+      this.getStyleCategory();
+      this.getColor();
+    this.getFit();
+    this.getSeason();
+    this.getPattern();
+    this.getOccasion();
     this.maxFilesize=1000000;
    // const variantId = 3;
    this.route.queryParams.subscribe(params => {
@@ -124,14 +151,59 @@ constructor(private route: ActivatedRoute, private productService: ProductServic
       }
     });
 
-    this.getColor();
+    
+    
 
     //this.nodeService.getFiles().then((data) => (this.treeSelectNodes = data));
   }
+
+  getStyleCategory() {
+    this.addProductService.getStyleCategory().subscribe({
+      next: (res: any) => {
+        this.styleCategory = res;
+this.isStyleCategoryLoaded = true;
+console.log("styeCat res",res);
+console.log("styeCat res--this.styleCategory",this.styleCategory);
+         this.tryMapStyleCategory();
+      },
+      error: (err: any) => {
+        this.messageService.add({
+          key: 'global',
+          severity: 'error',
+          summary: 'Error',
+          detail: err.error?.message || 'unable to get style Category'
+        });
+      }
+    });
+  }
+
   getColor() {
      this.colorService.getColors().then((colors) => {
       this.autoValue = colors;
     });}
+
+    getFit() {
+    this.fitService.getFits().then((fits) => {
+      this.autoFitValue = fits;
+    });
+  }
+  getPattern() {
+    this.patternService.getPatterns().then((patterns) => {
+      this.autoPatternValue = patterns;
+    });
+  }
+   getSeason() {
+    this.seasonService.getSeasons().then((season) => {
+      this.autoSeasonValue = season;
+      this.autoFilteredSeasonValue = season;
+    });
+  }
+  getOccasion() {
+    this.occasionService.getOccasions().then((occasions) => {
+      this.autoOccasionValue= occasions;
+      this.autoFilteredOccasionValue=occasions;
+    });
+  }
 
     filterStatuses(event: any) {
   const query = event.query.toLowerCase();
@@ -140,13 +212,65 @@ constructor(private route: ActivatedRoute, private productService: ProductServic
   );
 }
 
-  
+tryMapStyleCategory() {
+  if (!this.isProductLoaded || !this.isStyleCategoryLoaded) {
+    return; // wait until both are ready
+  }
 
+  const raw = this.rawStyleCategory?.trim().toLowerCase();
+  console.log("rae",raw);
+  if (!raw) return;
+
+  const matched = this.styleCategory.find(item =>
+    item.styleCategory?.trim().toLowerCase() === raw
+  );
+  console.log("matched",matched);
+
+  if (matched) {
+    this.product.variant.styleCategory = matched;
+      console.log("====if matched",this.product.variant.styleCategory);
+  } else {
+    // fallback so at least something is shown
+    const custom = { id: 0, styleCategory: this.rawStyleCategory };
+  this.product.variant.styleCategory = custom;
+  this.styleCategory.push(custom);
+  }
+
+  // Reset flags so remapping doesn't happen again unnecessarily
+  this.isProductLoaded = false;
+  this.isStyleCategoryLoaded = false;
+}
 
   loadProductByVariantId(variantId: number): void {
     this.productService.getProductByVariantId(variantId).subscribe({
-      next: (response) => {
+      next: (response:any) => {
         this.product = response;
+
+        const sc = this.product.variant.styleCategory;
+      this.rawStyleCategory = typeof sc === 'string' ? sc : sc?.styleCategory;
+      //season
+        const seasonStr = this.product.variant.season; 
+if (typeof seasonStr === 'string') {
+  const selectedSeasons = seasonStr.split(',').map(s => s.trim());
+
+  this.product.variant.season = this.autoFilteredSeasonValue.filter(opt =>
+    selectedSeasons.includes(opt.name)
+  );
+}
+
+//occasion
+const occasionStr = this.product.variant.occasion; 
+if (typeof occasionStr === 'string') {
+  const selectedOccasions = occasionStr.split(',').map(s => s.trim());
+
+  this.product.variant.occasion = this.autoFilteredOccasionValue.filter(opt =>
+    selectedOccasions.includes(opt.name)
+  );
+}
+
+        this.isProductLoaded = true;
+        
+        this.tryMapStyleCategory();
         this.images = (this.product.variant.productImage || []).map((img:any) => ({
           
           itemImageSrc: img.imageUrl,
@@ -197,6 +321,75 @@ removeSize(sizeId: number) {
     }
 
     this.autoFilteredValue = filtered;
+  }
+
+  filterStyleCategory(event: AutoCompleteCompleteEvent) {
+    const query = event.query;
+    const filtered: any[] = [];
+
+    for (let i = 0; i < (this.styleCategory as any[]).length; i++) {
+      const item = (this.styleCategory as any[])[i];
+      if (item.styleCategory.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(item);
+      }
+    }
+
+    this.autoFilteredStyleCategoryValue = filtered;
+  }
+
+  filterFitItem(event: AutoCompleteCompleteEvent) {
+    const query = event.query;
+    const filtered: any[] = [];
+
+    for (let i = 0; i < (this.autoFitValue as any[]).length; i++) {
+      const item = (this.autoFitValue as any[])[i];
+      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(item);
+      }
+    }
+
+    this.autoFilteredFitValue = filtered;
+  }
+  filterPatternItem(event: AutoCompleteCompleteEvent) {
+    const query = event.query;
+    const filtered: any[] = [];
+
+    for (let i = 0; i < (this.autoPatternValue as any[]).length; i++) {
+      const item = (this.autoPatternValue as any[])[i];
+      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(item);
+      }
+    }
+
+    this.autoFilteredPatternValue = filtered;
+  }
+
+  filterSeasonItem(event: AutoCompleteCompleteEvent) {
+    const query = event.query;
+    const filtered: any[] = [];
+
+    for (let i = 0; i < (this.autoSeasonValue as any[]).length; i++) {
+      const item = (this.autoSeasonValue as any[])[i];
+      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(item);
+      }
+    }
+
+    this.autoFilteredSeasonValue = filtered;
+  }
+
+  filterOccationItem(event: AutoCompleteCompleteEvent) {
+    const query = event.query;
+    const filtered: any[] = [];
+
+    for (let i = 0; i < (this.autoOccasionValue as any[]).length; i++) {
+      const item = (this.autoOccasionValue as any[])[i];
+      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(item);
+      }
+    }
+
+    this.autoFilteredOccasionValue = filtered;
   }
 
 
@@ -264,7 +457,16 @@ updateVariant() {
   const metadata = {
     id: this.product.variant.id,
     color: this.product.variant.color,
-    imagesToRemove: this.deletedImageIds, // deleted images
+    description:this.product.variant.variantDescription,
+    fit:this.product.variant.fit,
+    pattern:this.product.variant.pattern,
+    rating:this.product.variant.rating,
+    season:this.product.variant.season.map((s:any) => s.name).join(','),
+    styleCategory:this.product.variant.styleCategory.styleCategory,
+    variantName:this.product.variant.variantName,
+    occasion:this.product.variant.occasion.map((s:any) => s.name).join(','),
+    isFeatured:this.product.variant.isFeatured,
+    imagesToRemove: this.deletedImageIds, 
     sizes: this.product.variant.sizes
   };
 
@@ -286,6 +488,7 @@ updateVariant() {
         summary: 'Saved!',
         detail: res.message || 'Variant updated successfully'
       });
+      this.displayConfirmation = false;
     },
     error: (err:any) => {
       this.messageService.add({

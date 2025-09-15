@@ -1,6 +1,6 @@
 <p-toolbar class="mb-6">
     <ng-template #start>
-        <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
+        <p-button label="Add New Product" icon="pi pi-plus" severity="warn" raised class="mr-2" (onClick)="openNew()" />
 
     </ng-template>
 
@@ -53,7 +53,7 @@
                 <p-tag [value]="item.status" [severity]="getSeverity(item.status)" />
             </td>
             <td>
-                <p-button icon="pi pi-pencil raised" class="mr-2" [rounded]="true" [outlined]="true"
+                <p-button icon="pi pi-pencil"  raised class="mr-2" label="View/Edit" severity="warn" outlined
                     (click)="editProduct(item)" />
             </td>
         </tr>

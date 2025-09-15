@@ -8,6 +8,8 @@ import { CommonService } from '@/layout/service/common';
   providedIn: 'root'
 })
 export class Addproductservice {
+  
+  
    commonService:CommonService = new CommonService;
       private apiUrl = this.commonService.baseUrl;
 
@@ -23,5 +25,12 @@ export class Addproductservice {
 
    getSubCategory(genderCategoryId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/admin/products/gendercategory/${genderCategoryId}/subcategory`);
+  }
+  getAllProductName() {
+    return this.http.get<any>(`${this.apiUrl}/admin/products/productname`);
+  }
+
+  getStyleCategory(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/admin/products/stylecategory`);
   }
 }

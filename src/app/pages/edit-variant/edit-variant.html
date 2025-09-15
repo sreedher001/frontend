@@ -28,20 +28,20 @@
 </p-fluid>
 
 <p-fluid class="flex mt-5">
-  <div class="card flex flex-col gap-6 w-full">
+  <div class="card flex flex-col gap-6 w-full ">
     <div class="font-semibold text-xl">Product Level Details</div>
 
     <div class="flex flex-wrap w-full">
 
       <!-- Name (null-safe display) -->
-      <div class="basis-1/4 px-2 ">
+      <div class="w-full sm:w-1/2 lg:w-1/4  px-2 mb-4">
         <p-floatlabel variant="on">
-          <input pInputText id="name" type="text" [ngModel]="product?.name || '—'" [disabled]="true" class="w-full" />
+          <input pInputText id="name" type="text" [ngModel]="product.name || '—'" [disabled]="true" class="w-full" />
           <label for="name">Name</label>
         </p-floatlabel>
       </div>
       <!-- Gender Category -->
-      <div class="basis-1/4 px-2">
+      <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
         <p-floatlabel variant="on">
           <input pInputText id="genderCategory" type="text" [(ngModel)]="product.genderCategory" [disabled]="true"
             class="w-full" />
@@ -50,31 +50,21 @@
       </div>
 
       <!-- Category -->
-      <div class="basis-1/4 px-2">
+      <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
         <p-floatlabel variant="on">
           <input pInputText id="category" type="text" [(ngModel)]="product.category" [disabled]="true" class="w-full" />
           <label for="category">Category</label>
         </p-floatlabel>
       </div>
-
-      <!-- Rating -->
-      <div class="basis-1/4 px-2 ">
+      <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
         <p-floatlabel variant="on">
-          <input pInputText id="rating" type="number" [(ngModel)]="product.rating" [disabled]="true" class="w-full" />
-          <label for="rating">Rating</label>
-        </p-floatlabel>
-      </div>
-      <!-- Is Featured -->
-      <div class="basis-1/4 px-2 mt-3">
-        <p-floatlabel variant="on">
-          <input pInputText id="isFeatured" type="text"
-            [ngModel]="product.isFeatured !== null ? product.isFeatured : false" [disabled]="true" class="w-full" />
-          <label for="isFeatured">Featured</label>
+          <input pInputText id="subCategory" type="text" [(ngModel)]="product.subCategory" [disabled]="true" class="w-full" />
+          <label for="category">Sub Category</label>
         </p-floatlabel>
       </div>
 
       <!-- Uploaded At -->
-      <div class="basis-1/4 px-2 mt-3 ">
+      <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
         <p-floatlabel variant="on">
           <input pInputText id="uploadedAt" type="text" [ngModel]="product.uploadedAt || '—'" [disabled]="true"
             class="w-full" />
@@ -84,7 +74,7 @@
 
     </div>
     <div class="flex w-full">
-      <div class="basis-3/4 px-2 ">
+      <div class="basis-4/4 px-2 ">
         <p-floatlabel variant="on">
           <textarea pTextarea placeholder="product description" [(ngModel)]="product.description" [autoResize]="true"
             rows="3" cols="100" [disabled]="true"></textarea>
@@ -95,26 +85,150 @@
   </div>
 </p-fluid>
 <p-fluid class="flex flex-col md:flex-row gap-8 mt-5">
-  <div class="md:w-2/2">
+  <div class="md:w-4/4">
     <div class="card flex flex-col gap-4">
       <div class="font-semibold text-xl">Variant Details</div>
       <div class="flex flex-wrap w-full">
 
-        <div class="basis-1/2 px-2 ">
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 px-2 ">
           <p-floatlabel variant="on">
             <input pInputText id="id" type="text" [ngModel]="product?.variant.id || '—'" [disabled]="true"
               class="w-full" />
             <label for="id">Variant Id</label>
           </p-floatlabel>
         </div>
-        <div class="basis-1/2 px-2">
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 px-2 ">
           <p-floatlabel variant="on">
-            <p-autocomplete [(ngModel)]="product.variant.color" [suggestions]="autoFilteredValue" optionLabel="name"
+            <p-autocomplete [(ngModel)]="product.variant.color" [suggestions]="autoFilteredValue" optionLabel="name" [disabled]="true"
               field="name" dropdown (completeMethod)="filterCountry($event)" inputId="variantColor" class="w-full">
             </p-autocomplete>
             <label for="variantColor">Variant Color</label>
           </p-floatlabel>
         </div>
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 px-2 ">
+          <p-floatlabel variant="on">
+            <input pInputText id="variantName" type="text" [(ngModel)]="product.variant.variantName" name="variantName"
+              class="w-full" />
+            <label for="variantName">Variant Name</label>
+          </p-floatlabel>
+        </div>
+
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <p-autocomplete [(ngModel)]="product.variant.styleCategory" [suggestions]="autoFilteredStyleCategoryValue" optionLabel="styleCategory" 
+              field="styleCategory" dropdown (completeMethod)="filterStyleCategory($event)" inputId="styleCategory" class="w-full">
+            </p-autocomplete>
+            <label for="styleCategory">Style Category</label>
+          </p-floatlabel>
+        </div>
+
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 ">
+          <p-floatlabel variant="on">
+            <p-autocomplete [(ngModel)]="product.variant.fit" [suggestions]="autoFilteredFitValue" optionLabel="name" 
+              field="fit" dropdown (completeMethod)="filterFitItem($event)" inputId="fit" class="w-full">
+            </p-autocomplete>
+            <label for="fit">Fit</label>
+          </p-floatlabel>
+        </div>
+
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 ">
+          <p-floatlabel variant="on">
+            <p-autocomplete [(ngModel)]="product.variant.pattern" [suggestions]="autoFilteredPatternValue" optionLabel="name" 
+              field="pattern" dropdown (completeMethod)="filterPatternItem($event)" inputId="pattern" class="w-full">
+            </p-autocomplete>
+            <label for="pattern">Pattern</label>
+          </p-floatlabel>
+        </div>
+        <!-- season-->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <p-multiSelect 
+      [(ngModel)]="product.variant.season" 
+      name="seasons" 
+      #seasons="ngModel"
+      [options]="autoFilteredSeasonValue" 
+      optionLabel="name" 
+      display="chip"
+      inputId="season" 
+      class="w-full" 
+      required>
+    </p-multiSelect>
+    <label for="season">Season of Wearing</label>
+  </p-floatlabel>
+  @if(seasons.invalid && seasons.touched){
+    <small class="p-error text-red-800">At least one season is required</small>
+  }
+</div>
+
+        
+
+        <!-- occasion -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 ">
+  <p-floatlabel variant="on">
+    <p-multiSelect 
+      [(ngModel)]="product.variant.occasion" 
+      name="occasions" 
+      #occasions="ngModel"
+      [options]="autoFilteredOccasionValue" 
+      optionLabel="name" 
+      display="chip"
+      inputId="occasion" 
+      class="w-full" 
+      required>
+    </p-multiSelect>
+    <label for="occasion">Occasions</label>
+  </p-floatlabel>
+  @if(occasions.invalid && occasions.touched){
+    <small class="p-error text-red-800">At least one occasion is required</small>
+  }
+</div>
+
+<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <label for="rating" class="block mb-1 font-medium text-gray-700">Rating</label>
+  <p-rating [(ngModel)]="product.variant.rating" name="rating" [stars]="5" inputId="rating"></p-rating>
+  @if(!product.variant.rating){
+    <small class="p-error text-red-800">Rating is required</small>
+  }
+</div>
+
+<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 flex items-center gap-4">
+  <!-- Label with Info Icon -->
+  <div class="flex items-center gap-1">
+    <label for="isFeatured" class="font-medium">Featured?</label>
+
+    <!-- Info Icon with Tooltip -->
+    <i 
+      class="pi pi-info-circle text-blue-500 cursor-pointer" 
+      pTooltip="Featured items are highlighted on the main product page for better visibility." 
+      tooltipPosition="top">
+    </i>
+  </div>
+
+  <!-- Toggle & Text Column -->
+  <div class="flex flex-col items-center gap-1">
+    <p-toggleswitch
+      [(ngModel)]="product.variant.isFeatured"
+      severity="success"
+      class="scale-125 shadow-md rounded-lg"
+    >
+      <ng-template #handle let-checked="checked">
+        <i [ngClass]="['!text-xs', 'pi', checked ? 'pi-check' : 'pi-times']"></i>
+      </ng-template>
+    </p-toggleswitch>
+  </div>
+</div>
+
+        <div class="flex w-full mt-4">
+      <div class="basis-4/4 px-2 ">
+        <p-floatlabel variant="on">
+          <textarea pTextarea placeholder="product description" [(ngModel)]="product.variant.variantDescription" [autoResize]="true"
+            rows="3" cols="100"></textarea>
+          <label for="description">Variant description</label>
+        </p-floatlabel>
+      </div>
+    </div>
+        
+
 
       </div>
 

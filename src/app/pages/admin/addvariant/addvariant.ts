@@ -27,7 +27,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { MessageService, TreeNode } from 'primeng/api';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductResponse } from '@/models/product-response.model';
 import { Product } from '@/models/product.model';
 import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
@@ -38,16 +38,15 @@ import { Tooltip, TooltipModule } from "primeng/tooltip";
 import { DialogModule } from 'primeng/dialog';
 import { ProductService } from '@/pages/products/product.service';
 import { ColorService } from '@/pages/service/color.service';
-import { Addproductservice } from './addproductservice';
+import { Addproductservice } from '../addproduct/addproductservice';
 import { FitService } from '@/pages/service/fit.service';
 import { PatternService } from '@/pages/service/pattern.service';
 import { SeasonService } from '@/pages/service/season.service';
 import { OccasionService } from '@/pages/service/occation.service';
 
 @Component({
-  selector: 'app-addproduct',
-  imports: [
-    CommonModule,
+  selector: 'app-addvariant',
+  imports: [CommonModule,
     FormsModule,
     InputTextModule,
     ButtonModule,
@@ -77,40 +76,83 @@ import { OccasionService } from '@/pages/service/occation.service';
     InputGroupAddonModule,
     TextareaModule, FileUploadModule, GalleriaModule,
     Tooltip, DialogModule],
-  templateUrl: './addproduct.html',
-  styleUrl: './addproduct.scss'
+  templateUrl: './addvariant.html',
+  styleUrl: './addvariant.scss'
 })
-export class Addproduct implements OnInit {
+export class Addvariant implements OnInit {
+
   showeErrorSuggestion: boolean = false;
   showeErrorSuggestionSize: boolean = false;
   showeErrorSuggestionFile: boolean = false;
   uploadedFiles: File[] = [];
   displayConfirmation: boolean = false;
   autoValue: any[] | undefined;
-  autoFitValue: any[] | undefined;
-  autoPatternValue: any[] | undefined;
-  autoSeasonValue: any[] | undefined;
-  autoOccasionValue: any[] | undefined;
-  category:any[] | undefined;
   styleCategory:any[] | undefined;
+  category:any[] | undefined;
+  productName:any[] | undefined;
   subCategory:any[] | undefined;
   genderCategory:any[] | undefined;
   autoFilteredValue: any[] = [];
   autoFilteredCategoryValue: any[] = [];
-  autoFilteredStyleCategoryValue: any[] = [];
+  autoFilteredProductName: any[] = [];  
   autoFilteredGenderCategoryValue: any[] = [];
   autoFilteredSubCategoryValue: any[] = [];
+  autoFilteredStyleCategoryValue:any[]=[];
   autoFilteredFitValue: any[] = [];
   autoFilteredPatternValue: any[] = [];
   autoFilteredSeasonValue: any[] = [];
+
+  autoFitValue: any[] | undefined;
+  autoPatternValue: any[] | undefined;
+  autoSeasonValue: any[] | undefined;
+  autoOccasionValue: any[] | undefined;
+
   autoFilteredOccasionValue: any[] = [];
   loading: boolean = true;
   hasGenderCategory:boolean=false;
   hasSubCategory:boolean=false;
   maxFilesize:any;
+  productresponse!:ProductResponse;
+  productFound:boolean =true;
+  product: any = {
+    name: '',
+    description: '',
+    category: '',
+    subCategory: '',
+    genderCategory: ''
+  }
+  variant:any={
+    color: '',
+    isFeatured: false,
+    styleCategory:'',
+    fit:'',
+    pattern:'',
+    season:'',
+    occasion:'',
+    rating:3,
+    variantName:'',
+    variantDescription:'',
+    sizes: [] // start with empty table
+  };
+productParentId:any;
+  constructor(private route: Router, private productService: ProductService, private addProductService: Addproductservice,
+    private messageService: MessageService) { }
+  ngOnInit(): void {
+    this.maxFilesize=1000000;
+    this.loading = true;
+    this.getColor();
+    this.getProductNames();
+    this.getcategory();
+    this.getStyleCategory();
+    this.getFit();
+    this.getSeason();
+    this.getPattern();
+    this.getOccasion();
+    this.loading = false;
+  }
   hasInvalidSizes(): boolean {
-    if (this.product.sizes === null || this.product.sizes.length === 0) return false;
-    return this.product.sizes.some((size: any) =>
+    if (this.variant.sizes === null || this.variant.sizes.length === 0) return false;
+    return this.variant.sizes.some((size: any) =>
       !size.size ||
       size.price == null || size.price === '' ||
       size.quantity == null || size.quantity === '' ||
@@ -118,10 +160,85 @@ export class Addproduct implements OnInit {
     );
   }
 
+checkParentProduct() {
+  const errors: string[] = [];
+
+  // Validate name (string or object with productName)
+  if (!this.product.name || (typeof this.product.name === 'object' && !this.product.name.productName)) {
+    errors.push('Product Name');
+  }
+
+  // Validate category (object with .category or string)
+  if (!this.product.category || (typeof this.product.category === 'object' && !this.product.category.category)) {
+    errors.push('Category');
+  }
+
+  // Validate genderCategory (object with .genderCategory or string)
+  if (!this.product.genderCategory || (typeof this.product.genderCategory === 'object' && !this.product.genderCategory.genderCategory)) {
+    errors.push('Gender Category');
+  }
+
+  // Validate subCategory (object with .subCategory or string)
+  if (!this.product.subCategory || (typeof this.product.subCategory === 'object' && !this.product.subCategory.subCategory)) {
+    errors.push('Sub Category');
+  }
+
+  // If any errors, show a toast
+  if (errors.length > 0) {
+    this.messageService.add({
+      key: 'global',
+      severity: 'warn',
+      summary: 'Incomplete Selection',
+      detail: `Please select: ${errors.join(', ')}`
+    });
+    return;
+  }
+
+  // If all fields valid, call backend API
+  const params = {
+    name: typeof this.product.name === 'string' ? this.product.name : this.product.name.productName,
+    category: typeof this.product.category === 'string' ? this.product.category : this.product.category.category,
+    genderCategory: typeof this.product.genderCategory === 'string' ? this.product.genderCategory : this.product.genderCategory.genderCategory,
+    subCategory: typeof this.product.subCategory === 'string' ? this.product.subCategory : this.product.subCategory.subCategory
+  };
+
+  this.productService.checkParentProduct(params).subscribe({
+    next: (res: any) => {
+      if (res?.productId) {
+        this.productFound=true;
+        this.productParentId=res?.productId;
+        this.messageService.add({
+          key: 'global',
+          severity: 'success',
+          summary: 'Parent Product Found',
+          detail: 'You can proceed with adding the variant.'
+        });
+
+        this.product.productId = res.productId;
+      } else {
+        this.messageService.add({
+          key: 'global',
+          severity: 'error',
+          summary: 'Not Found',
+          detail: 'No parent product found for the selected combination.Consider creating new Product',
+          sticky:true
+        });
+      }
+    },
+    error: (err:any) => {
+      this.messageService.add({
+        key: 'global',
+        severity: 'error',
+        summary: 'API Error',
+        detail: err.error?.message || 'Failed to check parent product.'
+      });
+    }
+  });
+}
 
   onSubmit(form: NgForm) {
     console.log("Button Clicked")
-    if (form.invalid || this.product.sizes.length === 0 || this.hasInvalidSizes() || this.uploadedFiles === null || this.uploadedFiles.length === 0) {
+    if (form.invalid || this.variant.sizes.length === 0 || this.hasInvalidSizes() || this.uploadedFiles === null || this.uploadedFiles.length === 0) {
       this.messageService.add({
         key: 'global',
         severity: 'error',
@@ -157,27 +274,10 @@ export class Addproduct implements OnInit {
     this.displayConfirmation = true;
   }
 
-  product: any = {
-    name: '',
-    description: '',
-    category: '',
-    subCategory: '',
-    genderCategory: '',
-    isFeatured: false,
-    styleCategory:'',
-    fit:'',
-    pattern:'',
-    season:'',
-    occasion:'',
-    rating:3,
-    variantName:'',
-    variantDescription:'',
-    color: '',
-    sizes: [],  // start with empty table
-  };
+  
 
   removeSize(size: any) {
-    this.product.sizes = this.product.sizes.filter((s: any) => s !== size);
+    this.variant.sizes = this.variant.sizes.filter((s: any) => s !== size);
   }
   addSize() {
     const newSize = {
@@ -190,24 +290,21 @@ export class Addproduct implements OnInit {
       hsnCode: '',
       inventoryStatus: 'IN_STOCK'
     };
-    this.product.sizes.push(newSize);
+    this.variant.sizes.push(newSize);
   }
 
-  constructor(private route: ActivatedRoute, private productService: ProductService, private addProductService: Addproductservice,
-    private messageService: MessageService) { }
-  ngOnInit(): void {
-    this.maxFilesize=1000000;
-    this.loading = true;
-    this.getColor();
-    this.getcategory();
-    this.getStyleCategory();
-    this.getFit();
-    this.getSeason();
-    this.getPattern();
-    this.getOccasion();
-    this.loading = false;
+  
+  getProductNames() {
+    this.addProductService.getAllProductName().subscribe({
+      next:(res:any)=>{
+this.productName = res;
+console.log("this.productName",this.productName);
+      }
+      
+    });
+   
   }
-  getStyleCategory() {
+getStyleCategory() {
     this.addProductService.getStyleCategory().subscribe({
       next: (res: any) => {
         this.styleCategory = res;
@@ -250,12 +347,10 @@ export class Addproduct implements OnInit {
     });
   }
 
-
   getcategory() {
     this.addProductService.getCategory().subscribe({
       next: (res: any) => {
         this.category = res;
-        console.log(this.category);
       },
       error: (err: any) => {
         this.messageService.add({
@@ -335,60 +430,18 @@ onGenderCategorySelect(event: any) {
 
     this.autoFilteredValue = filtered;
   }
-
-  filterFitItem(event: AutoCompleteCompleteEvent) {
+  filterProductName(event: AutoCompleteCompleteEvent) {
     const query = event.query;
     const filtered: any[] = [];
 
-    for (let i = 0; i < (this.autoFitValue as any[]).length; i++) {
-      const item = (this.autoFitValue as any[])[i];
-      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+    for (let i = 0; i < (this.productName as any[]).length; i++) {
+      const item = (this.productName as any[])[i];
+      if (item?.productName.toLowerCase().indexOf(query.toLowerCase()) == 0) {
         filtered.push(item);
       }
     }
 
-    this.autoFilteredFitValue = filtered;
-  }
-  filterPatternItem(event: AutoCompleteCompleteEvent) {
-    const query = event.query;
-    const filtered: any[] = [];
-
-    for (let i = 0; i < (this.autoPatternValue as any[]).length; i++) {
-      const item = (this.autoPatternValue as any[])[i];
-      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(item);
-      }
-    }
-
-    this.autoFilteredPatternValue = filtered;
-  }
-
-  filterSeasonItem(event: AutoCompleteCompleteEvent) {
-    const query = event.query;
-    const filtered: any[] = [];
-
-    for (let i = 0; i < (this.autoSeasonValue as any[]).length; i++) {
-      const item = (this.autoSeasonValue as any[])[i];
-      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(item);
-      }
-    }
-
-    this.autoFilteredSeasonValue = filtered;
-  }
-
-  filterOccationItem(event: AutoCompleteCompleteEvent) {
-    const query = event.query;
-    const filtered: any[] = [];
-
-    for (let i = 0; i < (this.autoOccasionValue as any[]).length; i++) {
-      const item = (this.autoOccasionValue as any[])[i];
-      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(item);
-      }
-    }
-
-    this.autoFilteredOccasionValue = filtered;
+    this.autoFilteredProductName = filtered;
   }
 
   filterCategory(event: AutoCompleteCompleteEvent) {
@@ -404,21 +457,6 @@ onGenderCategorySelect(event: any) {
 
     this.autoFilteredCategoryValue = filtered;
   }
-
-  filterStyleCategory(event: AutoCompleteCompleteEvent) {
-    const query = event.query;
-    const filtered: any[] = [];
-
-    for (let i = 0; i < (this.styleCategory as any[]).length; i++) {
-      const item = (this.styleCategory as any[])[i];
-      if (item.styleCategory.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(item);
-      }
-    }
-
-    this.autoFilteredStyleCategoryValue = filtered;
-  }
-
   filterSubCategory(event: AutoCompleteCompleteEvent) {
     const query = event.query;
     const filtered: any[] = [];
@@ -480,28 +518,92 @@ onGenderCategorySelect(event: any) {
     this.messageService.add({ key: 'global', severity: 'info', summary: 'Success', detail: 'Removed all files' });
     console.log("==", this.uploadedFiles)
   }
+filterStyleCategory(event: AutoCompleteCompleteEvent) {
+    const query = event.query;
+    const filtered: any[] = [];
+
+    for (let i = 0; i < (this.styleCategory as any[]).length; i++) {
+      const item = (this.styleCategory as any[])[i];
+      if (item.styleCategory.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(item);
+      }
+    }
+
+    this.autoFilteredStyleCategoryValue = filtered;
+  }
+  filterFitItem(event: AutoCompleteCompleteEvent) {
+    const query = event.query;
+    const filtered: any[] = [];
+
+    for (let i = 0; i < (this.autoFitValue as any[]).length; i++) {
+      const item = (this.autoFitValue as any[])[i];
+      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(item);
+      }
+    }
+
+    this.autoFilteredFitValue = filtered;
+  }
+  filterPatternItem(event: AutoCompleteCompleteEvent) {
+    const query = event.query;
+    const filtered: any[] = [];
+
+    for (let i = 0; i < (this.autoPatternValue as any[]).length; i++) {
+      const item = (this.autoPatternValue as any[])[i];
+      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(item);
+      }
+    }
+
+    this.autoFilteredPatternValue = filtered;
+  }
+
+  filterSeasonItem(event: AutoCompleteCompleteEvent) {
+    const query = event.query;
+    const filtered: any[] = [];
+
+    for (let i = 0; i < (this.autoSeasonValue as any[]).length; i++) {
+      const item = (this.autoSeasonValue as any[])[i];
+      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(item);
+      }
+    }
+
+    this.autoFilteredSeasonValue = filtered;
+  }
+
+  filterOccationItem(event: AutoCompleteCompleteEvent) {
+    const query = event.query;
+    const filtered: any[] = [];
+
+    for (let i = 0; i < (this.autoOccasionValue as any[]).length; i++) {
+      const item = (this.autoOccasionValue as any[])[i];
+      if (item.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(item);
+      }
+    }
+
+    this.autoFilteredOccasionValue = filtered;
+  }
+
+
   saveProduct() {
     this.displayConfirmation = false;
 
     // Build request JSON
     const metadata = {
-      name: this.product.name,
-      description: this.product.description,
-      category: this.product.category.category,
-      subCategory: this.product.subCategory.subCategory,
-      genderCategory: this.product.genderCategory.genderCategory,
-      styleCategory:this.product.styleCategory.styleCategory,
-      fit:this.product.fit.name,
-      pattern:this.product.pattern.name,
-      season:this.product.season.map((s:any) => s.name).join(','),
-      occasion:this.product.occasion.map((s:any) => s.name).join(','),
-      rating:this.product.rating,
-      isFeatured: this.product.isFeatured,
-      color: this.product.color.name,
-      sizes: this.product.sizes,
-      variantName:this.product.variantName,
-      variantDescription:this.product.variantDescription
       
+      color: this.variant.color.name,
+       styleCategory:this.variant.styleCategory.styleCategory,
+      fit:this.variant.fit.name,
+      pattern:this.variant.pattern.name,
+      season:this.variant.season.map((s:any) => s.name).join(','),
+      occasion:this.variant.occasion.map((s:any) => s.name).join(','),
+      rating:this.variant.rating,
+      isFeatured: this.variant.isFeatured,
+      variantName:this.variant.variantName,
+      variantDescription:this.variant.variantDescription,
+      sizes: this.variant.sizes
     };
 
     const formData = new FormData();
@@ -511,15 +613,16 @@ onGenderCategorySelect(event: any) {
     console.log('FormData Metadata:', metadata);
     console.log('Files:', this.uploadedFiles);
 
-    this.productService.upload(formData).subscribe({
+    this.productService.addVariant(this.productParentId,formData).subscribe({
       next: (res: any) => {
         this.messageService.add({
           key: 'global',
           severity: 'success',
           summary: 'Success!',
-          sticky: true,
-          detail: res.message || 'New product has been added successfully'
+          sticky: false,
+          detail: res.message || 'New variant has been added successfully'
         });
+        this.route.navigate(['/admin/products/manageproducts']);
       },
       error: (err: any) => {
         this.messageService.add({
@@ -527,7 +630,7 @@ onGenderCategorySelect(event: any) {
           severity: 'error',
           summary: 'Error',
           sticky: true,
-          detail: err.error?.message || 'Failed to add new product'
+          detail: err.error?.message || 'Failed to add new variant'
         });
       }
     });

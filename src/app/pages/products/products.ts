@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Component, Injectable, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { Carousel } from 'primeng/carousel';
+import { Carousel, CarouselModule } from 'primeng/carousel';
 import { FluidModule } from 'primeng/fluid';
 import { TagModule } from 'primeng/tag';
 import { ProductService } from './product.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { JwtHelper } from '@/jwt/jwt-helper';
 import { CartService } from '../cart/cart.service';
 import { MessageService } from 'primeng/api';
@@ -15,10 +15,14 @@ import { Rating } from 'primeng/rating';
 import { FormsModule } from '@angular/forms';
 import { BadgeModule } from 'primeng/badge';
 import { Tooltip } from 'primeng/tooltip';
-
+import { ProductResponse } from '@/models/product-response.model';
+import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
+import { ChipModule } from 'primeng/chip';
 @Component({
   selector: 'app-products',
-  imports: [CardModule, CommonModule, ButtonModule, FluidModule, TagModule,FormsModule,BadgeModule,Tooltip],
+  imports: [CardModule, CommonModule, ButtonModule, FluidModule, TagModule,FormsModule,BadgeModule,Tooltip,CarouselModule,
+    ChipModule
+  ],
   templateUrl: './products.html',
   styleUrl: './products.scss'
 })
@@ -29,16 +33,32 @@ export class Products implements OnInit {
 
 
 
+searchQuery:String='';
+selectedChip: any = null;
   products: Product[] = [];
+  productResponseDto!:ProductResponse;
   loading: boolean = false;
   isAdmin: boolean = false;
 
+  page: number = 0;
+size: number = 10;
+lastPage: boolean = false;
+
   constructor(private productService: ProductService,private router: Router,private jwtHelper: JwtHelper,
      private cartService: CartService,
-    private messageService: MessageService
+    private messageService: MessageService,private route: ActivatedRoute
   ) { }
   ngOnInit(): void {
-    this.fetchProducts();
+
+    this.route.queryParams.subscribe(params => {
+    const searchQuery = params['search'];
+
+    if (searchQuery) {
+      this.fetchSearchedProducts(searchQuery); // If query param exists, search
+    } else {
+      this.fetchProducts(); // Else load all products
+    }
+  });
 
  const user = this.jwtHelper.getUserDetails();
   console.log('User info:', user);
@@ -53,6 +73,35 @@ export class Products implements OnInit {
   }
 
   }
+selectChip(chip: any) {
+  this.selectedChip = chip;
+  // You can also emit an event or trigger a filter here if needed
+}
+chips = [
+  {
+    label: 'Ethinic',
+    image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png',
+  },
+  {
+    label: 'Mon&Daughter',
+    image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/asiyajavayant.png',
+  },
+  {
+    label: 'Casuals',
+    image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/onyamalimba.png',
+  },
+  {
+    label: 'Formal',
+    image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/xuxuefeng.png',
+  },
+];
+navigateTo(link: string): void {
+  this.router.navigateByUrl(link);
+}
+  getFrontImageFromVariant(variant: any): string | null {
+  const frontImage = variant.productImage?.find((img: any) => img.viewType === 'front');
+  return frontImage?.imageUrl || null;
+}
 
   fetchProducts(): void {
     this.loading = true;
@@ -66,6 +115,30 @@ export class Products implements OnInit {
           summary: 'TADA!',
           detail: 'Enjoy shopping with ZFC!'
         });
+      },
+      error: (err) => {
+        console.error('Failed to fetch products:', err);
+        this.loading = false;
+         this.messageService.add({
+          key: 'global',
+          severity: 'error',
+          summary: 'Oops!',
+          detail: 'Failed to fetch the products'
+        });
+      }
+    });
+
+  }
+  fetchSearchedProducts(searchQuery:any): void {
+    this.products=[];
+    this.loading = true;
+    this.productService.getSearchedProducts(searchQuery).subscribe({
+      next: (res) => {
+        this.productResponseDto = res;
+        this.products.push(...res.content);
+        this.lastPage = res.last; // comes from Spring Data Page
+      this.page++; // increment for next call
+      this.loading = false;
       },
       error: (err) => {
         console.error('Failed to fetch products:', err);
@@ -101,8 +174,8 @@ export class Products implements OnInit {
 
     return 'assets/no-image.png'; // fallback if no front image found
   }
-  onCardClick(product:Product) {
-  this.router.navigate(['/product-details',product.id]);
+  onCardClick(product:Product,variant:ProductVariantResponseDto) {
+  this.router.navigate(['/product-details',variant.id]);
   this.fetchProducts();
 }
   buyNow(product: Product): void {
@@ -110,7 +183,7 @@ export class Products implements OnInit {
     // implement navigation to checkout or detail page
   }
 
-  addToCart(product: Product): void {
+  addToCart(product: Product,variant:ProductVariantResponseDto): void {
     //event.stopPropagation();
     this.cartService.addToCart({ productId: product.id, quantity: 1 }).subscribe({
       next: () => {
@@ -190,6 +263,13 @@ getSavings(product: any): string {
   }
   return '';
 }
+getOriginalPrice(product: any): number {
+  return product.variants?.[0]?.sizes?.[0]?.price ?? 0;
+}
+
+hasDiscount(product: any): boolean {
+  return !!product.variants?.[0]?.sizes?.[0]?.discountPercentage;
+}
 
 
   carouselResponsiveOptions: any[] = [
@@ -209,4 +289,59 @@ getSavings(product: any): string {
       numScroll: 1
     }
   ];
+
+
+
+
+
+getVariantFrontImage(variant: any): string {
+  const frontImage = variant.productImage?.find((img: any) => img.viewType === 'front');
+  return frontImage?.imageUrl || 'assets/placeholder.jpg';
+}
+
+getVariantFinalPrice(variant: any): number {
+  const size = variant?.sizes?.[0];
+  if (!size) return 0;
+  return size.price - (size.price * (size.discountPercentage ?? 0)) / 100;
+}
+
+getVariantSavings(variant: any): string {
+  const size = variant?.sizes?.[0];
+  if (!size || !size.discountPercentage) return '';
+  const discountAmount = (size.price * size.discountPercentage) / 100;
+  return `Save ₹${discountAmount.toFixed(0)}`;
+}
+
+getBestSize(variant: any) {
+  if (!variant?.sizes?.length) return null;
+  return variant.sizes.reduce((prev:any, curr:any) =>
+    curr.price < prev.price ? curr : prev
+  );
+}
+
+
+offers = [
+  {
+    title: '🎉 New Arrivals Just Dropped!',
+    subtitle: 'Check out our latest festive collection.',
+    image: 'assets/banners/new-arrivals.jpg',
+    cta: 'Shop Now',
+    link: '/collections/new'
+  },
+  {
+    title: '🚚 Free Shipping on Orders Above ₹999',
+    subtitle: 'Limited time offer. Don’t miss out!',
+    image: 'assets/banners/free-shipping.jpg',
+    cta: 'Grab Offer',
+    link: '/shipping-info'
+  },
+  {
+    title: '🔥 Flat 20% Off on Ethnic Wear',
+    subtitle: 'Use code FEST20 at checkout.',
+    image: 'assets/banners/ethnic-sale.jpg',
+    cta: 'Use Code',
+    link: '/collections/ethnic'
+  }
+];
+
 }

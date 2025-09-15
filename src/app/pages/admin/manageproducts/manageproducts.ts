@@ -160,9 +160,9 @@ this.flattenProducts();
       productId: product.productId,
       variantId: variant.id,
       code: variant.id, // or variant.sku if available
-      name: product.name,
+      name: variant.variantName,
       category: product.category,
-      rating: product.rating,
+      rating: variant.rating,
       image: this.getFrontImage(variant),
       color: variant.color,
       // you can keep aggregated info if needed

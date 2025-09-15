@@ -9,8 +9,6 @@ import { CommonService } from '@/layout/service/common';
   providedIn: 'root'
 })
 export class ProductService {
-  
-  //private apiUrl = 'http://localhost:8080/dev/api';
 
   commonService:CommonService = new CommonService;
       private apiUrl = this.commonService.baseUrl;
@@ -59,7 +57,45 @@ upload(formData: FormData) {
   );
 }
 
-  
+addVariant(productParentId:any,formData: FormData) {
+  return this.http.post<any>(
+    `${this.apiUrl}/admin/products/${productParentId}/variants`,  
+    formData
+  );
+}
+
+checkParentProduct(params: {
+  name: string,
+  category: string,
+  genderCategory: string,
+  subCategory: string
+}) {
+  const queryParams = new HttpParams()
+    .set('name', params.name)
+    .set('category', params.category)
+    .set('genderCategory', params.genderCategory)
+    .set('subCategory', params.subCategory);
+
+  return this.http.post<any>(
+    `${this.apiUrl}/admin/products/check-parent`,
+    {}, // empty body
+    { params: queryParams }
+  );
+}
+
+// product.service.ts
+getAutocompleteSuggestions(query: string) {
+  return this.http.get<any>(`${this.apiUrl}/products/search/autocomplete?query=${encodeURIComponent(query)}`);
+}
+
+getSearchedProducts(query: string,page: number = 0, size: number = 10){
+
+  const params = new HttpParams()
+    .set('query', query)
+    .set('page', page)
+    .set('size', size);
+  return this.http.get<any>(`${this.apiUrl}/products/search`,{params });
+}
 
 
 }

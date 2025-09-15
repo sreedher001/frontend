@@ -27,7 +27,7 @@
   <!-- Product Details -->
   <p-fluid class="flex mt-5">
     <div class="card flex flex-col gap-6 w-full">
-      <div class="font-semibold text-xl">Enter Product Details
+      <div class="font-semibold text-xl">Enter Product Level Details
         @if(showeErrorSuggestion){<span class="p-error text-red-800 ">(NOTE : All fields are mandatory to be
           filled)</span>}
       </div>
@@ -75,7 +75,7 @@
         <!-- Sub Category -->
         <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
           <p-floatlabel variant="on">
-            <p-autocomplete [(ngModel)]="product.subcategory" name="subcategory" #subCategory="ngModel" required
+            <p-autocomplete [(ngModel)]="product.subCategory" name="subcategory" #subCategory="ngModel" required
               [suggestions]="autoFilteredSubCategoryValue" optionLabel="subCategory" field="subCategory" dropdown
               (completeMethod)="filterSubCategory($event)" [disabled]="!hasSubCategory" inputId="subCategory"
               class="w-full">
@@ -84,6 +84,42 @@
           </p-floatlabel>
           @if(subCategory.invalid && subCategory.touched){<small class="p-error text-red-800">Product sub category is
             required</small>}
+        </div>
+      </div>
+
+
+      <!-- Description -->
+      <div class="flex w-full">
+        <div class="basis-4/4 px-2">
+          <p-floatlabel variant="on">
+            <textarea pTextarea id="description" name="description" [(ngModel)]="product.description"
+              #description="ngModel" required [autoResize]="true" rows="3" class="w-full"></textarea>
+            <label for="description">Description of the product</label>
+          </p-floatlabel>
+          @if(description.invalid && description.touched){<small class="p-error text-red-800">Product description is
+            required</small>}
+        </div>
+      </div>
+    </div>
+  </p-fluid>
+
+<!-- Variant level details-->
+  <p-fluid class="flex mt-5">
+    <div class="card flex flex-col gap-6 w-full">
+      <div class="font-semibold text-xl">Enter Variant Level Details
+        @if(showeErrorSuggestion){<span class="p-error text-red-800 ">(NOTE : All fields are mandatory to be
+          filled)</span>}
+      </div>
+
+      <div class="flex flex-wrap w-full">
+        <!-- Variant Name -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <input pInputText id="variantname" name="variantName" type="text" [(ngModel)]="product.variantName" #variantName="ngModel"
+              required class="w-full" />
+            <label for="variantname">Variant Name</label>
+          </p-floatlabel>
+          @if(variantName.invalid && variantName.touched){<small class="p-error text-red-800">Variant name is required</small>}
         </div>
 
         <!-- Color -->
@@ -98,23 +134,114 @@
           @if(color.invalid && color.touched){<small class="p-error text-red-800">Product color is required</small>}
         </div>
 
+        <!-- Style Category -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <p-autocomplete [(ngModel)]="product.styleCategory" name="styleCategory" #styleCategory="ngModel" required
+              [suggestions]="autoFilteredStyleCategoryValue" optionLabel="styleCategory" field="styleCategory" dropdown
+              (completeMethod)="filterStyleCategory($event)" inputId="styleCategory"
+              class="w-full">
+            </p-autocomplete>
+            <label for="styleCategory">Style Category</label>
+          </p-floatlabel>
+          @if(styleCategory.invalid && styleCategory.touched){<small class="p-error text-red-800">Style category is
+            required</small>}
+        </div>
+
+        <!-- fit -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <p-autocomplete [(ngModel)]="product.fit" name="fit" #fit="ngModel" required
+              [suggestions]="autoFilteredFitValue" optionLabel="name" field="fit" dropdown
+              (completeMethod)="filterFitItem($event)" inputId="fit" class="w-full">
+            </p-autocomplete>
+            <label for="fit">Fit</label>
+          </p-floatlabel>
+          @if(fit.invalid && fit.touched){<small class="p-error text-red-800">fit is required</small>}
+        </div>
+
+        <!-- pattern -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <p-autocomplete [(ngModel)]="product.pattern" name="pattern" #pattern="ngModel" required
+              [suggestions]="autoFilteredPatternValue" optionLabel="name" field="pattern" dropdown
+              (completeMethod)="filterPatternItem($event)" inputId="pattern" class="w-full">
+            </p-autocomplete>
+            <label for="pattern">Pattern</label>
+          </p-floatlabel>
+          @if(pattern.invalid && pattern.touched){<small class="p-error text-red-800">Pattern is required</small>}
+        </div>
+<!-- season-->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <p-multiSelect 
+      [(ngModel)]="product.season" 
+      name="seasons" 
+      #seasons="ngModel"
+      [options]="autoFilteredSeasonValue" 
+      optionLabel="name" 
+      display="chip"
+      inputId="season" 
+      class="w-full" 
+      required>
+    </p-multiSelect>
+    <label for="season">Season of Wearing</label>
+  </p-floatlabel>
+  @if(seasons.invalid && seasons.touched){
+    <small class="p-error text-red-800">At least one season is required</small>
+  }
+</div>
+
+        
+
+        <!-- occasion -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <p-multiSelect 
+      [(ngModel)]="product.occasion" 
+      name="occasions" 
+      #occasions="ngModel"
+      [options]="autoFilteredOccasionValue" 
+      optionLabel="name" 
+      display="chip"
+      inputId="occasion" 
+      class="w-full" 
+      required>
+    </p-multiSelect>
+    <label for="occasion">Occasions</label>
+  </p-floatlabel>
+  @if(occasions.invalid && occasions.touched){
+    <small class="p-error text-red-800">At least one occasion is required</small>
+  }
+</div>
+
+
+        <!-- rating -->
+<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <label for="rating" class="block mb-1 font-medium text-gray-700">Rating</label>
+  <p-rating [(ngModel)]="product.rating" name="rating" [stars]="5" inputId="rating"></p-rating>
+  @if(!product.rating){
+    <small class="p-error text-red-800">Rating is required</small>
+  }
+</div>
+
         <!-- Featured Checkbox -->
-        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mt-2 mb-4 flex items-center">
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 flex items-center">
           <p-checkbox [(ngModel)]="product.isFeatured" name="Featured" binary="true" inputId="isFeatured"></p-checkbox>
           <label for="isFeatured" class="ml-2">Featured?</label>
         </div>
       </div>
 
 
-      <!-- Description -->
-      <div class="flex w-full mt-3">
-        <div class="basis-3/4 px-2">
+      <!--Variant Description -->
+      <div class="flex w-full ">
+        <div class="basis-4/4 px-2">
           <p-floatlabel variant="on">
-            <textarea pTextarea id="description" name="description" [(ngModel)]="product.description"
-              #description="ngModel" required [autoResize]="true" rows="3" class="w-full"></textarea>
-            <label for="description">Description of the product</label>
+            <textarea pTextarea id="variantDscription" name="variantDscription" [(ngModel)]="product.variantDscription"
+              #variantDscription="ngModel" required [autoResize]="true" rows="3" class="w-full"></textarea>
+            <label for="variantDscription">Description of the variant</label>
           </p-floatlabel>
-          @if(description.invalid && description.touched){<small class="p-error text-red-800">Product description is
+          @if(variantDscription.invalid && variantDscription.touched){<small class="p-error text-red-800">variant description is
             required</small>}
         </div>
       </div>

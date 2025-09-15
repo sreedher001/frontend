@@ -12,7 +12,7 @@ import { MessageService } from 'primeng/api';
 import { CartService } from '../cart/cart.service';
 @Component({
   selector: 'app-productdetails',
-  imports: [GalleriaModule, ButtonModule, Products, Rating, FormsModule],
+  imports: [GalleriaModule, ButtonModule, Rating, FormsModule],
   templateUrl: './productdetails.html',
   styleUrl: './productdetails.scss'
 })
@@ -30,6 +30,7 @@ product!: Product;
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
     this.productId = Number(params.get('id'));
+    this.getProductByVariantId(this.productId);
    // this.fetchProduct();
   });
   }
@@ -49,22 +50,22 @@ product!: Product;
   //   });
   //   return this.product;
   // }
-  // fetchProductById(productId:number): Product {
-  //   this.productService.getProductById(productId).subscribe({
-  //     next: (data) => {
-  //       this.product = data;
-  //       this.images = data.imageUrls.map((img: string) => ({
-  //         itemImageSrc: img,
-  //         thumbnailImageSrc: img,
-  //         alt: this.product.name,
-  //       }));
-  //     },
-  //     error: (err) => {
-  //       console.error('Error fetching product:', err);
-  //     }
-  //   });
-  //   return this.product;
-  // }
+  getProductByVariantId(productId:number): Product {
+    this.productService.getProductByVariantId(productId).subscribe({
+      next: (data) => {
+        this.product = data;
+        this.images = data.variant.productImage.map((img: any) => ({
+          itemImageSrc: img.imageUrl,
+          thumbnailImageSrc: img.imageUrl,
+          alt: this.product.name,
+        }));
+      },
+      error: (err) => {
+        console.error('Error fetching product:', err);
+      }
+    });
+    return this.product;
+  }
 
    addToCart(product: Product,event: Event): void {
     event.stopPropagation();
