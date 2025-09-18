@@ -18,11 +18,11 @@ import { Tooltip } from 'primeng/tooltip';
 import { ProductResponse } from '@/models/product-response.model';
 import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
 import { ChipModule } from 'primeng/chip';
+import { Signup } from "../auth/signup/signup";
 @Component({
   selector: 'app-products',
-  imports: [CardModule, CommonModule, ButtonModule, FluidModule, TagModule,FormsModule,BadgeModule,Tooltip,CarouselModule,
-    ChipModule
-  ],
+  imports: [CardModule, CommonModule, ButtonModule, FluidModule, TagModule, FormsModule, BadgeModule, Tooltip, CarouselModule,
+    ChipModule, Signup],
   templateUrl: './products.html',
   styleUrl: './products.scss'
 })
@@ -32,14 +32,15 @@ import { ChipModule } from 'primeng/chip';
 export class Products implements OnInit {
 
 
-
+wishlistVariantIds: Set<number> = new Set(); // Store variant IDs in wishlist
+wishlistItems: any[] = [];
 searchQuery:String='';
 selectedChip: any = null;
   products: Product[] = [];
   productResponseDto!:ProductResponse;
   loading: boolean = false;
   isAdmin: boolean = false;
-
+showSignupPanel = false;
   page: number = 0;
 size: number = 10;
 lastPage: boolean = false;
@@ -50,6 +51,17 @@ lastPage: boolean = false;
   ) { }
   ngOnInit(): void {
 
+    if(localStorage.getItem("isLoggedIn")==="true"){
+    this.productService.getWishlist().subscribe({
+    next: (items: any[]) => {
+      this.wishlistItems = items;
+      this.wishlistVariantIds = new Set(items.map(i => i.variantId));
+    },
+    error: (err) => {
+      console.error('Failed to load wishlist', err);
+    }
+  });
+}
     this.route.queryParams.subscribe(params => {
     const searchQuery = params['search'];
 
@@ -183,41 +195,81 @@ navigateTo(link: string): void {
     // implement navigation to checkout or detail page
   }
 
-  addToCart(product: Product,variant:ProductVariantResponseDto): void {
-    //event.stopPropagation();
-    this.cartService.addToCart({ productId: product.id, quantity: 1 }).subscribe({
-      next: () => {
-        this.messageService.add({
-          key: 'global',
-          severity: 'success',
-          summary: 'Added to cart',
-          detail: `${product.name} was added successfully.`
-        });
-      },
-      error: (err) => {
-        console.error(err);
-        this.messageService.add({
-          key: 'global',
-          severity: 'error',
-          summary: 'Add Failed',
-          detail: 'Could not add to cart. Please try again.'
-        });
-      }
-    });
+  // addToCart(product: Product,variant:ProductVariantResponseDto): void {
+  //   //event.stopPropagation();
+  //   this.cartService.addToCart({ productId: product.id, quantity: 1 }).subscribe({
+  //     next: () => {
+  //       this.messageService.add({
+  //         key: 'global',
+  //         severity: 'success',
+  //         summary: 'Added to cart',
+  //         detail: `${product.name} was added successfully.`
+  //       });
+  //     },
+  //     error: (err) => {
+  //       console.error(err);
+  //       this.messageService.add({
+  //         key: 'global',
+  //         severity: 'error',
+  //         summary: 'Add Failed',
+  //         detail: 'Could not add to cart. Please try again.'
+  //       });
+  //     }
+  //   });
     
-  }
-
-
-editProduct(product: any) {
-  console.log("Editing product:", product);
-  // open edit dialog / navigate
-  alert("Editing product");
+  // }
+  isInWishlist(variant: any): boolean {
+  return this.wishlistVariantIds.has(variant.id);
 }
 
-deleteProduct(product: any) {
-  console.log("Deleting product:", product);
-   alert("Deleting product");
-  // show confirm + delete API call
+
+  toggleWishlist(variant: any, event: MouseEvent): void {
+  event.stopPropagation(); // prevent card click
+
+  const variantId = variant.id;
+
+  if (this.isInWishlist(variant)) {
+    // If already in wishlist → remove
+    this.productService.removeFromWishlist(variantId).subscribe({
+      next: () => {
+        this.wishlistVariantIds.delete(variantId);
+      },
+      error: () => {
+        // Optionally show error toast
+      }
+    });
+  } else {
+    // If not in wishlist → add
+    this.productService.addToWishlist(variantId).subscribe({
+      next: () => {
+        this.wishlistVariantIds.add(variantId);
+      },
+      error: () => {
+        // Optionally show error toast
+      }
+    });
+  }
+}
+
+
+toggleSignupPanel() {
+  this.showSignupPanel = !this.showSignupPanel;
+}
+
+editProduct(variant: any,event: MouseEvent) {
+  event.stopPropagation();
+  this.router.navigate(
+    ['/admin/products/edit'],
+    { queryParams: { variantId: variant.id, mode: 'edit' } }
+  );
+}
+
+deleteProduct(variant: any,event: MouseEvent) {
+  event.stopPropagation();
+ this.router.navigate(
+    ['/admin/products/edit'],
+    { queryParams: { variantId: variant.id, mode: 'edit' } }
+  );
 }
 
 
@@ -336,8 +388,8 @@ offers = [
     link: '/shipping-info'
   },
   {
-    title: '🔥 Flat 20% Off on Ethnic Wear',
-    subtitle: 'Use code FEST20 at checkout.',
+    title: '🔥 Grab best Off on Ethnic Wear',
+    subtitle: 'Offer ends soon!',
     image: 'assets/banners/ethnic-sale.jpg',
     cta: 'Use Code',
     link: '/collections/ethnic'

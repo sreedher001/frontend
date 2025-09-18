@@ -27,7 +27,9 @@ import { InputTextModule } from 'primeng/inputtext';
     BadgeModule,FormsModule,InputTextModule,
     ButtonModule,
         MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule,AutoCompleteModule],
-    template: `<div class="layout-topbar">
+    template: `<div class="layout-topbar 
+         bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 
+          shadow-md border-b border-orange-200">
   <div class="layout-topbar-logo-container flex items-center">
     <!-- Menu button -->
     <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -80,10 +82,11 @@ import { InputTextModule } from 'primeng/inputtext';
     >
         <i class="pi pi-ellipsis-v"></i>
     </button> -->
+   
 
     <!-- START: Icons Always Visible -->
     <div class="layout-topbar-menu-content w-full">
-      <div class="flex flex-row items-center justify-end gap-3 flex-nowrap overflow-x-auto w-full">
+      <div class="flex flex-row items-center justify-end gap-2 flex-nowrap overflow-x-auto w-full">
 
         <!-- Messages (Commented) -->
         <!-- 
@@ -92,7 +95,16 @@ import { InputTextModule } from 'primeng/inputtext';
           <span class="hidden sm:inline">Messages</span>
         </button> 
         -->
-
+  <div class="sm:hidden">
+  <button 
+    class="layout-topbar-action" 
+    (click)="showMobileSearch = true"
+    pTooltip="Search"
+    tooltipPosition="bottom"
+  >
+    <i class="pi pi-search text-xl"></i>
+  </button>
+</div>
         <!-- Search (hidden on mobile, full width below) -->
         <div class="hidden sm:block w-64">
           <p-autoComplete
@@ -103,7 +115,7 @@ import { InputTextModule } from 'primeng/inputtext';
             field="name"
             [dropdown]="false"
             [minLength]="1"
-            [forceSelection]="false"
+            [forceSelection]="true"
             placeholder="Search it..."
             appendTo="body"
             optionLabel="name"
@@ -139,6 +151,7 @@ import { InputTextModule } from 'primeng/inputtext';
           }
         </button>
 
+
         <!-- User Button -->
         <button 
           type="button" 
@@ -161,41 +174,68 @@ import { InputTextModule } from 'primeng/inputtext';
       </div>
     </div>
     <!-- END: Icons Always Visible -->
+
+    
   </div>
 </div>
-
-<!-- Mobile Search: shown only on small screens -->
-<div class="sm:hidden p-2">
-  <p-autoComplete
-    [(ngModel)]="searchQuery"
-    [suggestions]="filteredProducts"
-    (completeMethod)="filterProducts($event)"
-    (ngModelChange)="onProductSelected($event)"
-    field="name"
-    [dropdown]="false"
-    [minLength]="1"
-    [forceSelection]="false"
-    placeholder="Search it..."
-    appendTo="body"
-    optionLabel="name"
-    class="w-full"
-  >
-    <ng-template let-product pTemplate="item">
-      <div class="flex flex-col">
-        <span class="font-bold">{{ product.name }}</span>
-        <small class="text-gray-600">{{ product.category }} • {{ product.subCategory }} • {{product.genderCategory}}</small>
+<!-- Mobile Search Modal -->
+@if (showMobileSearch) {
+  <div class="fixed inset-0 bg-black/40 z-50 flex items-start justify-start px-4x mt-15">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-4">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-semibold">Search </h3>
+        <p-button severity="contrast" rounded  outlined (click)="toggleMobileSearch()">
+          <i class="pi pi-times text-lg"></i>
+        </p-button>
       </div>
-    </ng-template>
 
-    <ng-template let-product pTemplate="selectedItem">
-      <span>{{ formatProduct(product) }}</span>
-    </ng-template>
-  </p-autoComplete>
-</div>`
+      <!-- Search Input -->
+      <div class="relative mb-4">
+        <i class="pi pi-search absolute top-3 left-3 text-gray-400"></i>
+        <input 
+          type="text"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="filterProducts({ query: $event })"
+          placeholder="Search it..."
+          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-400"
+        />
+      </div>
+
+      <!-- Suggestions List -->
+     @if(filteredProducts.length > 0){ <div  class="space-y-2 max-h-64 overflow-y-auto">
+        @for (product of filteredProducts; track product.id) {
+          <div 
+            class="flex items-start gap-3 p-2 rounded-md hover:bg-gray-100 cursor-pointer transition"
+            (click)="onProductSelected(product)"
+          >
+            
+            <div>
+              <p class="font-medium text-gray-800">{{ product.name }}</p>
+              <p class="text-sm text-gray-500">
+                {{ product.category }} • {{ product.subCategory }} • {{ product.genderCategory }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+      }
+      <!-- Fallback -->
+      @else {
+        <p class="text-sm text-gray-500 text-center">No suggestions found.</p>
+      }
+    </div>
+  </div>
+}
+
+`
 })
 
 
 export class AppTopbar implements OnInit {
+
+  showMobileSearch = false;
+  quickSearchTags: string[] = [];
 
     searchQuery: string | any='';
   filteredProducts: any[] = [];
@@ -227,11 +267,12 @@ export class AppTopbar implements OnInit {
     }
       this.productService.getAutocompleteSuggestions(query).subscribe({
         next: (data:any) => {
-//             console.log('Suggestions from API:', data);
-//             console.log('Query typed:', query);
-// console.log('Results received:', this.filteredProducts);
-// console.log('Current ngModel value:', this.searchQuery);
+          
           this.filteredProducts = [...data];
+          this.filteredProducts.forEach(element => {
+            this.quickSearchTags.push(element.name);
+          });
+          
           this.cd.markForCheck();
           console.log("filtered",this.filteredProducts)
         },
@@ -243,6 +284,10 @@ export class AppTopbar implements OnInit {
     });
 
     }
+onQuickTagClick(tag: string) {
+  this.searchQuery = tag;
+  this.searchSubject.next(tag); // triggers autocomplete suggestions
+}
 
     filterProducts(event: any) {
     //const query = event.query;
@@ -304,6 +349,7 @@ const loggedIn = localStorage.getItem('isLoggedIn');
     }
     viewCart() {
         this.router.navigate(['/cart']);
+
     }
     signup() {
         this.router.navigate(['/auth/signup']);
@@ -314,10 +360,19 @@ const loggedIn = localStorage.getItem('isLoggedIn');
 
     onProductSelected(product: any) {
   this.router.navigate(['/products'], { queryParams: { search: product.name } });
+  this.showMobileSearch = false;
+
 }
 onModelChange(value: any) {
   this.searchQuery = value;
 }
+toggleMobileSearch() {
+  this.showMobileSearch = !this.showMobileSearch;
 
+  // Show all suggestions immediately on open
+  if (this.showMobileSearch) {
+    this.searchSubject.next('');
+  }
+}
 }
 

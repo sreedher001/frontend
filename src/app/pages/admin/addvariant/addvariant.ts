@@ -113,7 +113,7 @@ export class Addvariant implements OnInit {
   hasSubCategory:boolean=false;
   maxFilesize:any;
   productresponse!:ProductResponse;
-  productFound:boolean =true;
+  productFound:boolean =false;
   product: any = {
     name: '',
     description: '',

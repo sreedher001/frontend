@@ -1,10 +1,17 @@
 export interface CartItemDto {
   productId: number;
-  productName: string;
+  variantId:number;
+  variantName: string;
+  size:string;
+  color:string;
   price: number;
   quantity: number;
   imageUrl:String;
   total: number;
+  availableSizes:any[];
+
+  sizeOptions: any[];           // All sizes for autocomplete
+  filteredSizeOptions: any[];   // Filtered for search
 }
 
 export interface CartResponse {

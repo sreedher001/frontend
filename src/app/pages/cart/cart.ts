@@ -11,10 +11,14 @@ import { Products } from '../products/products';
 import { Productdetails } from '../productdetails/productdetails';
 import { ProductService } from '../products/product.service';
 import { MessageService } from 'primeng/api';
+import { TagModule } from 'primeng/tag';
+import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
-  imports: [ButtonModule, FormsModule, CardModule,DecimalPipe],
+  standalone:true,
+  imports: [ButtonModule, FormsModule, CardModule,DecimalPipe,TagModule,AutoCompleteModule,ButtonModule],
   templateUrl: './cart.html',
   styleUrl: './cart.scss'
 })
@@ -29,59 +33,78 @@ export class Cart implements OnInit {
     cartId: 0,
     items: []
   };
+  sizeOptions:any[]=[];
+
+autoFilteredSizeValue: any[] = [];
   
   relatedProducts: Product[] = [];
 
   constructor(private cartService: CartService,private productDetails:Productdetails,private prod : Products,
-    private productService:ProductService,private messageService: MessageService
+    private productService:ProductService,private messageService: MessageService,private router: Router
   ) { }
 
   ngOnInit(): void {
-//    this.loadCart();
+    this.loadCart();
 
   }
 
-  addToCart(product: Product,event: Event): void {
-    event.stopPropagation();
-    this.cartService.addToCart({ productId: product.id, quantity: 1 }).subscribe({
-      next: () => {
-        this.messageService.add({
-          key: 'global',
-          severity: 'info',
-          summary: 'Added to cart',
-          detail: `${product.name} was added successfully.`
-        });
-      },
-      error: (err) => {
-        console.error(err);
-        this.messageService.add({
-          key: 'global',
-          severity: 'error',
-          summary: 'Add Failed',
-          detail: 'Could not add to cart. Please try again.'
-        });
+  // addToCart(product: Product,event: Event): void {
+  //   event.stopPropagation();
+  //   this.cartService.addToCart({ productId: product.id, quantity: 1 }).subscribe({
+  //     next: () => {
+  //       this.messageService.add({
+  //         key: 'global',
+  //         severity: 'info',
+  //         summary: 'Added to cart',
+  //         detail: `${product.name} was added successfully.`
+  //       });
+  //     },
+  //     error: (err) => {
+  //       console.error(err);
+  //       this.messageService.add({
+  //         key: 'global',
+  //         severity: 'error',
+  //         summary: 'Add Failed',
+  //         detail: 'Could not add to cart. Please try again.'
+  //       });
+  //     }
+  //   });
+  // }
+  loadCart(): void {
+  this.cartService.getCart().subscribe({
+    next: (res) => {
+      this.cart = res;
+      this.cart.items.forEach((item) => {
+       item.sizeOptions = item.availableSizes;
+      });
+    },
+    error: (err) => {
+      console.error('Failed to load cart', err);
+    }
+  });
+}
+
+ filterSize(event: AutoCompleteCompleteEvent,item:any) {
+    const query = event.query;
+    const filtered: any[] = [];
+
+    for (let i = 0; i < (item.sizeOptions as any[]).length; i++) {
+      const sizeItem = (item.sizeOptions as any[])[i];
+      if (sizeItem.size.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(sizeItem);
       }
-    });
-    // this.loadCart();
-    // window.location.reload();
+    }
+
+    this.autoFilteredSizeValue = filtered;
   }
-//   loadCart(): CartResponse {
-//     this.cartService.getCart().subscribe({
-//       next: (res) => {
-//         this.cart = res;
-// console.log("id" ,this.cart.items[0].productId )
-//         // Only fetch related products if cart has items
-//       if (this.cart.items && this.cart.items.length > 0) {
-//         this.getRelatedProductsByCategory(this.cart.items[0].productId);
-//         console.log("id" ,this.cart.items[0].productId )
-//       }
-//       },
-//       error: (err) => {
-//         console.error('Failed to load cart', err);
-//       }
-//     });
-//     return this.cart;
-//   }
+
+  preventTyping(event: KeyboardEvent): void {
+  event.preventDefault();
+}
+
+goToProductDetails(variantId: number): void {
+  this.router.navigate(['/product-details', variantId]);
+}
 
 
 // getRelatedProductsByCategory(id: number): void {

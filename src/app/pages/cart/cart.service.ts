@@ -5,7 +5,9 @@ import { CommonService } from '@/layout/service/common';
 import { CartResponse } from './cart.model';
 
 export interface AddToCartPayload {
-    productId: number;
+    variantId: number;
+    sizeId: number;
+    color: string;
     quantity: number;
 }
 

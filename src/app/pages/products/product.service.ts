@@ -97,5 +97,15 @@ getSearchedProducts(query: string,page: number = 0, size: number = 10){
   return this.http.get<any>(`${this.apiUrl}/products/search`,{params });
 }
 
+getWishlist(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/wishlist/get-wishlist`);
+  }
 
+addToWishlist(variantId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/wishlist/add/${variantId}`, {});
+  }
+
+  removeFromWishlist(variantId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/wishlist/remove/${variantId}`, {});
+  }
 }
