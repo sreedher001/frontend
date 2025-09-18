@@ -14,47 +14,67 @@ import { MessageService } from 'primeng/api';
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule], //AppFloatingConfigurator
     template: `
-        <app-floating-configurator />
-        <div class="bg-surface-50 dark:bg-surface-950 animated-bg flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
-            <div class="flex flex-col items-center justify-center">
-                <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
-                    <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
-                        <div class="text-center mb-8">
-  <img
-    src="/assets/images/logo.png"
-    alt="ZFC Logo"
-    class="mx-auto mb-8 w-32 sm:w-40 md:w-48 h-auto object-contain"
-  />
-  <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">
-    Welcome to ZFC!
+        <!-- <app-floating-configurator /> -->
+        <div class="w-full max-w-md mx-auto bg-white dark:bg-surface-900 p-6 sm:p-8 rounded-2xl shadow-lg">
+  <div class="text-center mb-6">
+    <img
+      src="/assets/images/logo.png"
+      alt="ZFC Logo"
+      class="mx-auto mb-4 w-24 sm:w-32 h-auto object-contain"
+    />
+    <!-- <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Welcome to ZFC</h2> -->
+    <p class="text-lg text-gray-500 dark:text-gray-400">Sign in and continue shopping</p>
   </div>
-  <span class="text-muted-color font-medium">Sign in to continue</span>
+
+  <div class="space-y-6">
+    <div>
+      <label for="email1" class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Email</label>
+      <input
+        pInputText
+        id="email1"
+        type="text"
+        placeholder="Email address"
+        class="w-full"
+        [(ngModel)]="email"
+      />
+    </div>
+
+    <div>
+      <label for="password1" class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Password</label>
+      <p-password
+  [(ngModel)]="password"
+  id="password1"
+  placeholder="Password"
+  [toggleMask]="true"
+  [feedback]="false"
+  [inputStyle]="{ width: '100%' }"
+  styleClass="w-full"
+></p-password>
+    </div>
+
+    <div class="flex justify-between items-center text-sm">
+      <div class="flex items-center">
+        <p-checkbox
+          [(ngModel)]="checked"
+          id="rememberme1"
+          binary
+          class="mr-2"
+        ></p-checkbox>
+        <label for="rememberme1" class="text-gray-600 dark:text-gray-400">Remember me</label>
+      </div>
+      <a class=" font-medium hover:underline cursor-pointer">Forgot password?</a>
+    </div>
+
+    <p-button severity="warn"
+      label="Sign In"
+      styleClass="w-full"
+      (onClick)="onLogin()"
+    ></p-button>
+  </div>
 </div>
-
-
-                        <div>
-                            <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                            <input pInputText id="email1" type="text" placeholder="Email address" class="w-full md:w-120 mb-8" [(ngModel)]="email" />
-
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <p-password id="password1" [(ngModel)]="password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
-
-                            <div class="flex items-center justify-between mt-2 mb-8 gap-8">
-                                <div class="flex items-center">
-                                    <p-checkbox [(ngModel)]="checked" id="rememberme1" binary class="mr-2"></p-checkbox>
-                                    <label for="rememberme1">Remember me</label>
-                                </div>
-                                <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
-                            </div>
-                            <p-button label="Sign In" styleClass="w-full" (onClick)="onLogin()"></p-button>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>`
+`
 })
 export class Login {
     email: string = '';

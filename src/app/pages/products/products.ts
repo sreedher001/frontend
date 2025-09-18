@@ -19,10 +19,11 @@ import { ProductResponse } from '@/models/product-response.model';
 import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
 import { ChipModule } from 'primeng/chip';
 import { Signup } from "../auth/signup/signup";
+import { Login } from "../auth/login";
 @Component({
   selector: 'app-products',
   imports: [CardModule, CommonModule, ButtonModule, FluidModule, TagModule, FormsModule, BadgeModule, Tooltip, CarouselModule,
-    ChipModule, Signup],
+    ChipModule, Signup, Login],
   templateUrl: './products.html',
   styleUrl: './products.scss'
 })
@@ -41,6 +42,8 @@ selectedChip: any = null;
   loading: boolean = false;
   isAdmin: boolean = false;
 showSignupPanel = false;
+showMobileAuthUI = false;
+showLogin = false;
   page: number = 0;
 size: number = 10;
 lastPage: boolean = false;
@@ -51,6 +54,7 @@ lastPage: boolean = false;
   ) { }
   ngOnInit(): void {
 
+    this.checkDeviceAndAuthStatus();
     if(localStorage.getItem("isLoggedIn")==="true"){
     this.productService.getWishlist().subscribe({
     next: (items: any[]) => {
@@ -89,6 +93,12 @@ selectChip(chip: any) {
   this.selectedChip = chip;
   // You can also emit an event or trigger a filter here if needed
 }
+
+checkDeviceAndAuthStatus() {
+    const isMobile = window.innerWidth <= 768;
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    this.showMobileAuthUI = isMobile && isLoggedIn;
+  }
 chips = [
   {
     label: 'Ethinic',
@@ -254,6 +264,14 @@ navigateTo(link: string): void {
 
 toggleSignupPanel() {
   this.showSignupPanel = !this.showSignupPanel;
+
+  // Optional: reset to signup when panel opens
+  if (this.showSignupPanel) {
+    this.showLogin = false;
+  }
+}
+toggleLogin() {
+  this.showLogin = !this.showLogin;
 }
 
 editProduct(variant: any,event: MouseEvent) {
