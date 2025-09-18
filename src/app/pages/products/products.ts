@@ -42,7 +42,7 @@ selectedChip: any = null;
   loading: boolean = false;
   isAdmin: boolean = false;
 showSignupPanel = false;
-showMobileAuthUI = false;
+isLoggedIn:boolean =false;
 showLogin = false;
   page: number = 0;
 size: number = 10;
@@ -53,9 +53,11 @@ lastPage: boolean = false;
     private messageService: MessageService,private route: ActivatedRoute
   ) { }
   ngOnInit(): void {
-
-    this.checkDeviceAndAuthStatus();
+if(localStorage.getItem("isLoggedIn")==="true"){
+      this.isLoggedIn=true;}
+    
     if(localStorage.getItem("isLoggedIn")==="true"){
+      this.isLoggedIn=true;
     this.productService.getWishlist().subscribe({
     next: (items: any[]) => {
       this.wishlistItems = items;
@@ -94,17 +96,17 @@ selectChip(chip: any) {
   // You can also emit an event or trigger a filter here if needed
 }
 
-checkDeviceAndAuthStatus() {
-  const isMobileWidth = window.innerWidth <= 768;
-  const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+// checkDeviceAndAuthStatus() {
+//   const isMobileWidth = window.innerWidth <= 768;
+//   const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
 
-  // Basic mobile detection using user agent
-  const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+//   // Basic mobile detection using user agent
+//   const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
 
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+//   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
-  this.showMobileAuthUI = isMobileWidth && isMobileDevice && isLoggedIn;
-}
+//   this.showMobileAuthUI = isMobileWidth && isMobileDevice && isLoggedIn;
+// }
 
 chips = [
   {
