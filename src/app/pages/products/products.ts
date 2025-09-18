@@ -95,10 +95,17 @@ selectChip(chip: any) {
 }
 
 checkDeviceAndAuthStatus() {
-    const isMobile = window.innerWidth <= 768;
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    this.showMobileAuthUI = isMobile && isLoggedIn;
-  }
+  const isMobileWidth = window.innerWidth <= 768;
+  const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+
+  // Basic mobile detection using user agent
+  const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+  this.showMobileAuthUI = isMobileWidth && isMobileDevice && isLoggedIn;
+}
+
 chips = [
   {
     label: 'Ethinic',
