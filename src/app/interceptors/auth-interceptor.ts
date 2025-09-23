@@ -24,10 +24,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         detail: error?.error?.message || 'Something went wrong!',
       });
 
-      // Optional: redirect to login if 401
-      if (error.status === 401||error.status === 400||error.status ===500) {
-          router.navigate(['/auth/login']);
-      }
+      // // Optional: redirect to login if 401
+      // if (error.status === 401||error.status === 400||error.status ===500) {
+      //     router.navigate(['/auth/login']);
+      // }
 
       return throwError(() => error);
     })

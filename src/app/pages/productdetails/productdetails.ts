@@ -84,6 +84,11 @@ isSizeSelected=false;
       }
     });
   }
+  onImageLoad(event: Event) {
+  const img = event.target as HTMLImageElement;
+  img.classList.add('loaded');
+}
+
 
    addToCart(variant: any,event: Event,navigateToCart: boolean = false): void {
     event.stopPropagation();

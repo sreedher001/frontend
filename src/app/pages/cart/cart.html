@@ -51,12 +51,18 @@
           </div>
         }
       } @else {
-        <p class="text-gray-500">Your cart is empty.</p>
+        <div class="flex flex-col items-center justify-center py-16 text-center text-gray-500">
+  <div class="text-6xl">🛒</div>
+  <p class="mt-4 text-lg">Your cart is empty.</p>
+  <p class="text-sm">Looks like you haven’t added anything yet.</p>
+  <p-button class="mt-3 text-orange-500" severity="warn" raised  (click)="goToShop()">Explore Products</p-button>
+</div>
+
       }
     </div>
 
     <!-- Right: Summary -->
-    <div class="lg:w-72 flex-shrink-0 w-full">
+    @if(cart.items.length > 0){<div class="lg:w-72 flex-shrink-0 w-full">
       <div class="bg-white rounded-lg shadow p-4">
         <p class="text-base font-medium">
           Subtotal ({{ cart.items.length }} items):
@@ -68,8 +74,10 @@
   size="large" 
   raised 
   label="Proceed to Buy" 
-  styleClass="w-full">
+  styleClass="w-full"
+  (click)="goToCheckout()">
 </p-button>
+
 
       </div>
 
@@ -93,7 +101,7 @@
           </div>
         }
       </div>
-    </div>
+    </div>}
 
   </div>
 </div>

@@ -127,11 +127,17 @@ goToProductDetails(variantId: number): void {
 //   });
 // }
 
+goToShop() {
+  this.router.navigate(['/products']);
+}
 
   getCartTotal(): number {
     return this.cart.items.reduce((total: number, item: any) => total + item.total, 0);
   }
 
+   goToCheckout(): void {
+    this.router.navigate(['/checkout']);
+  }
   removeItem(productId: number): void {
     this.cartService.removeItem(productId).subscribe(() => {
       this.cart.items = this.cart.items.filter((i: any) => i.productId !== productId);

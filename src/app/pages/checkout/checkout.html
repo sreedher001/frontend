@@ -1,0 +1,156 @@
+<p-confirmDialog></p-confirmDialog>
+
+
+
+<div class="card p-6 rounded-lg shadow-md bg-white max-w-5xl mx-auto">
+
+    <div class="mb-4">
+  <h3 class="text-lg font-semibold mb-2">Select Payment Method</h3>
+  <div class="flex gap-4">
+    <p-radioButton name="payment" value="UPI" [(ngModel)]="selectedPaymentMode" inputId="razorpay"></p-radioButton>
+    <label for="razorpay">Online (Razorpay)</label>
+
+    <p-radioButton name="payment" value="COD" [(ngModel)]="selectedPaymentMode" inputId="cod"></p-radioButton>
+    <label for="cod">Cash on Delivery</label>
+  </div>
+</div>
+
+  <!-- Heading -->
+  <h2 class="text-2xl font-semibold text-orange-600 mb-6 flex items-center gap-2">
+    <i class="pi pi-map-marker text-xl"></i> Select Shipping Address
+  </h2>
+
+  <!-- Address Selection -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    
+
+    <div *ngFor="let address of addresses"
+         (click)="selectAddress(address.id)"
+         class="p-4 border rounded-lg cursor-pointer transition-all hover:shadow-lg bg-gray-50"
+         [ngClass]="{
+           'border-orange-400 ring-2 ring-orange-50 bg-grey-500': selectedAddressId === address.id
+         }">
+      <p class="font-semibold text-gray-800">{{ address.address }}</p>
+      <p class="text-sm text-gray-700">{{ address.city }}, {{ address.state }} - {{ address.pinCode }}</p>
+      <p class="text-sm text-gray-700">{{ address.country }}</p>
+      <p class="text-sm text-gray-700"><i class="pi pi-phone mr-1"></i> {{ address.phoneNumber }}</p>
+      <!-- Inside each address card -->
+       
+<div class="flex justify mt-3 gap-2 ">
+  <!-- Edit Button -->
+  <p-button
+    icon="pi pi-pencil"
+    outlined  raised
+    severity="info"
+    (click)="editAddress(address)">
+  </p-button>
+
+  <!-- Delete Button -->
+  <p-button
+    icon="pi pi-trash"
+    outlined raised
+    severity="danger"
+    (click)="deleteAddress(address.id)">
+  </p-button>
+</div>
+    </div>
+  </div>
+
+  <!-- Add New Address Button -->
+  <div class="text-right mb-4">
+    <p-button
+      (click)="showAddAddressDialog = true"
+      icon="pi pi-plus"
+      label="Add New Address"
+      outlined
+      severity="primary">
+    </p-button>
+  </div>
+
+  <!-- Add Address Modal Dialog -->
+  <p-dialog
+  header="Add New Address"
+  [(visible)]="showAddAddressDialog"
+  [modal]="true"
+  [style]="{ width: '600px', maxHeight: '90vh', overflowY: 'auto' }"
+  
+  [dismissableMask]="true"
+  [closeOnEscape]="true"
+  [breakpoints]="{ '768px': '90vw' }"
+  responsive="true"
+  class="p-fluid"
+          (onHide)="addressForm.reset()">
+
+  <form [formGroup]="addressForm" (ngSubmit)="submitNewAddress()" class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+    <p-floatlabel variant="on">
+      <input pInputText
+             formControlName="address"
+             id="shippingAddress" [ngClass]="{'p-filled': addressForm.get('address')?.value}"
+             class="w-full h-10 border border-gray-300 rounded-md focus:ring-1 focus:ring-orange-500 focus:outline-none" />
+      <label for="shippingAddress">D/no | House name / Flat / Landmark</label>
+    </p-floatlabel>
+
+    <p-floatlabel variant="on">
+      <input pInputText
+             formControlName="phoneNumber"
+             id="phoneNumber"
+             [ngClass]="{'p-filled': addressForm.get('phoneNumber')?.value}"
+             class="w-full h-10 border border-gray-300 rounded-md focus:ring-1 focus:ring-orange-500 focus:outline-none" />
+      <label for="phoneNumber">Phone Number of Receiver</label>
+    </p-floatlabel>
+
+    <p-floatlabel variant="on">
+      <input pInputText
+             formControlName="country"
+             id="country" [ngClass]="{'p-filled': addressForm.get('country')?.value}"
+             class="w-full h-10 border border-gray-300 rounded-md focus:ring-1 focus:ring-orange-500 focus:outline-none" />
+      <label for="country">Country</label>
+    </p-floatlabel>
+
+    <p-floatlabel variant="on">
+      <input pInputText
+             formControlName="state"
+             id="state" [ngClass]="{'p-filled': addressForm.get('state')?.value}"
+             class="w-full h-10 border border-gray-300 rounded-md focus:ring-1 focus:ring-orange-500 focus:outline-none" />
+      <label for="state">State</label>
+    </p-floatlabel>
+
+    <p-floatlabel variant="on">
+      <input pInputText
+             formControlName="pinCode"
+             id="pinCode" [ngClass]="{'p-filled': addressForm.get('pinCode')?.value}"
+             class="w-full h-10  border border-gray-300 rounded-md focus:ring-1 focus:ring-orange-500 focus:outline-none" />
+      <label for="pinCode">Pin Code</label>
+    </p-floatlabel>
+
+    <p-floatlabel variant="on">
+      <input pInputText
+             formControlName="city"
+             id="city" [ngClass]="{'p-filled': addressForm.get('city')?.value}"
+             class="w-full h-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+      <label for="city">City</label>
+    </p-floatlabel>
+
+    <div class="col-span-full text-right mt-4">
+      <p-button
+        label="Save Address"
+        type="submit"
+        icon="pi pi-save"
+        [disabled]="addressForm.invalid"
+        severity="success">
+      </p-button>
+    </div>
+  </form>
+</p-dialog>
+
+  <!-- Next Button -->
+  <div class="text-right mt-4">
+    <p-button raised
+      label="Place Order"
+      icon="pi pi-arrow-right"
+      severity="warn"
+      (click)="placeOrder()">
+    </p-button>
+  </div>
+</div>

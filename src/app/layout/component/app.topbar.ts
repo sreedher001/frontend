@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, NgModule, OnInit } from '@angular/core';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
@@ -19,13 +19,14 @@ import { debounceTime, Subject } from 'rxjs';
 import { ProductService } from '@/pages/products/product.service';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
+import { DrawerModule } from 'primeng/drawer';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
     imports: [RouterModule, CommonModule, StyleClassModule,//AppConfigurator, 
     BadgeModule,FormsModule,InputTextModule,
-    ButtonModule,
+    ButtonModule,DrawerModule,
         MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule,AutoCompleteModule],
     template: `<div class="layout-topbar 
          bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 
@@ -157,20 +158,35 @@ import { InputTextModule } from 'primeng/inputtext';
           type="button" 
           class="flex items-center justify-center bg-orange-100 dark:bg-blue-400/10 rounded-full shrink-0" 
           style="width: 2.5rem; height: 2.5rem;" 
-          (click)="menu.toggle($event)"
+          (click)="drawerVisible = true"
           #menuButton
         >
           <i class="pi pi-user text-orange-500 text-xl"></i>
         </button>
 
         <!-- User Menu -->
-        <p-menu 
-          #menu 
-          [popup]="true" 
-          [model]="overlayMenuItems" 
-          [baseZIndex]="1000" 
-          [appendTo]="'body'"
-        ></p-menu>
+       <p-drawer 
+  [header]="'Hello ' + userName"
+  [(visible)]="drawerVisible" 
+  position="right"
+  [baseZIndex]="1000"
+>
+
+  <ul class="p-0 m-0 list-none space-y-4">
+    <ng-container *ngFor="let item of overlayMenuItems">
+      
+      <!-- Separator -->
+      <li *ngIf="item.separator" class="border-t border-gray-300 my-2"></li>
+      
+      <!-- Menu Item -->
+      @if(!item.separator){<li  (click)="item.command?.({ originalEvent: $event, item: item })" class="cursor-pointer flex items-center gap-2 hover:text-orange-500">
+        <i [class]="item.icon"></i>
+        <span>{{ item.label }}</span>
+      </li>}
+
+    </ng-container>
+  </ul>
+</p-drawer>
       </div>
     </div>
     <!-- END: Icons Always Visible -->
@@ -234,6 +250,7 @@ import { InputTextModule } from 'primeng/inputtext';
 
 export class AppTopbar implements OnInit {
 
+  drawerVisible: boolean = false;
   showMobileSearch = false;
   quickSearchTags: string[] = [];
 
@@ -256,7 +273,7 @@ export class AppTopbar implements OnInit {
        
 
     }
-     constructor(public layoutService: LayoutService, private cartService: CartService,
+     constructor(public layoutService: LayoutService, private cartService: CartService,private messageService:MessageService,
         private router: Router,private jwtHelper:JwtHelper,private productService:ProductService,private cd: ChangeDetectorRef) {
             // Debounce the search input to avoid spamming API calls
     this.searchSubject.pipe(debounceTime(300)).subscribe(query => {
@@ -310,15 +327,15 @@ const loggedIn = localStorage.getItem('isLoggedIn');
         {
             label: 'My Profile',
             icon: 'pi pi-id-card'
-        },
+        },{ separator: true },
         {
             label: 'My Orders',
             icon: 'pi pi-box'
-        },
+        },{ separator: true },
         {
             label: 'Wishlist',
             icon: 'pi pi-heart'
-        },
+        },{ separator: true },
         {
             label: 'Settings',
             icon: 'pi pi-cog'
@@ -336,12 +353,19 @@ const loggedIn = localStorage.getItem('isLoggedIn');
     }}
 
     logout() {
-        this.router.navigate(['/auth/login']);
+      this.messageService.add({
+        key:'global',
+        severity: 'warn',
+        summary: 'You have been logged out successfully',
+        detail: 'Come back soon..',
+      });
         this.isLoggedIn = false;
         localStorage.setItem('isLoggedIn', "false");
-
+this.drawerVisible=false;
         localStorage.removeItem('username');
        this.jwtHelper.logout();
+window.location.reload();
+
     }
 
     toggleDarkMode() {

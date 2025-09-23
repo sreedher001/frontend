@@ -19,11 +19,11 @@ import { ProductResponse } from '@/models/product-response.model';
 import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
 import { ChipModule } from 'primeng/chip';
 import { Signup } from "../auth/signup/signup";
-import { Login } from "../auth/login";
+import {  LoginComponent } from "../auth/login";
 @Component({
   selector: 'app-products',
   imports: [CardModule, CommonModule, ButtonModule, FluidModule, TagModule, FormsModule, BadgeModule, Tooltip, CarouselModule,
-    ChipModule, Signup, Login],
+    ChipModule, Signup, LoginComponent],
   templateUrl: './products.html',
   styleUrl: './products.scss'
 })
@@ -132,6 +132,15 @@ navigateTo(link: string): void {
   getFrontImageFromVariant(variant: any): string | null {
   const frontImage = variant.productImage?.find((img: any) => img.viewType === 'front');
   return frontImage?.imageUrl || null;
+}
+
+handleLoginSuccess($event:any) {
+  console.log("triggered...");
+  this.isLoggedIn = true;
+  this.showSignupPanel = false;
+
+  // Refresh the current page
+  window.location.reload();
 }
 
   fetchProducts(): void {
@@ -245,6 +254,7 @@ navigateTo(link: string): void {
   toggleWishlist(variant: any, event: MouseEvent): void {
   event.stopPropagation(); // prevent card click
 
+  if(this.isLoggedIn){
   const variantId = variant.id;
 
   if (this.isInWishlist(variant)) {
@@ -268,6 +278,9 @@ navigateTo(link: string): void {
       }
     });
   }
+}else{
+  this.showSignupPanel=true;
+}
 }
 
 

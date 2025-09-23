@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -10,11 +10,14 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
 import { LoginRequest, LoginService } from './login.service';
 import { JwtHelper } from '@/jwt/jwt-helper';
 import { MessageService } from 'primeng/api';
+import { CommonModule } from '@angular/common';
+
+
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule], //AppFloatingConfigurator
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule,CommonModule], //AppFloatingConfigurator
     template: `
         <!-- <app-floating-configurator /> -->
         <div class="w-full max-w-md mx-auto bg-white dark:bg-surface-900 p-6 sm:p-8 rounded-2xl shadow-lg">
@@ -70,13 +73,14 @@ import { MessageService } from 'primeng/api';
     <p-button severity="warn"
       label="Sign In"
       styleClass="w-full"
-      (onClick)="onLogin()"
+      (click)="onLogin()"
     ></p-button>
   </div>
 </div>
 `
 })
-export class Login {
+export class LoginComponent {
+  @Output() loginSuccess = new EventEmitter<void>();
     email: string = '';
 
     password: string = '';
@@ -93,6 +97,7 @@ export class Login {
 
         this.loginService.loginUser(loginPayload).subscribe({
             next: (res) => {
+              this.loginSuccess.emit();
                 this.messageService.add({
                     key: 'global',
                     severity: 'success',
@@ -111,6 +116,7 @@ export class Login {
                 }
 
                 this.router.navigate(['/']);
+                window.location.reload();
                 this.email = "";
                 this.password = "";
             },

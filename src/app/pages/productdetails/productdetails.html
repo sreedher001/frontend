@@ -17,7 +17,9 @@
       >
         <ng-template #item let-item>
           <div class="aspect-w-4 aspect-h-3">
-            <img [src]="item.itemImageSrc" class="object-contain w-full h-full rounded-lg shadow" />
+            <img [src]="item.itemImageSrc" (load)="onImageLoad($event)"
+  [ngClass]="{ 'loaded': true }"
+             class="object-contain w-full h-full rounded-lg shadow" />
           </div>
         </ng-template>
 

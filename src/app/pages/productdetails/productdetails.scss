@@ -1,0 +1,45 @@
+/* General image fade-in animation */
+.gallery-img {
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.5s ease-out, transform 0.4s ease-out;
+}
+
+.gallery-img.loaded {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Thumbnail hover effect (also works on mobile as tap feedback) */
+::ng-deep .p-galleria-thumbnail-item img {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+::ng-deep .p-galleria-thumbnail-item img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Optional: Rounded shadowed container with mobile scaling */
+::ng-deep .p-galleria {
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.4s ease;
+}
+
+@media (max-width: 768px) {
+  /* Reduce image size slightly for phones */
+  .gallery-img {
+    transform: scale(0.95);
+  }
+
+  .gallery-img.loaded {
+    transform: scale(1);
+  }
+
+  ::ng-deep .p-galleria-thumbnail-item img:hover {
+    transform: scale(1.02);
+  }
+}
