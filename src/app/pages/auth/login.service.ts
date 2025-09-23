@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CommonService } from '@/layout/service/common';
 
@@ -42,4 +42,32 @@ export class LoginService {
    signup(payload: any): Observable<any> {
     return this.http.post(this.baseUrl+"/auth/signup", payload);
   }
+
+
+
+sendForgotOtp(email: string): Observable<any> {
+  return this.http.post(`${this.baseUrl}/auth/forgot-password?email=${encodeURIComponent(email)}`, {});
+}
+
+
+  //  Update: Verify OTP 
+verifyOtp(email: string, otp: string): Observable<any> {
+  const params = new HttpParams()
+    .set('email', email)
+    .set('otp', otp);
+
+  return this.http.post(`${this.baseUrl}/auth/verify-otp`,{}, { params });
+}
+
+  //  POST 
+ resetPassword(email: string, otp: string, password: string): Observable<any> {
+  const params = new HttpParams()
+    .set('email', email)
+    .set('otp', otp)
+    .set('password', password);
+
+  return this.http.post(`${this.baseUrl}/auth/reset-password`,{}, { params });
+}
+
+
 }

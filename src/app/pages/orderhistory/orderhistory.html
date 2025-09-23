@@ -1,0 +1,114 @@
+<div class="max-w-6xl mx-auto p-4 mt-12">
+    <h2 class="text-2xl font-bold mb-6 text-orange-500 flex items-center gap-2">
+        <i class="pi pi-history"></i>
+        Your Order History
+    </h2>
+
+    <!-- Loading Spinner -->
+    @if(loading){<p-progressSpinner strokeWidth="4"></p-progressSpinner>}
+
+    <!-- Orders Exist -->
+    @if(!loading && orders.length > 0){<ng-container>
+
+        <!--  Desktop Table View -->
+        <p-table [value]="orders" class="hidden lg:block" [scrollable]="true" scrollHeight="400px"
+            [style]="{ 'min-width': '60rem' }">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Items</th>
+                    <th>Image</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-order>
+                <tr>
+                    <td><p-tag severity="warn" >
+  {{ order.orderNumber }}
+</p-tag></td>
+                    <td>{{ order.orderDate | date: 'medium' }}</td>
+                    <td>₹{{ order.totalAmount.toFixed(2) }}</td>
+                    <td>{{ order.paymentMode || 'N/A' }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>
+                        <ul class="list-disc pl-4 text-sm">
+                            @for (item of order.items; track item.variantId) {
+                            <li>{{ item.productName }} ({{ item.quantity }}) - {{ item.size }}</li>
+                            }
+
+                        </ul>
+                    </td>
+                    <td>
+                        <p-avatarGroup>
+                            @for (item of order.items; track item.variantId) {
+                            <p-overlay-badge [value]=item.quantity severity="warn" class="flex">
+                                <p-avatar [image]="item.imageUrl" shape="square" size="xlarge"></p-avatar>
+                            </p-overlay-badge>
+                            }
+
+                        </p-avatarGroup>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+        <!-- ✅ Mobile View: Card Style -->
+        <div class="lg:hidden space-y-4">
+            @for (order of orders; track order.orderNumber) {<p-card class="shadow-sm">
+                <ng-template pTemplate="header">
+                    <div class="text-sm text-gray-600">
+                        <p-tag severity="warn" >
+  {{ order.orderNumber }}
+</p-tag>
+                    </div>
+                </ng-template>
+
+                <div class="text-sm">
+                    <div class="mb-2">
+                        <strong>Date:</strong> {{ order.orderDate | date: 'mediumDate' }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Total:</strong> ₹{{ order.totalAmount.toFixed(2) }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Payment:</strong> {{ order.paymentMode || 'N/A' }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Status:</strong> {{ order.status }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Items:</strong>
+                        <ul class="pl-4 list-disc">
+                            @for (item of order.items; track item.variantId) {
+                            <li>
+                                {{ item.productName }} ({{ item.quantity }}) - {{ item.size }}
+                            </li>
+                            }
+
+                        </ul>
+                    </div>
+                </div>
+
+                <ng-template pTemplate="footer">
+                    <p-avatarGroup>
+                        @for (item of order.items; track item.variantId) {
+                        <p-overlay-badge [value]=item.quantity severity="warn" class="inline-flex">
+                            <p-avatar [image]="item.imageUrl" shape="square" size="xlarge" (click)="goToProductDetails(item.variantId)"></p-avatar>
+                        </p-overlay-badge>
+                        }
+
+                    </p-avatarGroup>
+                </ng-template>
+
+            </p-card>}
+        </div>
+    </ng-container>}
+
+    <!--  No Orders -->
+    @if(!loading && orders.length === 0){<div class="text-center text-gray-500 mt-4">
+        You have no order history yet.
+    </div>}
+</div>

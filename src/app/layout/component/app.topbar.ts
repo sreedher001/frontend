@@ -326,15 +326,15 @@ const loggedIn = localStorage.getItem('isLoggedIn');
         { separator: true },
         {
             label: 'My Profile',
-            icon: 'pi pi-id-card'
+            icon: 'pi pi-id-card',
         },{ separator: true },
         {
             label: 'My Orders',
-            icon: 'pi pi-box'
+            icon: 'pi pi-box', command: () => this.myOrders()
         },{ separator: true },
         {
             label: 'Wishlist',
-            icon: 'pi pi-heart'
+            icon: 'pi pi-heart',command:()=>this.goTOWishList()
         },{ separator: true },
         {
             label: 'Settings',
@@ -351,6 +351,7 @@ const loggedIn = localStorage.getItem('isLoggedIn');
         { label: 'Sign Up', icon: 'pi pi-user-plus', command: () => this.signup() }
       ];
     }}
+  
 
     logout() {
       this.messageService.add({
@@ -367,6 +368,17 @@ this.drawerVisible=false;
 window.location.reload();
 
     }
+    myOrders(): void {
+      this.drawerVisible=false;
+    this.router.navigate(['/order/order-history']);
+    
+  }
+
+   goTOWishList(): void {
+      this.drawerVisible=false;
+    this.router.navigate(['/wishlist']);
+    
+  }
 
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
