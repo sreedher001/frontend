@@ -181,15 +181,20 @@ if (this.isEditMode && this.editingAddressId !== null) {
       paymentMode: this.selectedPaymentMode
     };
 
-    console.log('Submitting:', checkoutRequest);
-
     this.checkoutService.Checkout(checkoutRequest).subscribe({
   next: (res:any) => {
     console.log('Order placed successfully:', res);
     if (this.selectedPaymentMode === 'UPI') {
-        this.createRazorpayOrder(res.orderNumber);
+        this.createRazorpayOrder(res);
+        this.messageService.add({
+          key:'global',
+          severity: 'success',
+          summary: 'Order placed',
+          detail: 'Your order has been placed successfully!'
+        });
       } else {
         this.messageService.add({
+          key:'global',
           severity: 'success',
           summary: 'Order placed',
           detail: 'Your order has been placed with COD'
@@ -198,40 +203,55 @@ if (this.isEditMode && this.editingAddressId !== null) {
 
   },
   error: (err) => {
-    console.error('Checkout failed:', err);
+    this.messageService.add({
+          key:'global',
+          severity: 'warn',
+          summary: 'Oops!',
+          detail: err.error.message
+        });
   }
 });
     // TODO: Send to backend via HTTP POST
 
     
   }
-  createRazorpayOrder(orderNumber: string) {
-  this.checkoutService.createRazorpayOrder(orderNumber).subscribe({
-    next: (razorpayOrder) => {
-      this.openRazorpayWidget(razorpayOrder, orderNumber);
+  createRazorpayOrder(order: any) {
+  
+      this.openRazorpayWidget(order);
       
-    },
-    error: () => {
-      this.messageService.add({ severity: 'error', summary: 'Failed', detail: 'Could not create payment order' });
-    }
-  });
+ 
 }
 
-openRazorpayWidget(order: any, orderNumber: string) {
+openRazorpayWidget(order: any) {
+
+    console.log("Razorpay Order ID:", order.razorPayOrderId);
   const options: any = {
-    key: order.key,
+    key: order.apikey,
     amount: order.amount,
     currency: order.currency,
     name: "ZFC Store",
     description: "Order Payment",
-    order_id: order.razorpayOrderId,
+    order_id: order.razorPayOrderId,
     handler: (response: any) => {
-      this.verifyRazorpayPayment({
-        orderNumber: orderNumber,
-        razorpayPaymentId: response.razorpay_payment_id,
-        razorpayOrderId: response.razorpay_order_id,
-        razorpaySignature: response.razorpay_signature
+      // Payment succeeded in Razorpay UI, but verification happens via webhook on backend
+      this.messageService.add({
+        key:'global',
+        severity: 'info',
+        summary: 'Payment Processing',
+        detail: 'Your payment was successful. Order confirmation will be sent shortly.'
       });
+      // Optional: disable further payment attempts, redirect user, etc.
+    },
+    modal: {
+      ondismiss: () => {
+        // User closed the payment modal without completing payment
+        this.messageService.add({
+          key:'global',
+          severity: 'warn',
+          summary: 'Payment Cancelled',
+          detail: 'You cancelled the payment. Please try again to complete your order.'
+        });
+      }
     },
     prefill: {
       name: this.userInfo.username,
@@ -242,22 +262,22 @@ openRazorpayWidget(order: any, orderNumber: string) {
       color: '#F37254'
     },
     method: {
-    upi: true, 
-    card: true,
-    netbanking: true,
-    wallet: true,
-  },
-  upi: {
-  flow: 'qr'
-}
-
+      upi: true, 
+      card: true,
+      netbanking: true,
+      wallet: false,
+    },
+    upi: {
+      flow: 'qr'
+    }
   };
 
   this.loadRazorpayScript().then(() => {
-  const rzp = new Razorpay(options);
-  rzp.open();
-});
+    const rzp = new Razorpay(options);
+    rzp.open();
+  });
 }
+
 
 loadRazorpayScript(): Promise<void> {
   return new Promise((resolve, reject) => {

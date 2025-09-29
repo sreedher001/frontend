@@ -6,57 +6,96 @@
       <h1 class="text-xl font-semibold mb-4">My cart</h1>
 
       @if (cart.items.length > 0) {
-        @for (item of cart.items; track item.variantId) {
-          <div class="flex flex-col border-b border-gray-200 py-4 gap-3">
-            <!-- Top Row: Image + Details -->
-            <div class="flex gap-3">
-              <!-- Product Image -->
-              <div class="w-24 h-24 flex-shrink-0 bg-gray-100 rounded flex items-center justify-center">
-                <img 
-  [src]="item.imageUrl" 
-  alt="{{ item.variantName }}" 
-  class="max-w-full max-h-full object-contain cursor-pointer"
-  (click)="goToProductDetails(item.variantId)" 
-/>
-              </div>
+      @for (item of cart.items; track item.id) {
+      <div class="relative flex flex-col border-b border-gray-200 py-4 gap-3 mt-2  rounded rounded-2xl" [ngClass]="{
+    'bg-green-10': item.selectedSizeObj?.availableQuantity > 0,
+    'bg-red-50': item.selectedSizeObj?.availableQuantity <= 0}">
+        <!--  Delete Button (Top-Right) -->
+        <!--  Positioning wrapper -->
+        <div class="absolute top-2 right-2 z-10">
+          <p-button icon="pi pi-times" severity="danger" outlined (onClick)="removeFromCart(item)" raised size="small"
+            aria-label="Remove from cart">
+          </p-button>
+        </div>
+        <!-- In Stock / Out of Stock Badge -->
 
-              <!-- Product Info -->
-              <div class="flex-1 space-y-1">
-                <p class="font-medium text-sm sm:text-base">{{ item.variantName }}</p>
-                <p-tag value="Color: {{ item.color }}" severity="secondary" class="text-xs"></p-tag>
 
-                 <!-- Quantity + Size + Total: Single Row on All Devices -->
+
+
+        <!-- Top Row: Image + Details -->
+        <div class="flex gap-3">
+          <!-- Product Image -->
+          <div class="w-24 h-24 flex-shrink-0 bg-gray-100 rounded flex items-center justify-center">
+            <img [src]="item.imageUrl" alt="{{ item.variantName }}"
+              class="max-w-full max-h-full object-contain cursor-pointer"
+              (click)="goToProductDetails(item.variantId)" />
+          </div>
+
+          <!-- Product Info -->
+          <div class="flex-1 space-y-1">
+            <p class="font-medium text-sm sm:text-base">{{ item.variantName }}</p>
+            <p-tag value="Color: {{ item.color }}" severity="secondary" class="text-xs"></p-tag>
+
+            <div class="d-flex">
+              @if(item.selectedSizeObj?.availableQuantity > 0){<p-tag value="In Stock" severity="success"
+                class="text-xs font-medium">
+              </p-tag>}
+
+              @if(item.selectedSizeObj?.availableQuantity <= 0){<p-tag value="Out of Stock" severity="danger"
+                class="text-xs font-medium">
+                </p-tag>}
+            </div>
+            <!-- Quantity + Size + Total: Single Row on All Devices -->
             <div class="flex flex-wrap items-center justify-between gap-2 text-sm">
               <!-- Quantity Control -->
-              <div class="flex items-center border border-gray-300 rounded overflow-hidden">
-                <button class="px-2 py-1" (click)="decreaseQuantity(item)">−</button>
-                <span class="px-3">{{ item.quantity }}</span>
-                <button class="px-2 py-1" (click)="increaseQuantity(item)">+</button>
-                <!-- Size Dropdown -->
-             
-              </div>
-              <div class="w-40">   
-<p-autocomplete [(ngModel)]="item.size" name="size" #size="ngModel" required
-              [suggestions]="autoFilteredSizeValue" optionLabel="size" field="size" dropdown forceSelection="true" type="false"
-              (completeMethod)="filterSize($event,item)"  inputId="size" (keydown)="preventTyping($event)"
-              [inputStyle]="{ 'caretColor': 'transparent' }"
-              class="w-full">
-            </p-autocomplete>
-              </div>
-            </div>
-              </div>
-            </div>
+              <div class="flex items-center  overflow-hidden w-fit">
 
-           
+                <!-- Decrease Button -->
+                <p-button severity="contrast" outlined raised size="small" (click)="decreaseQuantity(item)"
+                  aria-label="Decrease quantity">
+                  <i class="pi pi-minus"></i>
+                </p-button>
+
+                <!-- Quantity Display -->
+                <span class=" text-sm font-semibold text-orange-500 min-w-[32px] text-center">
+                  <p-tag value="{{ item.quantity }}" severity="contrast"></p-tag>
+                </span>
+
+                <!-- Increase Button -->
+                <p-button severity="contrast" outlined raised size="small" (click)="increaseQuantity(item)"
+                  aria-label="Increase quantity">
+                  <i class="pi pi-plus"></i>
+                </p-button>
+
+              </div>
+
+              <div class="w-40">
+                <p-autocomplete [(ngModel)]="item.selectedSizeObj" name="size" #size="ngModel" required
+                  [suggestions]="autoFilteredSizeValue" optionLabel="size" field="size" dropdown forceSelection="true"
+                  type="false" (completeMethod)="filterSize($event,item)" inputId="size"
+                  (keydown)="preventTyping($event)" (onSelect)="onSizeChange(item)"
+                  [inputStyle]="{ 'caretColor': 'transparent' }" class="w-full">
+                </p-autocomplete>
+                @if(item.selectedSizeObj?.availableQuantity <= 0 && item.availableSizes.length>1){ <span>
+                  <p-tag value="Check other sizes" severity="danger" class="text-xs font-medium">
+                  </p-tag>
+                  </span>
+                  }
+              </div>
+            </div>
           </div>
-        }
+        </div>
+
+
+      </div>
+      }
       } @else {
-        <div class="flex flex-col items-center justify-center py-16 text-center text-gray-500">
-  <div class="text-6xl">🛒</div>
-  <p class="mt-4 text-lg">Your cart is empty.</p>
-  <p class="text-sm">Looks like you haven’t added anything yet.</p>
-  <p-button class="mt-3 text-orange-500" severity="warn" raised  (click)="goToShop()">Explore Products</p-button>
-</div>
+      <div class="flex flex-col items-center justify-center py-16 text-center text-gray-500">
+        <div class="text-6xl">🛒</div>
+        <p class="mt-4 text-lg">Your cart is empty.</p>
+        <p class="text-sm">Looks like you haven’t added anything yet.</p>
+        <p-button class="mt-3 text-orange-500" severity="warn" raised (click)="goToShop()">Explore Products</p-button>
+      </div>
 
       }
     </div>
@@ -69,26 +108,21 @@
           <span class="font-semibold">₹{{ getCartTotal() | number:'1.2-2' }}</span>
         </p>
 
-        <p-button 
-  severity="warn" 
-  size="large" 
-  raised 
-  label="Proceed to Buy" 
-  styleClass="w-full"
-  (click)="goToCheckout()">
-</p-button>
+        <p-button severity="warn" size="large" raised label="Proceed to Buy" styleClass="w-full"
+          (click)="goToCheckout()">
+        </p-button>
 
 
       </div>
 
       <!-- Related Products -->
-      <div class="bg-white rounded-lg shadow p-4 mt-4">
+      <!-- <div class="bg-white rounded-lg shadow p-4 mt-4">
         <h2 class="text-sm font-semibold mb-2">Products related to your cart</h2>
         <small class="text-gray-500 mb-3 block">Sponsored</small>
 
         @for (product of relatedProducts; track product.id) {
           <div class="flex gap-3 mb-4 pb-4 border-b border-gray-200">
-            <!-- Product Info -->
+            
             <div class="flex flex-col flex-1">
               <p class="text-xs font-medium line-clamp-2">{{ product.name }}</p>
               <div class="flex items-center gap-1 text-xs text-yellow-500">
@@ -100,7 +134,7 @@
             </div>
           </div>
         }
-      </div>
+      </div> -->
     </div>}
 
   </div>

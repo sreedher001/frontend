@@ -7,4 +7,5 @@ export interface sizeDto{
      sku:string;
      hsnCode:string;
      inventoryStatus:any;
+     stockAdjustment:number;
 }

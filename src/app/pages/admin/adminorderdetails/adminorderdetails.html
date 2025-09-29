@@ -1,0 +1,108 @@
+<div class="card mx-auto p-4 mt-12">
+ @if(!loading && orderDetails) { <h2 class="text-2xl font-bold mb-6 text-orange-500 flex items-center gap-2">
+    <i class="pi pi-eye"></i>
+    Order Details - <span class="ml-1">{{ orderDetails.orderNumber }}</span>
+  </h2>}
+
+
+  <!-- Order Info -->
+  @if(!loading && orderDetails) {
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Left: Order Summary -->
+      <div class="space-y-3 text-sm">
+        <p><strong>Customer:</strong> {{ orderDetails.username }}</p>
+        <p><strong>Order Date:</strong> {{ orderDetails.orderDate | date:'medium' }}</p>
+        <p><strong>Payment Mode:</strong> {{ orderDetails.paymentMode }}</p>
+        <p><strong>Status:</strong> 
+          <p-tag severity="success" value="{{ orderDetails.status }}"></p-tag>
+        </p>
+        <p><strong>Total Amount:</strong> ₹{{ orderDetails.totalAmount.toFixed(2) }}</p>
+      </div>
+
+      <!-- Right: Shipping Address -->
+      <div class="bg-green-100 p-4 rounded shadow text-sm">
+        <h3 class="font-semibold text-orange-700 mb-2">Shipping Address</h3>
+        <p>{{ orderDetails.shippingAddressDto.address }}</p>
+        <p>{{ orderDetails.shippingAddressDto.city }}, {{ orderDetails.shippingAddressDto.state }} - {{ orderDetails.shippingAddressDto.pinCode }}</p>
+        <p>{{ orderDetails.shippingAddressDto.country }}</p>
+        <p><strong>Phone:</strong> {{ orderDetails.shippingAddressDto.phoneNumber }}</p>
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <h3 class="text-lg font-semibold mb-2 text-gray-800">Ordered Items</h3>
+    <p-table [value]="orderDetails.items" [scrollable]="true" scrollHeight="300px" class="mb-8"
+             [style]="{ 'min-width': '60rem' }">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Image</th>
+          <th>Product</th>
+          <th>Color</th>
+          <th>Size</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>
+            <p-avatar shape="square" size="large" [image]="item.imageUrl"></p-avatar>
+          </td>
+          <td>{{ item.productName || 'Unnamed Product' }}</td>
+          <td>{{ item.color }}</td>
+          <td>{{ item.size }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>₹{{ item.price.toFixed(2) }}</td>
+          <td>₹{{ item.total.toFixed(2) }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <!-- Admin Controls -->
+<div class="flex flex-wrap gap-3 mt-4">
+  <p-button 
+    label="Mark as Shipped" 
+    icon="pi pi-truck" 
+    severity="success" 
+    (click)="updateOrderStatus(orderDetails.id,'SHIPPED')"
+    [disabled]="orderDetails.status === 'SHIPPED' || orderDetails.status === 'REJECTED'"
+  ></p-button>
+
+  <p-button 
+    label="Reject Order" 
+    icon="pi pi-times" 
+    severity="danger" 
+    (click)="updateOrderStatus(orderDetails.id,'REJECTED')" 
+    [disabled]="orderDetails.status === 'SHIPPED' || orderDetails.status === 'REJECTED'"
+  ></p-button>
+
+  <p-autoComplete
+  [(ngModel)]="selectedStatus"
+  [suggestions]="filteredStatusOptions"
+  (completeMethod)="filterStatus($event)"
+  field="label"
+  [dropdown]="true"
+  placeholder="Update Status"
+  [forceSelection]="true"
+  class="w-64"
+></p-autoComplete>
+
+
+  <p-button 
+    label="Apply" 
+    icon="pi pi-check" 
+    severity="warn"
+    (click)="updateOrderStatus(orderDetails.id, selectedStatus)" 
+    [disabled]="!selectedStatus || selectedStatus.value === orderDetails.status"
+  ></p-button>
+</div>
+  }
+
+  <!-- Error / No Data -->
+  @if(!loading && !orderDetails) {
+    <div class="text-center text-gray-500">Order not found.</div>
+  }
+
+</div>
+

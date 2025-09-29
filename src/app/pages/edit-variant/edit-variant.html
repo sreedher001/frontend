@@ -252,9 +252,9 @@
               <th>Discount %</th>
               <th>SKU</th>
               <th>HSN</th>
-              <th>Available</th>
-              <th>Low Stock</th>
-              <th>Status</th>
+              <th>Available Qty</th>
+              <th>Threshold to notify</th>
+              <th>Adjustment</th>
               <th>Actions</th>
             </tr>
           </ng-template>
@@ -333,31 +333,35 @@
                 </p-cellEditor>
               </td>
 
-              <!-- Inventory Status -->
+              <!--  Adjustments -->
               <td pEditableColumn>
-                <p-cellEditor>
-                  <!-- Input template -->
-                  <ng-template pTemplate="input">
-                    <p-autoComplete [(ngModel)]="size.inventoryStatus" [suggestions]="filteredStatuses"
-                      (completeMethod)="filterStatuses($event)" placeholder="Select Status" class="w-full">
-                      <ng-template let-status pTemplate="item">
-                        <div>{{ status }}</div>
-                      </ng-template>
-                    </p-autoComplete>
-                  </ng-template>
+  <p-cellEditor>
+    <!-- Input template -->
+    <ng-template pTemplate="input">
+      <p-inputNumber [(ngModel)]="size.stockAdjustment"
+                     inputId="stockAdjustment"
+                     mode="decimal"
+                     [showButtons]="true"
+                     [min]="-size.availableQuantity"
+                     [step]="1"
+                     [placeholder]="'Adjust Stock'"
+                     class="w-full">
+      </p-inputNumber>
+    </ng-template>
 
-                  <!-- Output template -->
-                  <ng-template pTemplate="output">
-                    <span class="px-2 py-1 rounded text-xs font-semibold" [ngClass]="{
-          'bg-green-200 text-green-800': size.inventoryStatus==='IN_STOCK',
-          'bg-red-200 text-red-800': size.inventoryStatus==='OUT_OF_STOCK',
-          'bg-yellow-200 text-yellow-800': size.inventoryStatus==='LOW_STOCK'
-        }">
-                      {{ size.inventoryStatus }}
-                    </span>
-                  </ng-template>
-                </p-cellEditor>
-              </td>
+    <!-- Output template -->
+    <ng-template pTemplate="output">
+      <span [ngClass]="{
+        'text-green-700': size.stockAdjustment > 0,
+        'text-red-700': size.stockAdjustment < 0,
+        'text-gray-500': size.stockAdjustment === 0
+      }">
+        {{ size.stockAdjustment || 0 }}
+      </span>
+    </ng-template>
+  </p-cellEditor>
+</td>
+
 
 
 

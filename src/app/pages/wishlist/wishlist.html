@@ -4,12 +4,13 @@
     <i class="pi pi-heart"></i>
     Your Wishlist
   </h2>
+  
 
 
   <!-- Wishlist Items -->
   @if(!loading && wishlist.length > 0){<div  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     @for (item of wishlist; track item.variantId) {
-      <p-card class="shadow-sm cursor-pointer" (click)="goToProductDetails(item.variantId)">
+      <p-card class="relative shadow-sm cursor-pointer" (click)="goToProductDetails(item.variantId)">
         <ng-template pTemplate="header">
           <p-avatar
             [image]="item.imageUrl"
@@ -17,6 +18,13 @@
             size="xlarge"
             class="rounded-lg mx-auto mb-3"
           ></p-avatar>
+          <button
+    (click)="removeItemFromWishlist(item.variantId, $event)"
+    class="absolute top-2 right-2 text-red-500 hover:text-red-700 bg-white rounded-full p-2 shadow-md"
+    title="Remove from Wishlist"
+  >
+    <i class="pi pi-times text-lg"></i>
+  </button>
         </ng-template>
 
         <div class="text-center">
@@ -30,12 +38,30 @@
             {{ item.inStock ? 'In Stock' : 'Out of Stock' }}
           </div>
         </div>
+        
       </p-card>
     }
   </div>}
 
   <!-- Empty Wishlist -->
-  @if(!loading && wishlist.length === 0){<div class="text-center text-gray-500 mt-8">
-    Your wishlist is empty. Start adding your favorite products!
-  </div>}
+@if (!loading && wishlist.length === 0) {
+  <div class="text-center text-gray-500 mt-16 flex flex-col items-center justify-center">
+    
+    <!-- Large Icon -->
+    <i class="pi pi-ban text-6xl text-orange-400 mb-6"></i>
+
+    <!-- Message -->
+    <p class="text-lg mb-4">Your wishlist is empty. Start adding your favorite products!</p>
+
+    <!-- Go to Products Button -->
+    <p-button
+      severity="warn" raised 
+      label="Browse Products"
+      icon="pi pi-arrow-right"
+      (click)="goToProducts()"
+    ></p-button>
+
+  </div>
+}
+
 </div>

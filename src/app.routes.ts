@@ -15,6 +15,8 @@ import { Addvariant } from '@/pages/admin/addvariant/addvariant';
 import { Checkout } from '@/pages/checkout/checkout';
 import { Orderhistory } from '@/pages/orderhistory/orderhistory';
 import { Wishlist } from '@/pages/wishlist/wishlist';
+import { Adminorder } from '@/pages/admin/adminorder/adminorder';
+import { Adminorderdetails } from '@/pages/admin/adminorderdetails/adminorderdetails';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -31,6 +33,8 @@ export const appRoutes: Routes = [
             { path: 'cart', component: Cart},
             { path: 'order/order-history', component: Orderhistory},
             { path: 'wishlist', component: Wishlist},
+            { path: 'admin/orders', component: Adminorder},
+            { path: 'admin/order-details/:id', component: Adminorderdetails},
             { path: 'checkout', component: Checkout},
             { path: 'auth/signup', component: Signup},
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },

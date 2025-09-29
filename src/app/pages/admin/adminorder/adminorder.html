@@ -1,0 +1,50 @@
+<div class="p-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <h2 class="text-2xl font-bold text-gray-800">All Orders - Summary</h2>
+
+        <div class="flex items-center gap-3">
+            <p-floatlabel variant="in"><p-datepicker [(ngModel)]="startDate"  inputId="startDate" [iconDisplay]="'input'"
+                    [showIcon]="true" [maxDate]="maxDate" /><label for="startDate">Start Date</label></p-floatlabel>
+            <p-floatlabel variant="in"><p-datepicker [(ngModel)]="endDate" inputId="endDate" [iconDisplay]="'input'"
+                    [showIcon]="true" [maxDate]="maxDate" /><label for="endDate">End Date</label></p-floatlabel>
+            <p-button severity="warn" raised type="button" label="Filter" icon="pi pi-filter" class="p-button-sm"
+                (click)="loadOrdersByDateRange(startDate, endDate)"></p-button>
+        </div>
+
+
+    </div>
+
+    <p-table [value]="orders" [paginator]="true" [rows]="pageSize" [totalRecords]="totalOrders" [lazy]="true"
+        (onLazyLoad)="onPageChange($event)" [loading]="loading" empt>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Order #</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-order>
+            <tr>
+                <td><a [routerLink]="['/admin/order-details', order.id]" class="cursor-pointer">
+  <p-tag value="{{ order.orderNumber }}" severity="warn" class="hover:underline" style="cursor: pointer;"></p-tag>
+</a>
+</td>
+                <td>{{ order.username }}</td>
+                <td>₹{{ order.totalAmount }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.orderDate | date:'short' }}</td>
+
+                
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td [attr.colspan]="6" class="text-center">No records found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

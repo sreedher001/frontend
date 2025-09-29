@@ -13,6 +13,7 @@ export interface AddToCartPayload {
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
+   
     commonService: CommonService = new CommonService;
     private baseUrl = this.commonService.baseUrl;
 
@@ -28,6 +29,21 @@ export class CartService {
     }
 
     removeItem(productId: number): Observable<any> {
-        return this.http.delete(`${this.baseUrl}/cart/remove/${productId}`);
+         const params = new HttpParams()
+      .set('productId', productId);
+        return this.http.post(`${this.baseUrl}/cart/remove`, null, {
+  params
+});
     }
+
+    updateCartItem(productId: number, quantity: number, size: string) {
+
+
+    const params = new HttpParams()
+      .set('productId', productId)
+      .set('quantity', quantity)
+      .set('size', size);
+
+    return this.http.post(`${this.baseUrl}/cart/update`, null, {params });
+  }
 }

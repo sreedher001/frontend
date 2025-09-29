@@ -5,7 +5,7 @@ import { CartService } from './cart.service';
 import { CardModule } from 'primeng/card';
 import { BehaviorSubject } from 'rxjs';
 import { CartItemDto, CartResponse } from './cart.model';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { Product } from '@/models/product.model';
 import { Products } from '../products/products';
 import { Productdetails } from '../productdetails/productdetails';
@@ -14,11 +14,12 @@ import { MessageService } from 'primeng/api';
 import { TagModule } from 'primeng/tag';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { Router } from '@angular/router';
+import { BadgeModule } from 'primeng/badge';
 
 @Component({
   selector: 'app-cart',
   standalone:true,
-  imports: [ButtonModule, FormsModule, CardModule,DecimalPipe,TagModule,AutoCompleteModule,ButtonModule],
+  imports: [ButtonModule,NgClass, FormsModule, BadgeModule,CardModule,DecimalPipe,TagModule,AutoCompleteModule,ButtonModule],
   templateUrl: './cart.html',
   styleUrl: './cart.scss'
 })
@@ -74,8 +75,14 @@ autoFilteredSizeValue: any[] = [];
   this.cartService.getCart().subscribe({
     next: (res) => {
       this.cart = res;
+      
       this.cart.items.forEach((item) => {
        item.sizeOptions = item.availableSizes;
+
+        item.selectedSizeObj = item.sizeOptions.find(
+    (opt: any) => opt.size === item.size
+  );
+  console.log("selectedsize",item.selectedSizeObj);
       });
     },
     error: (err) => {
@@ -90,7 +97,7 @@ autoFilteredSizeValue: any[] = [];
 
     for (let i = 0; i < (item.sizeOptions as any[]).length; i++) {
       const sizeItem = (item.sizeOptions as any[])[i];
-      if (sizeItem.size.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+      if (sizeItem.size.toLowerCase().indexOf(query.toLowerCase()) == 0 && sizeItem.availableQuantity>0) {
         filtered.push(sizeItem);
       }
     }
@@ -151,24 +158,88 @@ goToShop() {
   updateCartCount(count: number) {
     this.cartCountSubject.next(count);
   }
-increaseQuantity(item: CartItemDto) {
-  if (item.quantity < 10) {
+increaseQuantity(item: any) {
+  const selectedSize = item.size;
+console.log("selected",selectedSize);
+  // Find the matching available size object
+  const sizeInfo = item.sizeOptions.find(
+    (size: any) => size.size === selectedSize
+  );
+  console.log("sizeInfo",sizeInfo);
+
+  if (!sizeInfo) {
+    this.messageService.add({
+      key: 'global',
+      severity: 'error',
+      summary: 'Size Info Missing',
+      detail: 'Cannot find stock info for selected size.',
+      life: 3000
+    });
+    return;
+  }
+
+  if (item.quantity < sizeInfo.availableQuantity) {
     item.quantity++;
     this.updateCartItem(item);
+  } else {
+    this.messageService.add({
+      key: 'global',
+      severity: 'warn',
+      summary: 'Stock Limit Reached',
+      detail: `Only ${sizeInfo.availableQuantity} items available in stock.`,
+      life: 3000
+    });
   }
 }
 
-decreaseQuantity(item: CartItemDto) {
+
+decreaseQuantity(item: any) {
   if (item.quantity > 1) {
     item.quantity--;
     this.updateCartItem(item);
   }
 }
 
-updateCartItem(item: CartItemDto) {
-  // Call backend to update quantity, or re-calculate total if local
-  item.total = item.quantity * item.price;
-  // Optionally: call cartService.updateItem(item) if using API
+updateCartItem(item: any) {
+  this.cartService.updateCartItem(item.id, item.quantity, item.size)
+      .subscribe({
+        next: (res: any) => {
+          console.log('Cart updated:', res);
+        },
+        error: (err:any) => {
+          console.error('Update failed:', err);
+        }
+      });
+}
+ onSizeChange(item: any) {
+  if (item.selectedSizeObj) {
+    item.size = item.selectedSizeObj.size; // keep string for backend
+    item.quantity=1;
+    this.updateCartItem(item);
+  }
+}
+
+removeFromCart(item: any): void {
+  this.cartService.removeItem(item.id).subscribe({
+    next: (res: any) => {
+      this.cart.items = this.cart.items.filter(i => i.id !== item.id);
+      this.messageService.add({
+      key: 'global',
+      severity: 'success',
+      summary: 'Removed',
+      icon:'pi pi-trash',
+      detail: `${item.variantName} removed from cart.`
+    });
+    },
+    error: (error) => {
+      this.messageService.add({
+      key: 'global',
+      severity: 'danger',
+      summary: 'Failed to remove!',
+      icon:'pi pi-times'
+    });
+    }
+  });
 }
 
 }

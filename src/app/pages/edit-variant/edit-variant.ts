@@ -458,8 +458,14 @@ updateVariant() {
     id: this.product.variant.id,
     color: this.product.variant.color,
     description:this.product.variant.variantDescription,
-    fit:this.product.variant.fit.name,
-    pattern:this.product.variant.pattern.name,
+    fit: typeof this.product.variant.fit === 'string'
+  ? this.product.variant.fit
+  : this.product.variant.fit?.name || '',
+
+pattern: typeof this.product.variant.pattern === 'string'
+  ? this.product.variant.pattern
+  : this.product.variant.pattern?.name || '',
+
     rating:this.product.variant.rating,
     season:this.product.variant.season.map((s:any) => s.name).join(','),
     styleCategory:this.product.variant.styleCategory.styleCategory,
