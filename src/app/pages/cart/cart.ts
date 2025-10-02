@@ -72,6 +72,10 @@ autoFilteredSizeValue: any[] = [];
   //   });
   // }
   loadCart(): void {
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+  if (isLoggedIn) {
+    // Load from backend
   this.cartService.getCart().subscribe({
     next: (res) => {
       this.cart = res;
@@ -89,7 +93,48 @@ autoFilteredSizeValue: any[] = [];
       console.error('Failed to load cart', err);
     }
   });
+}else {
+    // Load from localStorage (guest cart)
+    const guestCartKey = 'guestCart';
+    const guestCart = JSON.parse(localStorage.getItem(guestCartKey) || '[]');
+
+    // Map guest cart into same format as backend `CartResponse`
+    this.cart = {
+      cartId: 0, // No ID for guest cart
+      items: guestCart.map((item: any) => ({
+        id: item.variantId, // or another identifier
+        productId: item.variantId,
+        variantName: item.variantName,
+        quantity: item.quantity,
+        size: item.size,
+        sizeOptions: [ // single option or placeholder
+          {
+            size: item.size,
+            price: item.price,
+            availableQuantity: 9999,
+            discountPercentage: item.discountPercentage
+          }
+        ],
+        selectedSizeObj: {
+          size: item.size,
+          price: item.price,
+          availableQuantity: 9999,
+          discountPercentage: item.discountPercentage
+        },
+        total: this.calculateItemTotal(item),
+        image: item.image
+      }))
+    };
+  }
 }
+//for guest cart
+calculateItemTotal(item: any): number {
+  const price = item.price;
+  const discount = item.discountPercentage || 0;
+  const finalPrice = price - (price * discount / 100);
+  return finalPrice * item.quantity;
+}
+
 
  filterSize(event: AutoCompleteCompleteEvent,item:any) {
     const query = event.query;

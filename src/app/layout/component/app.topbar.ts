@@ -33,9 +33,13 @@ import { DrawerModule } from 'primeng/drawer';
           shadow-md border-b border-orange-200">
   <div class="layout-topbar-logo-container flex items-center">
     <!-- Menu button -->
-    <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
+    @if(isAdmin){<button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
       <i class="pi pi-bars"></i>
+    </button>}@else{
+      <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
+      <i class="pi pi-filter"></i>
     </button>
+    }
 
     <!-- Logo -->
     <a class="layout-topbar-logo ml-2" routerLink="/products">
@@ -138,15 +142,15 @@ import { DrawerModule } from 'primeng/drawer';
         <!-- Cart Button -->
         <button 
           type="button" 
-          class="relative flex items-center justify-center bg-pink-100 dark:bg-pink-400/10 rounded-full shrink-0" 
+          class="relative flex items-center justify-center bg-pink-100 dark:bg-pink-400/10 rounded-lg shrink-0" 
           style="width: 2.5rem; height: 2.5rem;" 
           (click)="viewCart()"
           pTooltip="View items in your bag" 
           tooltipPosition="top"
-        >
+        > 
           <i class="cart-button pi pi-shopping-bag text-pink-500 text-xl"></i>
           @if(cartCount > 0) {
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none z-10">
+            <span class="absolute -top-0 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-lg flex items-center justify-center leading-none z-10">
               {{ cartCount }}
             </span>
           }
@@ -242,9 +246,7 @@ import { DrawerModule } from 'primeng/drawer';
       }
     </div>
   </div>
-}
-
-`
+}`
 })
 
 
@@ -256,6 +258,7 @@ export class AppTopbar implements OnInit {
 
     searchQuery: string | any='';
   filteredProducts: any[] = [];
+  isAdmin=false;
 
   private searchSubject = new Subject<string>();
     items!: MenuItem[];
@@ -264,13 +267,21 @@ export class AppTopbar implements OnInit {
         items: []
 
     };
+
     isLoggedIn: boolean = false;
     cartCount: number = 0;
     userName:any ='';
     overlayMenuItems: MenuItem[] = [];
      ngOnInit(): void {
         this.setUserMenuItem();
-       
+        if (localStorage.getItem("isLoggedIn") === "true") {
+const roles = this.jwtHelper.getUserRoles(); // assuming this returns an array
+
+  if (roles && roles.includes("ROLE_ADMIN")) {
+    this.isAdmin=true;
+  }
+  this.getcart();
+}
 
     }
      constructor(public layoutService: LayoutService, private cartService: CartService,private messageService:MessageService,
@@ -291,10 +302,8 @@ export class AppTopbar implements OnInit {
           });
           
           this.cd.markForCheck();
-          console.log("filtered",this.filteredProducts)
         },
         error: (err:any) => {
-          console.error('Autocomplete error', err);
           this.filteredProducts = [];
         }
       });
@@ -365,7 +374,8 @@ const loggedIn = localStorage.getItem('isLoggedIn');
 this.drawerVisible=false;
         localStorage.removeItem('username');
        this.jwtHelper.logout();
-window.location.reload();
+       window.location.reload();
+       this.router.navigate(['']);
 
     }
     myOrders(): void {
@@ -410,5 +420,15 @@ toggleMobileSearch() {
     this.searchSubject.next('');
   }
 }
-}
 
+getcart(){
+  this.cartService.getCart().subscribe({
+    next: (res) => {
+      this.cart = res;
+      this.cartCount = this.cart.items.length;
+    },
+    error: (err) => {
+      console.error('Failed to load cart', err);
+    }
+  });
+}}

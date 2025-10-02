@@ -63,6 +63,21 @@ isSizeSelected=false;
   return 'bg-white-100 text-red-500';                            // low rating
 }
 
+hasUniformPrice(sizes: any[]): boolean {
+  if (!sizes || sizes.length === 0) return true;
+  const firstPrice = sizes[0].price;
+  const firstDiscount = sizes[0].discountPercentage;
+  return sizes.every(s =>
+    s.price === firstPrice && s.discountPercentage === firstDiscount
+  );
+}
+
+getDiscountedPrice(size: any): number {
+  if (!size || size.discountPercentage === 0) return size.price;
+  return Math.round(size.price - (size.price * size.discountPercentage / 100));
+}
+
+
 
   selectSize(size: any) {
   if (size.availableQuantity > 0) {
@@ -103,7 +118,17 @@ isSizeSelected=false;
     });
     return;
   }
+  const payload: any = {
+    variantId: variant.id,
+    sizeId: this.selectedSize.id,
+    color: variant.color,
+    quantity: 1
+  };
     const sizeId = this.selectedSize.id;
+const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+if (isLoggedIn) {
+  // Logged-in: use backend
     this.cartService.addToCart({ variantId: variant.id,sizeId:sizeId,color:variant.color, quantity: 1 }).subscribe({
       next: () => {
         this.isSizeSelected=true;
@@ -128,6 +153,48 @@ isSizeSelected=false;
         });
       }
     });
+  }
+    else {
+    // Guest: Save in localStorage
+    const guestCartKey = 'guestCart';
+    const guestCart = JSON.parse(localStorage.getItem(guestCartKey) || '[]');
+
+    const newItem = {
+      ...payload,
+      variantName: variant.variantName,
+      size: this.selectedSize.size,
+      price: this.selectedSize.price,
+      discountPercentage: this.selectedSize.discountPercentage,
+      image: variant.productImage?.[0]?.imageUrl || ''
+    };
+
+    // Check if already in guest cart
+    const existing = guestCart.find((item: any) =>
+      item.variantId === newItem.variantId &&
+      item.sizeId === newItem.sizeId
+    );
+
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      guestCart.push(newItem);
+    }
+
+    localStorage.setItem(guestCartKey, JSON.stringify(guestCart));
+
+    this.messageService.add({
+      key: 'global',
+      severity: 'success',
+      summary: 'Added to Bag (Guest)',
+      detail: `${variant.variantName} added. Login to checkout.`
+    });
+
+    this.showStylePanel = true;
+    if (navigateToCart) {
+      this.router.navigate(['/cart']);
+    }
+  }
+  
   }
 
   buyNow(variant: any,event: Event): void {

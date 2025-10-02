@@ -1,0 +1,81 @@
+<div class="card mb-8 flex flex-col">
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+    <h3 class="text-2xl font-semibold text-gray-800 flex items-center gap-2">
+      📊 Sales Trend
+    </h3>
+
+    <p-autoComplete 
+      [(ngModel)]="selectedView" 
+      [suggestions]="filteredViews"
+      (completeMethod)="filterViewModes($event)" 
+      (onSelect)="fetchSalesData()"
+      [minLength]="0"
+      [dropdown]="true"
+      inputStyleClass="min-w-[160px] sm:w-40 w-full"
+      placeholder="Select View"
+    ></p-autoComplete>
+  </div>
+
+  <!-- Chart Section -->
+  
+    <p-chart 
+      type="line" 
+      [data]="chartData" 
+      [options]="chartOptions"
+      class="h-[30rem]"
+    ></p-chart>
+
+  <!-- Summary Section -->
+<div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center text-sm sm:text-base text-gray-700">
+  
+  <!-- Total Sales -->
+  <div class="bg-gray-50 rounded-lg py-4 px-5 shadow-sm flex flex-col items-center">
+    <div class="mb-2 text-blue-600 text-2xl">
+      <i class="pi pi-wallet"></i> <!-- PrimeIcons wallet -->
+    </div>
+    <div class="text-xs font-semibold text-gray-500 uppercase">Total Sales</div>
+    <div class="text-xl font-bold text-gray-800">₹{{ summary.total | number }}</div>
+  </div>
+
+  <!-- Growth -->
+  <div class="bg-gray-50 rounded-lg py-4 px-5 shadow-sm flex flex-col items-center">
+    <div 
+      class="mb-2 text-2xl"
+      [ngClass]="{
+        'text-green-600': summary.growth >= 0,
+        'text-red-600': summary.growth < 0
+      }"
+    >
+      <i 
+        class="pi"
+        [ngClass]="{
+          'pi-arrow-up': summary.growth >= 0,
+          'pi-arrow-down': summary.growth < 0
+        }"
+      ></i>
+    </div>
+    <div class="text-xs font-semibold text-gray-500 uppercase">Growth</div>
+    <div 
+      class="text-xl font-bold"
+      [ngClass]="{
+        'text-green-600': summary.growth >= 0,
+        'text-red-600': summary.growth < 0
+      }"
+    >
+      {{ summary.growth | number:'1.2-2' }}%
+    </div>
+  </div>
+
+  <!-- Best Period -->
+  <div class="bg-gray-50 rounded-lg py-4 px-5 shadow-sm flex flex-col items-center">
+    <div class="mb-2 text-purple-600 text-2xl">
+      <i class="pi pi-calendar"></i>
+    </div>
+    <div class="text-xs font-semibold text-gray-500 uppercase">Best Period</div>
+    <div class="text-xl font-bold text-gray-800">{{ summary.bestPeriod }}</div>
+  </div>
+
+</div>
+
+</div>

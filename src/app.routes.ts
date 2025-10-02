@@ -17,28 +17,32 @@ import { Orderhistory } from '@/pages/orderhistory/orderhistory';
 import { Wishlist } from '@/pages/wishlist/wishlist';
 import { Adminorder } from '@/pages/admin/adminorder/adminorder';
 import { Adminorderdetails } from '@/pages/admin/adminorderdetails/adminorderdetails';
+import { Salestrend } from '@/pages/dashboard/salestrend/salestrend';
+import { AuthGuard } from 'src/app/security/authguard';
+import { LoginGuard } from '@/security/login.guard';
 export const appRoutes: Routes = [
     {
         path: '',
         component: AppLayout,
         children: [
-            { path: 'admin/dashboard', component: Dashboard },
+            { path: 'admin/dashboard', component: Dashboard,canActivate: [AuthGuard] },
             { path: '', component: Products },
             { path: 'products', component: Products },
             { path: 'product-details/:id', component: Productdetails },
-            { path: 'admin/products/edit', component: EditVariant},
-            { path: 'admin/products/add', component: Addproduct},
-            { path: 'admin/products/addvariant', component: Addvariant},
-            { path: 'admin/products/manageproducts', component: Manageproducts},
+            { path: 'admin/products/edit', component: EditVariant,canActivate: [AuthGuard]},
+            { path: 'admin/products/add', component: Addproduct,canActivate: [AuthGuard]},
+            { path: 'admin/products/addvariant', component: Addvariant,canActivate: [AuthGuard]},
+            { path: 'admin/products/manageproducts', component: Manageproducts,canActivate: [AuthGuard]},
             { path: 'cart', component: Cart},
             { path: 'order/order-history', component: Orderhistory},
             { path: 'wishlist', component: Wishlist},
-            { path: 'admin/orders', component: Adminorder},
-            { path: 'admin/order-details/:id', component: Adminorderdetails},
-            { path: 'checkout', component: Checkout},
+            { path: 'admin/orders', component: Adminorder,canActivate: [AuthGuard]},
+            { path: 'admin/order-details/:id', component: Adminorderdetails,canActivate: [AuthGuard]},
+            { path: 'admin/sales/trend', component: Salestrend,canActivate: [AuthGuard]},
+            { path: 'checkout', component: Checkout,canActivate:[LoginGuard]},
             { path: 'auth/signup', component: Signup},
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
-            { path: 'documentation', component: Documentation },
+            // { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },

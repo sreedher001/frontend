@@ -174,10 +174,13 @@
               <p><strong>Order Date:</strong> {{ step.details.orderDate | date:'medium' }}</p>
               <p><strong>Items:</strong></p>
               <ul class="text-left">
-                <li *ngFor="let item of step.details.items">
-                  {{ item.productName }} ({{ item.color }}, {{ item.size }}) x
-                  {{ item.quantity }} - ₹{{ item.total }}
-                </li>
+                @for (item of step.details.items; track item) {
+  <li>
+    {{ item.productName }} ({{ item.color }}, {{ item.size }}) x
+    {{ item.quantity }} - ₹{{ item.total }}
+  </li>
+}
+
               </ul>
             </div>}
 

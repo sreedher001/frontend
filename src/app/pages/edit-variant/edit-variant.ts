@@ -47,6 +47,8 @@ import { FitService } from '../service/fit.service';
 import { PatternService } from '../service/pattern.service';
 import { OccasionService } from '../service/occation.service';
 import { Addproductservice } from '../admin/addproduct/addproductservice';
+import { BadgeModule } from 'primeng/badge';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-input-demo',
@@ -70,7 +72,7 @@ import { Addproductservice } from '../admin/addproduct/addproductservice';
     RatingModule,
     ColorPickerModule,
     KnobModule,
-    SelectModule,
+    SelectModule,TagModule,
     DatePickerModule,
     TooltipModule,
     ToggleButtonModule,
@@ -81,7 +83,7 @@ import { Addproductservice } from '../admin/addproduct/addproductservice';
     ListboxModule,
     InputGroupAddonModule,
     TextareaModule, FileUploadModule, GalleriaModule,
-    Tooltip,DialogModule
+    Tooltip,DialogModule,BadgeModule
 ],
   templateUrl: './edit-variant.html',
   providers: [ NodeService]
@@ -156,6 +158,14 @@ constructor(private route: ActivatedRoute, private productService: ProductServic
 
     //this.nodeService.getFiles().then((data) => (this.treeSelectNodes = data));
   }
+
+ getSeverity(inventory: number): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
+  if (inventory > 3) return 'success';  // In stock
+   if (inventory > 0 && inventory<=3 ) return 'warn';      // Low stock
+   return 'danger';                       // Out of stock
+}
+
+
 
   getStyleCategory() {
     this.addProductService.getStyleCategory().subscribe({
@@ -444,11 +454,20 @@ addSize() {
     hsnCode: '',
     availableQuantity: 0,
     lowStockThreshold: 0,
-    inventoryStatus: 'IN_STOCK'
+    inventoryStatus: ''
   };
   this.product.variant.sizes.push(newSize);
 }
 
+getStatusLabel(size: any): string {
+  if (size.availableQuantity > (size.lowStockThreshold || 3)) {
+    return 'In Stock';
+  } else if (size.availableQuantity > 0 && size.availableQuantity <=3 ) {
+    return 'Low Stock';
+  } else {
+    return 'Out of Stock';
+  }
+}
 
 updateVariant() {
   const variantId = this.product.variant.id;
@@ -495,6 +514,7 @@ pattern: typeof this.product.variant.pattern === 'string'
         detail: res.message || 'Variant updated successfully'
       });
       this.displayConfirmation = false;
+      window.location.reload();
     },
     error: (err:any) => {
       this.messageService.add({
