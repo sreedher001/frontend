@@ -144,7 +144,7 @@ console.log("paylload",payload);
           console.log("response signup",res);
           this.messageService.add({
         key: 'global',
-        severity: 'Success',
+        severity: 'success',
         summary: 'Verify email!',
         detail: 'Click on the link sent to your mail and verify',
         sticky:true
@@ -156,7 +156,7 @@ console.log("paylload",payload);
         key: 'global',
         severity: 'error',
         summary: 'Oops!',
-        detail: 'Something went wrong. Write to us at zyrafashioncurves@gmail.com',
+        detail: err.error.message,
         sticky:true
       });
         }
