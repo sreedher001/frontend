@@ -136,7 +136,6 @@ if (signupForm.invalid) {
       this.loading = true;
       const payload = {...this.user};
       //delete payload.confirmPassword;
-console.log("paylload",payload);
       this.loginService.signup(payload).subscribe({
         next: (res) => {
           this.loading = false; 
@@ -145,8 +144,8 @@ console.log("paylload",payload);
           this.messageService.add({
         key: 'global',
         severity: 'success',
-        summary: 'Verify email!',
-        detail: 'Click on the link sent to your mail and verify',
+        summary: 'Verify your mail!',
+        detail: `Click on the link sent to your email -${this.user.email} and verify`,
         sticky:true
       });
         },
