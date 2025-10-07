@@ -375,7 +375,7 @@ this.drawerVisible=false;
         localStorage.removeItem('username');
        this.jwtHelper.logout();
        window.location.reload();
-       this.router.navigate(['']);
+       this.router.navigate(['/products']);
 
     }
     myOrders(): void {

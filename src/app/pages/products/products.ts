@@ -149,12 +149,12 @@ handleLoginSuccess($event:any) {
       next: (res) => {
         this.products = res.content;
         this.loading = false;
-        this.messageService.add({
-          key: 'global',
-          severity: 'success',
-          summary: 'TADA!',
-          detail: 'Enjoy shopping with ZFC!'
-        });
+        // this.messageService.add({
+        //   key: 'global',
+        //   severity: 'success',
+        //   summary: 'TADA!',
+        //   detail: 'Enjoy shopping with ZFC!'
+        // });
       },
       error: (err) => {
         console.error('Failed to fetch products:', err);

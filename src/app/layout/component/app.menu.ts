@@ -35,7 +35,10 @@ isAdmin=false;
                 { label: 'Add New Product', icon: 'pi pi-fw pi-plus', routerLink: ['/admin/products/add'] },
                 { label: 'Manage Products', icon: 'pi pi-fw pi-cog', routerLink: ['/admin/products/manageproducts'] },
                 { label: 'Add New Variant', icon: 'pi pi-fw pi-plus', routerLink: ['/admin/products/addvariant'] },
-                { label: 'Manage Orders', icon: 'pi pi-fw pi-cog', routerLink: ['/admin/orders'] }
+                { label: 'Manage Orders', icon: 'pi pi-fw pi-cog', routerLink: ['/admin/orders'] },
+                { label: 'Register Expense', icon: 'pi pi-receipt', routerLink: ['/admin/invoice'] },
+                
+                { label: 'View Expense', icon: 'pi pi-eye', routerLink: ['/admin/invoice-list'] }
             ]
             },
             

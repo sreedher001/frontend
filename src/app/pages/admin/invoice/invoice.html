@@ -1,0 +1,273 @@
+<form #invoiceForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
+  <p-fluid class="flex flex-col gap-6 mt-4">
+
+    <!-- Invoice Metadata -->
+    <div class="card p-4 flex flex-col gap-4">
+      <h4 class="font-bold text-lg">Upload Invoice</h4>
+
+      <div class="flex flex-wrap gap-4">
+        <!-- Vendor -->
+        <div class="w-full sm:w-1/2 lg:w-1/4">
+          <p-floatlabel variant="on">
+            <input
+              pInputText
+              id="vendor"
+              name="vendor"
+              [(ngModel)]="invoice.vendorName"
+              required
+              class="w-full"
+            />
+            <label for="vendor">Vendor Name</label>
+          </p-floatlabel>
+          @if(invoiceForm.submitted && !invoice.vendorName){<small class="p-error">Required</small>}
+        </div>
+
+        <!-- Invoice Date -->
+        <div class="w-full sm:w-1/2 lg:w-1/4">
+          <p-floatlabel variant="on">
+            <p-datepicker 
+              [(ngModel)]="invoice.invoiceDate"
+              [iconDisplay]="'input'"
+              [showIcon]="true"
+              inputId="invoiceDate"
+              dateFormat="yy-mm-dd"
+              class="w-full"
+              name="invoiceDate"
+              required
+            />
+            <label for="invoiceDate">Invoice Date</label>
+          </p-floatlabel>
+          @if(invoiceForm.submitted && !invoice.invoiceDate){<small class="p-error">Required</small>}
+        </div>
+
+        <!-- Amount -->
+        <div class="w-full sm:w-1/2 lg:w-1/4">
+          <p-floatlabel variant="on">
+            <input
+              pInputText
+              id="amount"
+              name="amount"
+              [(ngModel)]="invoice.amount"
+              required
+              class="w-full"
+            />
+            <label for="amount">Total Amount</label>
+          </p-floatlabel>
+          @if(invoiceForm.submitted && !invoice.amount){<small class="p-error">Required</small>}
+        </div>
+
+        <!-- Currency -->
+        <div class="w-full sm:w-1/2 lg:w-1/4">
+          <p-floatlabel variant="on">
+            <input
+              pInputText
+              id="currency"
+              name="currency"
+              [(ngModel)]="invoice.currency"
+              required
+              class="w-full"
+            />
+            <label for="currency">Currency</label>
+          </p-floatlabel>
+          @if(invoiceForm.submitted && !invoice.currency){<small class="p-error text-red-500">Required</small>}
+        </div>
+
+         <div class="w-full sm:w-1/2 lg:w-1/4">
+          <p-floatlabel variant="on">
+            <input
+              pInputText
+              id="paymentMethod"
+              name="paymentMethod"
+              [(ngModel)]="invoice.paymentMethod"
+              required
+              class="w-full"
+            />
+            <label for="paymentMethod">Payment Method</label>
+          </p-floatlabel>
+          @if(invoiceForm.submitted && !invoice.paymentMethod){<small class="p-error">Required</small>}
+        </div>
+
+         <div class="w-full sm:w-1/2 lg:w-1/4">
+          <p-floatlabel variant="on">
+            <input
+              pInputText
+              id="category"
+              name="category"
+              [(ngModel)]="invoice.category"
+              required
+              class="w-full"
+            />
+            <label for="category">Category</label>
+          </p-floatlabel>
+          <!-- @if(invoiceForm.submitted && !invoice.category){<small class="p-error">Required</small>} -->
+        </div>
+        <div class="w-full sm:w-1/2 lg:w-1/4">
+          <p-floatlabel variant="on">
+            <input
+              pInputText
+              id="tags"
+              name="tags"
+              [(ngModel)]="invoice.tags"
+              required
+              class="w-full"
+            />
+            <label for="tags">Tags</label>
+          </p-floatlabel>
+          <!-- @if(invoiceForm.submitted && !invoice.category){<small class="p-error">Required</small>} -->
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- Size Details Table -->
+    <p-fluid class="flex ">
+      <div class="card flex flex-col gap-6 w-full">
+        <div class="flex justify-between items-center flex-wrap mt-2">
+          <h6 class="mb-0">Add the item details</h6>
+          <p-button label="Add Item" icon="pi pi-plus" severity="warn" raised (click)="addInvoiceItem()"
+              pTooltip="Add new item" tooltipPosition="left">
+          </p-button>
+        </div>
+
+       
+        <!-- Invoice Items Table -->
+<p-table [value]="invoice.invoiceItem" dataKey="sku" editMode="row" [responsiveLayout]="'scroll'" class="w-full">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Item Name</th>
+      <th>Price for 1-qty</th>
+      <th>Quantity</th>
+      <th>Actions</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-item let-editing="editing" let-ri="rowIndex">
+    <tr [pEditableRow]="item">
+      <!-- Item Name -->
+      <td pEditableColumn>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input
+              pInputText
+              [(ngModel)]="item.itemName"
+              name="itemName_{{ ri }}"
+              required
+            />
+          </ng-template>
+          <ng-template pTemplate="output">{{ item.itemName }}</ng-template>
+        </p-cellEditor>
+      </td>
+
+      <!-- Price -->
+      <td pEditableColumn>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <p-inputnumber
+              [(ngModel)]="item.price"
+              name="price_{{ ri }}"
+              mode="decimal"
+              required
+            ></p-inputnumber>
+          </ng-template>
+          <ng-template pTemplate="output">{{ item.price }}</ng-template>
+        </p-cellEditor>
+      </td>
+
+      <!-- Quantity -->
+      <td pEditableColumn>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <p-inputnumber
+              [(ngModel)]="item.quantity"
+              name="quantity_{{ ri }}"
+              required
+            ></p-inputnumber>
+          </ng-template>
+          <ng-template pTemplate="output">{{ item.quantity }}</ng-template>
+        </p-cellEditor>
+      </td>
+
+      <!-- Actions -->
+      <td>
+        <div class="flex gap-2">
+          @if (!editing) {
+            <p-button
+              icon="pi pi-pencil"
+              pInitEditableRow
+              severity="info"
+              outlined
+              rounded
+              raised
+            ></p-button>
+          }
+          @if (editing) {
+            <p-button
+              icon="pi pi-check"
+              pSaveEditableRow
+              severity="success"
+              outlined
+              rounded
+              raised
+            ></p-button>
+            <p-button
+              icon="pi pi-times"
+              pCancelEditableRow
+              severity="secondary"
+              outlined
+              rounded
+              raised
+            ></p-button>
+          }
+          <p-button
+            icon="pi pi-trash"
+            severity="danger"
+            outlined
+            rounded
+            raised
+            (click)="removeItem(item)"
+          ></p-button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+
+
+      </div>
+    </p-fluid>
+
+    <!-- File Upload Section - moved to bottom -->
+    <div class="card p-4 flex flex-col gap-4">
+      <h5 class="font-semibold">Attach Invoice File</h5>
+
+      <p-fileupload
+        name="invoiceFile"
+        [customUpload]="true"
+        accept=".pdf,.png,.jpg,.jpeg"
+        [auto]="false"
+        [showUploadButton]="false"
+        (uploadHandler)="onFileUpload($event)"
+        (onSelect)="onFileSelect($event)"
+        (onRemove)="onFileClear($event)"
+        [maxFileSize]="2000000"
+        chooseLabel="Choose File"
+        cancelLabel="Clear"
+        [multiple]="false"
+        required
+      >
+        <ng-template #empty>
+          <div class="text-center text-gray-500">Drag & drop or browse to upload</div>
+        </ng-template>
+      </p-fileupload>
+
+      @if(invoiceForm.submitted && !uploadedFile){<small class="p-error">File is required</small>}
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex justify-end">
+      <p-button type="submit" label="Upload Invoice" icon="pi pi-upload" severity="warn" size="large" />
+    </div>
+  </p-fluid>
+</form>

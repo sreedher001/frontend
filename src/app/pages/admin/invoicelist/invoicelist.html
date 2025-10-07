@@ -1,0 +1,123 @@
+<div class="p-4 card">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <h2 class="text-2xl font-bold text-gray-800">All Invoice - Summary</h2>
+
+        <div class="flex items-center gap-3">
+            
+            <p-floatlabel variant="in"><p-datepicker [(ngModel)]="startDate"  inputId="startDate" [iconDisplay]="'input'"
+                    [showIcon]="true" [maxDate]="maxDate" /><label for="startDate">Start Date</label></p-floatlabel>
+            <p-floatlabel variant="in"><p-datepicker [(ngModel)]="endDate" inputId="endDate" [iconDisplay]="'input'"
+                    [showIcon]="true" [maxDate]="maxDate" /><label for="endDate">End Date</label></p-floatlabel>
+            <p-button severity="warn" raised type="button" label="Filter" icon="pi pi-filter" class="p-button-sm"
+                (click)="loadInvoiceByDateRange(startDate, endDate)"></p-button>
+        </div>
+        <div>
+            <a [routerLink]="['/admin/invoice']">
+  <p-button severity="secondary"  type="button" label="Add New Expense" icon="pi pi-receipt" class="p-button-sm"></p-button>
+</a>
+        </div>
+
+
+    </div>
+
+    <p-table [value]="invoices" [paginator]="true" [rows]="pageSize" [totalRecords]="totalInvoices" [lazy]="true"
+        (onLazyLoad)="onPageChange($event)" [loading]="loading" empt>
+
+
+<ng-template pTemplate="header">
+    <tr>
+        <th>Invoice #</th>
+        <th>Vendor</th>
+        <th>Amount</th>
+        <th>Invoice/purchase Date</th>
+        <th>Actions</th>
+    </tr>
+</ng-template>
+
+
+        <ng-template pTemplate="body" let-invoice>
+    <tr >
+        <td>
+            <p-tag value="INV-{{ invoice.id }}" severity="warn"></p-tag>
+        </td>
+        <td>{{ invoice.vendorName }}</td>
+        <td>₹{{ invoice.amount }}</td>
+        <td>{{ invoice.invoiceDate | date:'mediumDate' }}</td>
+        <td>
+  <div class="flex items-center gap-2">
+    <p-button icon="pi pi-eye" severity="warn" rounded outlined raised (click)="viewInvoice(invoice)"></p-button>
+
+    <a [href]="invoice.s3Url" target="_blank" download>
+      <p-button icon="pi pi-download" rounded outlined raised></p-button>
+    </a>
+
+    <p-button icon="pi pi-trash" severity="danger" pTooltip="Delete invoice" rounded outlined raised (click)="deleteInvoice(invoice)"></p-button>
+  </div>
+</td>
+
+    </tr>
+</ng-template>
+    </p-table>
+</div>
+<p-confirmDialog></p-confirmDialog>
+<p-dialog header="Invoice Details" [(visible)]="invoiceDialogVisible" [modal]="true">
+    @if(selectedInvoice){<ng-container >
+        <div class="grid grid-cols-2 gap-4">
+            <div><strong>Invoice ID:</strong> {{ selectedInvoice.id }}</div>
+            <div><strong>Vendor:</strong> {{ selectedInvoice.vendorName }}</div>
+            <div><strong>Amount:</strong> ₹{{ selectedInvoice.amount }}</div>
+            <div><strong>Currency:</strong> {{ selectedInvoice.currency }}</div>
+            <div><strong>Category:</strong> {{ selectedInvoice.category }}</div>
+            <div><strong>Payment Method:</strong> {{ selectedInvoice.paymentMethod }}</div>
+            <div><strong>Tags:</strong> {{ selectedInvoice.tags }}</div>
+            <div><strong>Invoice Date:</strong> {{ selectedInvoice.invoiceDate | date:'mediumDate' }}</div>
+        </div>
+
+        <h4 class="mt-6 mb-2">Items</h4>
+        <p-table [value]="selectedInvoice.invoiceItem">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Item Name</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>price</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item>
+                <tr>
+                    <td>{{ item.itemName }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.price }}</td>
+                    <td>₹{{ item.totalPrice }}</td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+    <tr>
+      <td colspan="3" class="text-right font-bold" style="color: rgb(227, 150, 5)">Total</td>
+      <td class="font-bold" style="color: rgb(227, 150, 5);">₹{{ getTotal(selectedInvoice.invoiceItem) }}</td>
+
+    </tr>
+  </ng-template>
+        </p-table>
+        <div class="text-right mt-4">
+            <a [href]="selectedInvoice.s3Url" target="_blank" download>
+                <p-button  icon="pi pi-download"   severity="warn" outlined label="Download Invoice" ></p-button>
+            </a>
+        </div>
+        <div class="mb-4 mt-2">
+            <img [src]="selectedInvoice.s3Url" alt="Invoice Image" class="w-full h-auto rounded shadow" />
+        </div>
+
+        <div class="text-right mt-4">
+            <a [href]="selectedInvoice.s3Url" target="_blank" download>
+                <p-button  icon="pi pi-download"   severity="warn" outlined label="Download Invoice" ></p-button>
+            </a>
+        </div>
+        <div class="text-right mt-4">
+        <p-button icon="pi pi-trash" severity="danger" label="Delete Invoice" pTooltip="Delete invoice"  outlined raised (click)="deleteInvoice(selectedInvoice)"></p-button>
+</div>
+    </ng-container>}
+    
+</p-dialog>
+

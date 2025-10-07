@@ -20,6 +20,8 @@ import { Adminorderdetails } from '@/pages/admin/adminorderdetails/adminorderdet
 import { Salestrend } from '@/pages/dashboard/salestrend/salestrend';
 import { AuthGuard } from 'src/app/security/authguard';
 import { LoginGuard } from '@/security/login.guard';
+import { Invoice } from '@/pages/admin/invoice/invoice';
+import { Invoicelist } from '@/pages/admin/invoicelist/invoicelist';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -37,6 +39,8 @@ export const appRoutes: Routes = [
             { path: 'order/order-history', component: Orderhistory},
             { path: 'wishlist', component: Wishlist},
             { path: 'admin/orders', component: Adminorder,canActivate: [AuthGuard]},
+            { path: 'admin/invoice', component: Invoice,canActivate: [AuthGuard]},
+            { path: 'admin/invoice-list', component: Invoicelist,canActivate: [AuthGuard]},
             { path: 'admin/order-details/:id', component: Adminorderdetails,canActivate: [AuthGuard]},
             { path: 'admin/sales/trend', component: Salestrend,canActivate: [AuthGuard]},
             { path: 'checkout', component: Checkout,canActivate:[LoginGuard]},
