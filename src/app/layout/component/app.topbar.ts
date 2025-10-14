@@ -29,8 +29,8 @@ import { DrawerModule } from 'primeng/drawer';
     ButtonModule,DrawerModule,
         MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule,AutoCompleteModule],
     template: `<div class="layout-topbar 
-         bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 
-          shadow-md border-b border-orange-200">
+         bg-gradient-to-r from-[#f9e0bb] via-[#fce7d2] to-[#fff7ed] 
+         shadow-md border-b border-[#e2b14c] text-[#8a5c1d]">
   <div class="layout-topbar-logo-container flex items-center">
     <!-- Menu button -->
     @if(isAdmin){<button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -375,7 +375,7 @@ this.drawerVisible=false;
         localStorage.removeItem('username');
        this.jwtHelper.logout();
        window.location.reload();
-       this.router.navigate(['/products']);
+       this.router.navigate(['']);
 
     }
     myOrders(): void {

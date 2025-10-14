@@ -10,9 +10,9 @@ export interface ProductVariantResponseDto{
     fit:string;
     pattern:string;
     season:any;
-    occation:any;
+    occasion:any;
     isFeatured:any;
-    rating:any;
+    rating:number;
     variantDescription:string;
     productImage:ProductImage[];
     sizes:SizeInventoryDto[];

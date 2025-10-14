@@ -1,0 +1,72 @@
+<div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1 cursor-pointer mt-12">
+  @for (product of products; track product.productId) {
+  @for (variant of product.variants; track variant.id) {
+
+  <div
+    class="bg-white rounded-2xl shadow-md border border-orange-100 overflow-hidden hover:shadow-lg transition duration-300 relative"
+    (click)="onCardClick(product, variant)">
+
+    @if (isAdmin) {
+    <div class="absolute top-2 right-2 flex space-x-2 z-10">
+      <p-button pTooltip="Edit" icon="pi pi-pencil" severity="info" raised rounded outlined
+        (onClick)="editProduct(variant,$event); $event.stopPropagation()">
+      </p-button>
+      <p-button pTooltip="Delete" icon="pi pi-trash" severity="danger" raised rounded outlined
+        (onClick)="deleteProduct(variant,$event); $event.stopPropagation()">
+      </p-button>
+
+
+    </div>
+    }@else {
+    <p-button [icon]="isInWishlist(variant) ? 'pi pi-heart-fill' : 'pi pi-heart'"
+      [severity]="isInWishlist(variant) ? 'danger' : 'secondary'" [raised]="isInWishlist(variant) ? true:false" rounded
+      size="small" class="absolute top-2 right-2 z-10"
+      pTooltip="{{ isInWishlist(variant) ? 'Remove from Wishlist' : 'Add to Wishlist' }}" tooltipPosition="left"
+      (onClick)="toggleWishlist(variant, $event)">
+    </p-button>
+
+
+    }
+
+    <div class="relative w-full h-60 sm:h-72 md:h-80">
+      <img class="w-full h-full object-cover" [src]="getVariantFrontImage(variant)" [alt]="product.name"
+        loading="lazy" />
+    </div>
+
+    <div class="p-3 sm:p-4">
+      <p class="text-base sm:text-sm text-gray-700 font-medium line-clamp-2 w-full block" title="{{ product.name }}">
+        {{ product.name }}
+      </p>
+
+      <div class="flex justify-between items-center ">
+        <div class="flex flex-col">
+          <span class="price text-green-800 font-semibold">
+            ₹{{ getVariantFinalPrice(variant) | number:'1.0-0' }}
+          </span>
+          @if (getBestSize(variant)?.discountPercentage > 0) {
+          <span class="text-xs sm:text-sm text-red-500 line-through">
+            ₹{{ getBestSize(variant)?.price }}
+          </span>
+          }
+        </div>
+
+        <div class="flex justify-start items-center mt-2">
+          <p-badge [value]="'⭐ ' + variant.rating" severity="secondary"
+            class="text-sm sm:text-base px-3 py-2 font-medium rounded-lg">
+          </p-badge>
+        </div>
+      </div>
+
+      @if (hasDiscount(variant)) {
+      <p-badge [value]="getVariantSavings(variant)" severity="success"></p-badge>
+      }
+
+      <div class="mt-2 text-xs sm:text-sm text-gray-500">
+        Get it by {{ getDeliveryDate() }}
+      </div>
+    </div>
+  </div>
+
+
+  }
+  }

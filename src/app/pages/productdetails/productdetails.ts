@@ -14,6 +14,12 @@ import { BadgeModule } from 'primeng/badge';
 import { TagModule } from 'primeng/tag';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { CarouselModule } from 'primeng/carousel';
+
+interface RelatedItem {
+  variantId:number;
+  label: string; // Variant name
+  image: string; // Front image URL
+}
 @Component({
   selector: 'app-productdetails',
   imports: [GalleriaModule, ButtonModule, FormsModule,BadgeModule,TagModule,PanelMenuModule,CarouselModule],
@@ -24,11 +30,49 @@ import { CarouselModule } from 'primeng/carousel';
   providedIn: 'root' 
 })
 export class Productdetails implements OnInit {
+viewSimilar(arg0: number) {
+this.showStylePanel = !this.showStylePanel;
+}
+relatedItems: RelatedItem[] = [];
 productId!: number;
-product: any={};
+productResponse!:ProductResponse;
+
+product: Product = {
+  id: 0,
+  productId: '',
+  name: '',
+  description: '',
+  genderCategory: '',
+  category: '',
+  subCategory: '',
+  color: '',
+  rating: 0,
+  isFeatured: false,
+  uploadedAt: null,
+  variants: [],
+  variant: {
+    id: 0,
+    variantName: '',
+    color: '',
+    styleCategory: '',
+    fit: '',
+    pattern: '',
+    season: '',
+    occasion: '',
+    isFeatured: false,
+    rating: 0,
+    variantDescription: '',
+    productImage: [],
+    sizes: []
+  },
+  sizes: []
+};
+
   images: any[] = [];
  selectedSize: any = null;
 isSizeSelected=false;
+//hasRelatedItems=true;
+loading=true;
 
   constructor(private route: ActivatedRoute,private productService: ProductService, private cartService: CartService,
     private messageService: MessageService,private router: Router) {}
@@ -37,31 +81,50 @@ isSizeSelected=false;
     this.route.paramMap.subscribe(params => {
     this.productId = Number(params.get('id'));
     this.getProductByVariantId(this.productId);
-   // this.fetchProduct();
+    this.fetchSimilarProducts(this.productId);
+    
+    
   });
   }
-  // fetchProduct(): Product {
-  //   this.productService.getProductById(this.productId).subscribe({
-  //     next: (data) => {
-  //       this.product = data;
-  //       this.images = data.imageUrls.map((img: string) => ({
-  //         itemImageSrc: img,
-  //         thumbnailImageSrc: img,
-  //         alt: this.product.name,
-  //       }));
-  //     },
-  //     error: (err) => {
-  //       console.error('Error fetching product:', err);
-  //     }
-  //   });
-  //   return this.product;
-  // }
+  fetchSimilarProducts(variantId:number): Product {
+    this.productService.getSimilarProducts(variantId).subscribe({
+      next: (data) => {
+        this.product = data;
+        if(this.product.variants.length<=1){
+          // this.hasRelatedItems=false;
+          console.log("length=",this.product.variants.length);
+        }
+        this.relatedItems = this.product.variants.map((variant:any) => {
+          
+  const frontImage = variant.productImage.find((img:any) => img.viewType === 'front');
+  return {
+    variantId:variant?.id,
+    label: variant.variantName,
+    image: frontImage?.imageUrl || variant.name  // fallback if no front image
+  } as RelatedItem;
+});
+        
+      },
+      error: (err) => {
+        console.error('Error fetching product:', err);
+      }
+    });
+    return this.product;
+  }
   
   getRatingSeverity(rating: number): string {
   if (rating >= 4) return 'bg-white-100 text-green-500';      // high rating
   if (rating >= 3) return 'bg-white-100 text-yellow-500';     // medium rating
   return 'bg-white-100 text-red-500';                            // low rating
 }
+goToProductDetails(id: string) {
+  this.showStylePanel = false;
+  const currentId = this.route.snapshot.paramMap.get('id');
+  if (currentId !== id) {
+    this.router.navigate([`/product-details/${id}`]);
+  }
+}
+
 
 hasUniformPrice(sizes: any[]): boolean {
   if (!sizes || sizes.length === 0) return true;
@@ -85,17 +148,25 @@ getDiscountedPrice(size: any): number {
   }
 }
   getProductByVariantId(productId:number) {
+    this.loading=true;
+    this.product.variant.productImage = [];
+this.product.variant.sizes = [];
+
     this.productService.getProductByVariantId(productId).subscribe({
       next: (data) => {
-        this.product = data;
+
+      this.product = data;
+      this.product.variant.sizes =data.variant.sizes?? [];
+      this.product.variant.productImage=data.variant.productImage ?? [];
         this.images = this.product.variant.productImage.map((img: any) => ({
           itemImageSrc: img.imageUrl,
           thumbnailImageSrc: img.imageUrl,
           alt: this.product.name,
-        }));
+        }));this.loading=false;
       },
       error: (err) => {
         console.error('Error fetching product:', err);
+        this.loading=false;
       }
     });
   }
@@ -138,7 +209,7 @@ if (isLoggedIn) {
           summary: 'Added to your bag',
           detail: `${variant.variantName} was added successfully.`
         });
-        this.showStylePanel=true;
+        //this.showStylePanel=true;
         if (navigateToCart) {
           this.router.navigate(['/cart']);
         }
@@ -215,23 +286,6 @@ toggleStylePanel() {
   this.showStylePanel = !this.showStylePanel;
 }
 
-relatedItems = [
-  {
-    label: 'Denim Jacket',
-    image: 'assets/images/jacket.jpg',
-    description: 'Perfect with your current outfit'
-  },
-  {
-    label: 'White Sneakers',
-    image: 'assets/images/sneakers.jpg',
-    description: 'Casual and comfortable'
-  },
-  {
-    label: 'Leather Belt',
-    image: 'assets/images/belt.jpg',
-    description: 'Adds edge to your look'
-  }
-];
 
 
 }

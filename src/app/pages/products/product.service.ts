@@ -9,6 +9,7 @@ import { CommonService } from '@/layout/service/common';
   providedIn: 'root'
 })
 export class ProductService {
+  
 
   commonService:CommonService = new CommonService;
       private apiUrl = this.commonService.baseUrl;
@@ -43,6 +44,9 @@ getProductByVariantId(variantId: number): Observable<Product> {
     return this.http.get<Product>(`${this.apiUrl}/products/variants/${variantId}`);
   }
 
+  getSimilarProducts(variantId: number): Observable<Product> {
+    return this.http.post<Product>(`${this.apiUrl}/products/variants/${variantId}/similar`,{});
+  }
   updateVariant(variantId: number, formData: FormData) {
   return this.http.post<any>(
     `${this.apiUrl}/admin/products/variants/${variantId}`,  
@@ -108,4 +112,13 @@ addToWishlist(variantId: number): Observable<any> {
   removeFromWishlist(variantId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/wishlist/remove/${variantId}`, {});
   }
+
+  getWearType(wearType: any,page: number = 0, size: number = 10){
+
+  const params = new HttpParams()
+    .set('query', wearType)
+    .set('page', page)
+    .set('size', size);
+  return this.http.get<any>(`${this.apiUrl}/products/search/weartype`,{params });
+}
 }

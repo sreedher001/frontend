@@ -33,6 +33,7 @@ import {  LoginComponent } from "../auth/login";
 export class Products implements OnInit {
 
 
+
 wishlistVariantIds: Set<number> = new Set(); // Store variant IDs in wishlist
 wishlistItems: any[] = [];
 searchQuery:String='';
@@ -47,6 +48,7 @@ showLogin = false;
   page: number = 0;
 size: number = 10;
 lastPage: boolean = false;
+showWearSections = true;
 
   constructor(private productService: ProductService,private router: Router,private jwtHelper: JwtHelper,
      private cartService: CartService,
@@ -69,6 +71,8 @@ if(localStorage.getItem("isLoggedIn")==="true"){
   });
 }
     this.route.queryParams.subscribe(params => {
+      this.showWearSections = !params['search'];
+
     const searchQuery = params['search'];
 
     if (searchQuery) {
@@ -92,8 +96,10 @@ if(localStorage.getItem("isLoggedIn")==="true"){
 
   }
 selectChip(chip: any) {
+  
   this.selectedChip = chip;
-  // You can also emit an event or trigger a filter here if needed
+  const style=chip.label;
+ this.router.navigate(['/search', style]);
 }
 
 // checkDeviceAndAuthStatus() {
@@ -110,21 +116,18 @@ selectChip(chip: any) {
 
 chips = [
   {
-    label: 'Ethinic',
-    image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png',
+    label: 'Ethnic Wear',
+    image: '',
   },
   {
-    label: 'Mon&Daughter',
-    image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/asiyajavayant.png',
+    label: 'Mom&Daughter',
+    image: '',
   },
   {
-    label: 'Casuals',
-    image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/onyamalimba.png',
+    label: 'Casual Wear',
+    image: '',
   },
-  {
-    label: 'Formal',
-    image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/xuxuefeng.png',
-  },
+  
 ];
 navigateTo(link: string): void {
   this.router.navigateByUrl(link);
@@ -147,14 +150,10 @@ handleLoginSuccess($event:any) {
     this.loading = true;
     this.productService.getAllProducts(0, 10).subscribe({
       next: (res) => {
-        this.products = res.content;
+        this.productResponseDto=res;
+        this.products = this.productResponseDto.content;
         this.loading = false;
-        // this.messageService.add({
-        //   key: 'global',
-        //   severity: 'success',
-        //   summary: 'TADA!',
-        //   detail: 'Enjoy shopping with ZFC!'
-        // });
+        
       },
       error: (err) => {
         console.error('Failed to fetch products:', err);
@@ -411,6 +410,10 @@ getBestSize(variant: any) {
   );
 }
 
+getRating(variant: any) {
+  return variant.rating;
+  
+}
 
 offers = [
   {
@@ -436,4 +439,30 @@ offers = [
   }
 ];
 
+
+// getWearType(wearType:any){
+// this.productService.getWearType(wearType).subscribe({
+//       next: (res) => {
+//         this.productResponseDto = res;
+//         this.products.push(...res.content);
+//         this.lastPage = res.last; // comes from Spring Data Page
+//       this.page++; // increment for next call
+//       this.loading = false;
+//       },
+//       error: (err) => {
+//         console.error('Failed to fetch products:', err);
+//         this.loading = false;
+//          this.messageService.add({
+//           key: 'global',
+//           severity: 'error',
+//           summary: 'Oops!',
+//           detail: 'Failed to fetch the products'
+//         });
+//       }
+//     });
+// }
+
+getWearType(style:any){
+  this.router.navigate(['/search', style]);
+}
 }

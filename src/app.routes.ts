@@ -22,6 +22,7 @@ import { AuthGuard } from 'src/app/security/authguard';
 import { LoginGuard } from '@/security/login.guard';
 import { Invoice } from '@/pages/admin/invoice/invoice';
 import { Invoicelist } from '@/pages/admin/invoicelist/invoicelist';
+import { Searchresult } from '@/pages/searchresult/searchresult';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -38,6 +39,7 @@ export const appRoutes: Routes = [
             { path: 'cart', component: Cart},
             { path: 'order/order-history', component: Orderhistory},
             { path: 'wishlist', component: Wishlist},
+            { path: 'search/:style', component: Searchresult},
             { path: 'admin/orders', component: Adminorder,canActivate: [AuthGuard]},
             { path: 'admin/invoice', component: Invoice,canActivate: [AuthGuard]},
             { path: 'admin/invoice-list', component: Invoicelist,canActivate: [AuthGuard]},
