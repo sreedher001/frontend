@@ -90,7 +90,6 @@ if(localStorage.getItem("isLoggedIn")==="true"){
 
   const roles = this.jwtHelper.getUserRoles();
   if (roles.includes('ROLE_ADMIN')) {
-    console.log('Admin access granted.');
     this.isAdmin=true;
   }
 

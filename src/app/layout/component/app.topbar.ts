@@ -43,8 +43,8 @@ import { DrawerModule } from 'primeng/drawer';
 
     <!-- Logo -->
     <a class="layout-topbar-logo ml-2" routerLink="/products">
-      <img src="assets/images/logo.png" alt="ZFC" class="h-10" />
-      <!-- <span>ZFC</span> -->
+      <!-- <img src="assets/images/logo.png" alt="ZFC" class="h-10" /> -->
+      <span class="my-title">ZFC</span>
     </a>
   </div>
 

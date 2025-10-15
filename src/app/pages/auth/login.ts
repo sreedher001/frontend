@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -23,11 +23,11 @@ import { FloatLabelModule } from 'primeng/floatlabel';
         <!-- <app-floating-configurator /> -->
        @if(!isForgotPasswordFlow){ <div class="w-full max-w-md mx-auto bg-white dark:bg-surface-900 p-6 sm:p-8 rounded-2xl shadow-lg">
   <div class="text-center mb-6">
-    <img
+    <!-- <img
       src="/assets/images/logo.png"
       alt="ZFC Logo"
       class="mx-auto mb-4 w-24 sm:w-32 h-auto object-contain"
-    />
+    />--><span class="my-title">ZFC</span> 
     <!-- <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Welcome to ZFC</h2> -->
     <p class="text-lg text-gray-500 dark:text-gray-400">Sign in and continue shopping</p>
   </div>
@@ -153,7 +153,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 
 `
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   @Output() loginSuccess = new EventEmitter<void>();
     email: string = '';
 
@@ -171,7 +171,36 @@ newPassword = '';
 confirmPassword = '';
 
 
-    constructor(private loginService: LoginService, private router: Router, private jwtHelper: JwtHelper, private messageService: MessageService) { }
+    constructor(private loginService: LoginService, private router: Router, private jwtHelper: JwtHelper, 
+      private messageService: MessageService,private route: ActivatedRoute) { }
+
+    ngOnInit() {
+  this.route.queryParams.subscribe(params => {
+    const verifiedStatus = params['verified'];
+
+    if (verifiedStatus === 'success') {
+      this.messageService.add({
+        key:'global',
+        severity: 'success',
+        summary: 'Email Verified',
+        detail: 'Your email has been successfully verified. Please log in.',
+        sticky:true
+      });
+    }
+
+    if (verifiedStatus === 'failed') {
+      this.messageService.add({
+        key:'global',
+        severity: 'error',
+        summary: 'Verification Failed',
+        detail: 'Invalid or expired verification link.',
+        sticky:true
+      });
+    }
+  });
+}
+
+  
 
     onLogin() {
         const loginPayload: LoginRequest = {
@@ -200,7 +229,6 @@ confirmPassword = '';
                 }
 
                 this.router.navigate(['/']);
-                window.location.reload();
                 this.email = "";
                 this.password = "";
             },

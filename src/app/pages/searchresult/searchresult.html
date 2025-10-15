@@ -40,11 +40,11 @@
 
       <div class="flex justify-between items-center ">
         <div class="flex flex-col">
-          <span class="price text-green-800 font-semibold">
+          <span class="price text-green-800 font-semibold dune-font">
             ₹{{ getVariantFinalPrice(variant) | number:'1.0-0' }}
           </span>
           @if (getBestSize(variant)?.discountPercentage > 0) {
-          <span class="text-xs sm:text-sm text-red-500 line-through">
+          <span class="text-xs sm:text-sm text-red-500 line-through dune-font">
             ₹{{ getBestSize(variant)?.price }}
           </span>
           }
@@ -52,7 +52,7 @@
 
         <div class="flex justify-start items-center mt-2">
           <p-badge [value]="'⭐ ' + variant.rating" severity="secondary"
-            class="text-sm sm:text-base px-3 py-2 font-medium rounded-lg">
+            class="text-sm sm:text-base px-3 py-2 font-medium rounded-lg dune-font">
           </p-badge>
         </div>
       </div>
@@ -70,3 +70,77 @@
 
   }
   }
+
+  <!-- BACKDROP (only if modal open and not logged in) -->
+@if (showSignupPanel && !isLoggedIn) {
+  <div class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300"></div>
+}
+
+<!-- SLIDE-UP MODAL PANEL (only on mobile and not logged in) -->
+@if (showSignupPanel && !isLoggedIn) {
+  <div
+    class="fixed bottom-0 left-0 w-full h-3/4 bg-white/80 backdrop-blur-md shadow-xl rounded-t-2xl transform transition-transform duration-300 ease-in-out z-50"
+    [class.translate-y-full]="!showSignupPanel"
+  >
+    <!-- Close Button -->
+    <div
+  class="absolute -top-10 left-1/2 transform -translate-x-1/2 z-50 
+         flex items-center gap-3 px-5 py-2 rounded-full 
+         shadow-md border border-yellow-400 
+         bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee] 
+         text-[#8a5c1d] font-semibold cursor-pointer 
+         hover:scale-105 transition-transform duration-200"
+  (click)="toggleSignupPanel()"
+>
+      <i class="pi pi-times text-xl"></i>
+      <span class="font-medium whitespace-nowrap text-sm sm:text-base">Close</span>
+    </div>
+
+    <!-- Modal Header -->
+    <div class="p-4 pt-10 border-b border-yellow-100 flex justify-between items-center 
+            rounded-t-2xl text-[#8a5c1d] 
+            bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee]">
+<h2 class="text-lg font-semibold">
+        {{ showLogin ? 'Login' : 'Sign up' }}
+      </h2>
+
+      <p-button
+        (click)="toggleLogin()"
+        class="text-white text-sm font-medium hover:underline"
+        raised
+        severity="secondary"
+      >
+        {{ showLogin ? 'Sign up' : 'Login instead' }}
+      </p-button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="p-4 h-[calc(100%-64px)] overflow-y-auto">
+      @if (showLogin) {
+        <app-login  (loginSuccess)="handleLoginSuccess($event)"/>
+      } @else {
+        <app-signup />
+      }
+    </div>
+  </div>
+}
+
+<!-- Floating CTA Button (only if modal closed and not logged in) -->
+@if (!showSignupPanel && !isLoggedIn) {
+ <div
+  class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 
+         flex items-center gap-3 px-5 py-3 rounded-full 
+         shadow-md border border-yellow-400 
+         bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee] 
+         text-[#8a5c1d] font-semibold cursor-pointer 
+         hover:scale-105 transition-transform duration-200"
+  (click)="toggleSignupPanel()"
+>
+    <i class="pi pi-user-plus text-xl"></i>
+    <span class="font-medium whitespace-nowrap text-sm sm:text-base">Sign up / Sign in</span>
+  </div>
+}
+
+
+
+</div>

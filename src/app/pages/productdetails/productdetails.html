@@ -33,8 +33,8 @@
 
           @if (product.variant.rating != null) {
             <div class="absolute bottom-2 right-2 bg-grey-500 text-green-600 font-semibold px-2 py-1 rounded flex items-center space-x-1 shadow">
-              <i class="pi pi-star-fill"></i>
-              <span>{{ product.variant.rating }}</span>
+              <i class="pi pi-star-fill "></i>
+              <span class="dune-font">{{ product.variant.rating }}</span>
             </div>
           }
         </div>
@@ -48,15 +48,15 @@
     <!-- Product Info -->
     <div class="card w-full lg:w-1/2 space-y-4">
     
-  <p class="text-lg font-semibold">{{ product.variant.variantName }}</p> <!-- ✅ no need for ?. -->
+  <p class="text-lg font-semibold">{{ product.variant.variantName }}</p> 
 
       <div class="flex items-center gap-4">
-        <p-tag severity="warn" class="whitespace-nowrap">{{ product.category }}</p-tag>
+        <p-tag severity="warn" class="whitespace-nowrap ">{{ product.category }}</p-tag>
         <div
           class="p-2 rounded-full flex items-center gap-2"
           [ngClass]="getRatingSeverity(product.variant.rating)"
         >
-          <span class="font-medium text-lg">{{ product.variant.rating }}</span>
+          <span class="font-medium text-lg dune-font">{{ product.variant.rating }}</span>
           <i
   class="pi pi-star-fill text-xs"
   [ngClass]="{
@@ -81,18 +81,18 @@
       <!-- Price Display -->
       @if (product && product.variant && product.variant.sizes && product.variant.sizes.length > 0 && hasUniformPrice(product.variant.sizes)) {
   @let price = getDiscountedPrice(product.variant.sizes[0]);
-  <div class="flex items-center gap-3">
-    <span class="text-2xl font-bold text-green-600">₹{{ price }}</span>
-    <span class="line-through text-red-500 text-lg">₹{{ product.variant.sizes[0].price }}</span>
-    <span class="text-sm text-gray-600">({{ product.variant.sizes[0].discountPercentage }}% OFF)</span>
+  <div class="flex items-center gap-3 ">
+    <span class=" font-bold text-green-600  dune-font">₹{{ price }}</span>
+    <span class="line-through text-red-500 text-lg ">₹{{ product.variant.sizes[0].price }}</span>
+    <span class="text-sm text-gray-600 ">({{ product.variant.sizes[0].discountPercentage }}% OFF)</span>
     @if (product.variant.sizes[0].price >= 999) {
-      <p-tag severity="success" class="ml-4">Free Delivery</p-tag>
+      <p-tag severity="success" class=" ml-4 ">Free Delivery</p-tag>
     }
   </div>
 }
 
       @else {
-        <p class="text-sm text-orange-400 italic">NOTE: Price varies by size. Select a size to view its price.</p>
+        <p class="text-sm text-orange-400 italic ">NOTE: Price varies by size. Select a size to view its price.</p>
         @if (selectedSize) {
           @let dp = getDiscountedPrice(selectedSize);
           <div class="mt-4 flex items-center gap-3">
@@ -122,7 +122,7 @@
                     'border border-gray-300': selectedSize?.id !== s.id,
                     'bg-gray-100 text-gray-400 cursor-not-allowed': s.availableQuantity === 0
                   }"
-                  class="w-15 h-12 rounded text-sm font-medium flex items-center justify-center transition flex-col"
+                  class="w-15 h-12 rounded text-sm font-medium flex items-center justify-center transition flex-col  font-semibold"
                 >
                   {{ s.size }}
                 </button>

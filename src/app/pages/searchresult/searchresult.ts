@@ -17,11 +17,13 @@ import { ProductService } from '../products/product.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { JwtHelper } from '@/jwt/jwt-helper';
 import { MessageService } from 'primeng/api';
+import { Signup } from "../auth/signup/signup";
+import { LoginComponent } from "../auth/login";
 
 @Component({
   selector: 'app-searchresult',
   imports: [CardModule, CommonModule, ButtonModule, FluidModule, TagModule, FormsModule, BadgeModule, Tooltip, CarouselModule,
-    ChipModule],
+    ChipModule, Signup, LoginComponent],
   templateUrl: './searchresult.html',
   styleUrl: './searchresult.scss'
 })
@@ -45,6 +47,10 @@ isAdmin: boolean = false;
     private messageService: MessageService,private route: ActivatedRoute
   ) { }
     ngOnInit(): void {
+      const roles = this.jwtHelper.getUserRoles();
+  if (roles.includes('ROLE_ADMIN')) {
+    this.isAdmin=true;
+  }
 
       if(localStorage.getItem("isLoggedIn")==="true"){
       this.isLoggedIn=true;}
@@ -122,7 +128,24 @@ isInWishlist(variant: any): boolean {
   this.showSignupPanel=true;
 }
 }
+toggleSignupPanel() {
+  this.showSignupPanel = !this.showSignupPanel;
 
+  // Optional: reset to signup when panel opens
+  if (this.showSignupPanel) {
+    this.showLogin = false;
+  }
+}
+toggleLogin() {
+  this.showLogin = !this.showLogin;
+}
+handleLoginSuccess($event:any) {
+  this.isLoggedIn = true;
+  this.showSignupPanel = false;
+
+  // Refresh the current page
+  window.location.reload();
+}
 getFrontImage(product: Product): string {
     if (!product.variants || product.variants.length === 0) {
       return 'assets/no-image.png'; // fallback image

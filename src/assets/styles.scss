@@ -35,3 +35,31 @@
   }
 }
 
+@font-face {
+  font-family: 'Dune Rise';
+  src: url('/assets/fonts/dune-rise/Dune_Rise.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.my-title {
+  font-family: 'Dune Rise', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #892e00;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 0 #fff8e1, 
+               -1px -1px 0 #fff8e1, 
+               1px -1px 0 #fff8e1, 
+               -1px 1px 0 #fff8e1;
+  background: linear-gradient(to right, #320204, #ce801b);
+  -webkit-background-clip: text;
+  display: inline-block;
+}
+
+
+.dune-font {
+  font-family: 'Dune Rise';
+  font-size: small;
+}

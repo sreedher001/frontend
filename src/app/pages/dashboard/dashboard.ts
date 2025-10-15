@@ -9,10 +9,10 @@ import { Salestrend } from "./salestrend/salestrend";
 
 @Component({
     selector: 'app-dashboard',
-    imports: [StatsWidget,Adminorder, Salestrend],
+    imports: [Adminorder, Salestrend],
     template: `
         <div class="grid grid-cols-12 gap-8">
-            <app-stats-widget class="contents" />
+            <!-- <app-stats-widget class="contents" /> -->
             <div class="col-span-12 xl:col-span-6">
                 <!-- <app-recent-sales-widget /> -->
                  <app-salestrend/>
