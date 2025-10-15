@@ -20,6 +20,7 @@ export interface LoginResponse {
   providedIn: 'root'
 })
 export class LoginService {
+    
     commonService:CommonService = new CommonService;
     private baseUrl = this.commonService.baseUrl;
 
@@ -69,5 +70,11 @@ verifyOtp(email: string, otp: string): Observable<any> {
   return this.http.post(`${this.baseUrl}/auth/reset-password`,{}, { params });
 }
 
+subscribeNewsletter(email: string): Observable<any> {
+        const params = new HttpParams()
+    .set('email', email);
+
+  return this.http.post(`${this.baseUrl}/newsletter/subscribe`,{}, { params });
+    }
 
 }

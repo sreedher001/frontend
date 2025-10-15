@@ -23,6 +23,7 @@ import { LoginGuard } from '@/security/login.guard';
 import { Invoice } from '@/pages/admin/invoice/invoice';
 import { Invoicelist } from '@/pages/admin/invoicelist/invoicelist';
 import { Searchresult } from '@/pages/searchresult/searchresult';
+import { Home } from '@/pages/home/home';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -47,6 +48,7 @@ export const appRoutes: Routes = [
             { path: 'admin/sales/trend', component: Salestrend,canActivate: [AuthGuard]},
             { path: 'checkout', component: Checkout,canActivate:[LoginGuard]},
             { path: 'auth/signup', component: Signup},
+            { path: 'home', component: Home},
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             // { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
