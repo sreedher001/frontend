@@ -87,7 +87,7 @@
 
       <!-- Price Display -->
 <!-- @if (product.variant!=null && product.variant.sizes.length > 0) { -->
-  @if (hasUniformPrice(product.variant.sizes)) {
+  @if (product.variant!=null && product.variant.sizes.length>0 && hasUniformPrice(product.variant.sizes)) {
     @let price = getDiscountedPrice(product.variant.sizes[0]);
 
     <div class="flex items-center gap-3">
