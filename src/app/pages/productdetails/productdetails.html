@@ -155,8 +155,9 @@
       </div>}
 
       <!-- Description -->
+       @if(product.variant!=null){
       <p class="text-gray-700 text-sm">{{ product.variant.variantDescription ? product.variant.variantDescription:'n/a' }}</p>
-
+       }
       <!-- Action Buttons -->
       <div class="flex flex-col sm:flex-row gap-3 mt-4">
         <p-button
