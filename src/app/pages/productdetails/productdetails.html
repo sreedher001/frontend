@@ -35,7 +35,7 @@
           </p-button>
 
           <!-- Rating -->
-          @if (product.variant.rating != null) {<div
+          @if (product.variant!=null && product.variant.rating != null) {<div
             class="absolute bottom-2 right-2 bg-grey-500 text-green-600 font-semibold px-2 py-1 rounded flex items-center space-x-1 shadow"
           >
             <i class="pi pi-star-fill"></i>
@@ -126,7 +126,7 @@
 <!-- } -->
 
        
-@if(product.variant.sizes.length>0){
+@if(product.variant !=null && product.variant.sizes.length>0){
       <!-- Size Selector -->
       <div>
         <h3 class="text-lg font-semibold mb-2">Select Size</h3>
