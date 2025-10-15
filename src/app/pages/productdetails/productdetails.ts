@@ -78,6 +78,7 @@ loading=true;
     private messageService: MessageService,private router: Router) {}
   
   ngOnInit(): void {
+    this.loading=true;
     this.route.paramMap.subscribe(params => {
     this.productId = Number(params.get('id'));
     this.getProductByVariantId(this.productId);
