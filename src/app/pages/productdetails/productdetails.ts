@@ -14,6 +14,7 @@ import { BadgeModule } from 'primeng/badge';
 import { TagModule } from 'primeng/tag';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { CarouselModule } from 'primeng/carousel';
+import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
 
 interface RelatedItem {
   variantId:number;
@@ -36,6 +37,8 @@ this.showStylePanel = !this.showStylePanel;
 relatedItems: RelatedItem[] = [];
 productId!: number;
 productResponse!:ProductResponse;
+
+//  product: Product |null=null;
 
 product: Product = {
   id: 0,
@@ -69,7 +72,7 @@ product: Product = {
 };
 
   images: any[] = [];
- selectedSize: any = null;
+ selectedSize: any | null = null;
 isSizeSelected=false;
 //hasRelatedItems=true;
 loading=true;
@@ -87,15 +90,11 @@ loading=true;
     
   });
   }
-  fetchSimilarProducts(variantId:number): Product {
+  fetchSimilarProducts(variantId:number) {
     this.productService.getSimilarProducts(variantId).subscribe({
       next: (data) => {
-        this.product = data;
-        if(this.product.variants.length<=1){
-          // this.hasRelatedItems=false;
-          console.log("length=",this.product.variants.length);
-        }
-        this.relatedItems = this.product.variants.map((variant:any) => {
+         const variants = data?.variants ?? [];
+        this.relatedItems = variants?.map((variant:any) => {
           
   const frontImage = variant.productImage.find((img:any) => img.viewType === 'front');
   return {
@@ -110,7 +109,6 @@ loading=true;
         console.error('Error fetching product:', err);
       }
     });
-    return this.product;
   }
   
   getRatingSeverity(rating: number): string {
@@ -150,19 +148,20 @@ getDiscountedPrice(size: any): number {
 }
   getProductByVariantId(productId:number) {
     this.loading=true;
-    this.product.variant.productImage = [];
-this.product.variant.sizes = [];
+    
 
     this.productService.getProductByVariantId(productId).subscribe({
       next: (data) => {
 
       this.product = data;
+      this.product.variant =data.variant;
+      this.product.variant.variantName=data.variant.variantName;
       this.product.variant.sizes =data.variant.sizes?? [];
       this.product.variant.productImage=data.variant.productImage ?? [];
         this.images = this.product.variant.productImage.map((img: any) => ({
           itemImageSrc: img.imageUrl,
           thumbnailImageSrc: img.imageUrl,
-          alt: this.product.name,
+          alt: this.product?.name,
         }));this.loading=false;
       },
       error: (err) => {
@@ -171,6 +170,39 @@ this.product.variant.sizes = [];
       }
     });
   }
+
+//   getProductByVariantId(productId: number): void {
+//   this.loading = true;
+
+//   this.productService.getProductByVariantId(productId).subscribe({
+//     next: (data) => {
+//   this.product = {
+//     ...data,
+//     variant: {
+//       ...data.variant,
+//       sizes: data.variant?.sizes ?? [],
+//       productImage: data.variant?.productImage ?? []
+//     }
+//   };
+
+//   console.log('🛠️ product after assignment:', JSON.stringify(this.product, null, 2));
+
+//   this.images = this.product.variant.productImage.map((img: any) => ({
+//     itemImageSrc: img.imageUrl,
+//     thumbnailImageSrc: img.imageUrl,
+//     alt: this.product?.name,
+//   }));
+
+//   this.loading = false;
+// },
+
+//     error: (err) => {
+//       console.error('Error fetching product:', err);
+//       this.loading = false;
+//     }
+//   });
+// }
+
   onImageLoad(event: Event) {
   const img = event.target as HTMLImageElement;
   img.classList.add('loaded');
