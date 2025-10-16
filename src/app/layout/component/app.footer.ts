@@ -13,26 +13,26 @@ import { RouterModule } from '@angular/router';
     <!-- Branding -->
     <div>
       <a href="/" class="text-2xl font-bold tracking-wide text-primary hover:underline my-title">ZFC</a>
-      <p class="text-sm text-gray-400 italic mt-2">See through you. Beyond Mirror</p>
+      <p class=" text-gray-400 italic mt-2 dune-font">Beyond Mirror. See through you</p>
     </div>
 
     <!-- Navigation -->
     <div>
-      <h3 class="text-sm font-semibold uppercase text-gray-300 mb-4">Explore</h3>
-      <ul class="space-y-2 text-sm text-gray-400">
-      <li>  <a [routerLink]="['/home']" fragment="about" class="hover:underline">About</a></li>
-<li><a [routerLink]="['/home']" fragment="collections" class="hover:underline">Collections</a></li>
-<li><a [routerLink]="['/home']" fragment="bespoke" class="hover:underline">Bespoke</a></li>
-<li><a [routerLink]="['/home']" fragment="contact" class="hover:underline">Contact</a></li>
+      <h3 class="text-3xl font-semibold uppercase text-gray-300 mb-4 dune-font">Explore</h3>
+      <ul class="space-y-2 text-xs text-gray-400">
+      <li>  <a [routerLink]="['/home']" fragment="about" class="hover:underline dune-font uppercase">About</a></li>
+<li><a [routerLink]="['/home']" fragment="collections" class="hover:underline dune-font uppercase">Collections</a></li>
+<li><a [routerLink]="['/home']" fragment="bespoke" class="hover:underline dune-font uppercase">Bespoke</a></li>
+<li><a [routerLink]="['/home']" fragment="contact" class="hover:underline dune-font uppercase">Contact</a></li>
 
       </ul>
     </div>
 
     <!-- Newsletter -->
    <div>
-  <h3 class="text-sm font-semibold uppercase text-gray-300 mb-4">Stay in Touch</h3>
+  <h3 class="text-sm font-semibold uppercase text-gray-300 mb-4 dune-font">Stay in Touch</h3>
   <form (submit)="subscribeNewsletter($event)">
-    <label for="email" class="block text-sm text-gray-400 mb-2">Join our private mailing list</label>
+    <label for="email" class="block text-sm text-gray-400 mb-2 dune-font">Join our private mailing list</label>
     <div class="flex">
       <input
         type="email"
@@ -59,7 +59,7 @@ import { RouterModule } from '@angular/router';
 
     <!-- Social Media -->
     <div>
-  <h3 class="text-sm font-semibold uppercase text-gray-900 mb-4">Connect</h3>
+  <h3 class="text-sm font-semibold uppercase text-grey-500 mb-4 dune-font">Connect</h3>
   <div class="flex gap-4 mt-2 text-orange-500 text-xl">
     <a href="https://www.instagram.com/zyra.fashion.curves" target="_blank" aria-label="Instagram" class="hover:text-primary">
       <i class="pi pi-instagram"></i>

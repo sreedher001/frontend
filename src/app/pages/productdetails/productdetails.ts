@@ -15,6 +15,9 @@ import { TagModule } from 'primeng/tag';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { CarouselModule } from 'primeng/carousel';
 import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
+import { LoginComponent } from "../auth/login";
+import { Signup } from "../auth/signup/signup";
+import { DialogModule } from 'primeng/dialog';
 
 interface RelatedItem {
   variantId:number;
@@ -23,7 +26,7 @@ interface RelatedItem {
 }
 @Component({
   selector: 'app-productdetails',
-  imports: [GalleriaModule, ButtonModule, FormsModule,BadgeModule,TagModule,PanelMenuModule,CarouselModule],
+  imports: [GalleriaModule, ButtonModule,DialogModule, FormsModule, BadgeModule, TagModule, PanelMenuModule, CarouselModule, LoginComponent, Signup],
   templateUrl: './productdetails.html',
   styleUrl: './productdetails.scss'
 })
@@ -33,13 +36,32 @@ interface RelatedItem {
 export class Productdetails implements OnInit {
 viewSimilar(arg0: number) {
 this.showStylePanel = !this.showStylePanel;
+this.showSizeSelector=false;
 }
 relatedItems: RelatedItem[] = [];
 productId!: number;
 productResponse!:ProductResponse;
-
+showSizeGuide: boolean = false;
+unit: 'cm' | 'inch' = 'cm';
 //  product: Product |null=null;
-
+sizeGuideData = {
+  cm: [
+    { size: 'XS', chest: 86, waist: 71 },
+    { size: 'S', chest: 91, waist: 76 },
+    { size: 'M', chest: 97, waist: 81},
+    { size: 'L', chest: 102, waist: 86 },
+    { size: 'XL', chest: 107, waist: 91 },
+    { size: 'XXL', chest: 112, waist: 96 }
+  ],
+  inch: [
+    { size: 'XS', chest: 34, waist: 28 },
+    { size: 'S', chest: 36, waist: 30 },
+    { size: 'M', chest: 38, waist: 32 },
+    { size: 'L', chest: 40, waist: 34 },
+    { size: 'XL', chest: 42, waist: 36 },
+    { size: 'XXL', chest: 44, waist: 38 }
+  ]
+};
 product: Product = {
   id: 0,
   productId: '',
@@ -76,6 +98,14 @@ product: Product = {
 isSizeSelected=false;
 //hasRelatedItems=true;
 loading=true;
+showSizeSelector: boolean = false;
+ isAdmin: boolean = false;
+showSignupPanel = false;
+showLogin = false;
+isLoggedIn:boolean =false;
+wishlistVariantIds: Set<number> = new Set(); // Store variant IDs in wishlist
+wishlistItems: any[] = [];
+
 
   constructor(private route: ActivatedRoute,private productService: ProductService, private cartService: CartService,
     private messageService: MessageService,private router: Router) {}
@@ -86,10 +116,28 @@ loading=true;
     this.productId = Number(params.get('id'));
     this.getProductByVariantId(this.productId);
     this.fetchSimilarProducts(this.productId);
+
+    if(localStorage.getItem("isLoggedIn")==="true"){
+      this.isLoggedIn=true;}
     
-    
+    if(localStorage.getItem("isLoggedIn")==="true"){
+      this.isLoggedIn=true;
+    this.productService.getWishlist().subscribe({
+    next: (items: any[]) => {
+      this.wishlistItems = items;
+      this.wishlistVariantIds = new Set(items.map(i => i.variantId));
+    },
+    error: (err) => {
+      console.error('Failed to load wishlist', err);
+    }
+  });
+}   
   });
   }
+
+  isInWishlist(variant: any): boolean {
+  return this.wishlistVariantIds.has(variant.id);
+}
   fetchSimilarProducts(variantId:number) {
     this.productService.getSimilarProducts(variantId).subscribe({
       next: (data) => {
@@ -171,37 +219,13 @@ getDiscountedPrice(size: any): number {
     });
   }
 
-//   getProductByVariantId(productId: number): void {
-//   this.loading = true;
+handleLoginSuccess($event:any) {
+  this.isLoggedIn = true;
+  this.showSignupPanel = false;
 
-//   this.productService.getProductByVariantId(productId).subscribe({
-//     next: (data) => {
-//   this.product = {
-//     ...data,
-//     variant: {
-//       ...data.variant,
-//       sizes: data.variant?.sizes ?? [],
-//       productImage: data.variant?.productImage ?? []
-//     }
-//   };
-
-//   console.log('🛠️ product after assignment:', JSON.stringify(this.product, null, 2));
-
-//   this.images = this.product.variant.productImage.map((img: any) => ({
-//     itemImageSrc: img.imageUrl,
-//     thumbnailImageSrc: img.imageUrl,
-//     alt: this.product?.name,
-//   }));
-
-//   this.loading = false;
-// },
-
-//     error: (err) => {
-//       console.error('Error fetching product:', err);
-//       this.loading = false;
-//     }
-//   });
-// }
+  // Refresh the current page
+  window.location.reload();
+}
 
   onImageLoad(event: Event) {
   const img = event.target as HTMLImageElement;
@@ -317,8 +341,61 @@ if (isLoggedIn) {
 
 toggleStylePanel() {
   this.showStylePanel = !this.showStylePanel;
+  this.showSizeSelector = false;
 }
 
+openSizeSelector() {
+  this.showSizeSelector = true;
+  this.showStylePanel =false;
+}
 
+closeSizeSelector() {
+  this.showSizeSelector = false;
+}
+toggleWishlist(variant: any, event: MouseEvent): void {
+  event.stopPropagation(); // prevent card click
 
+  if(this.isLoggedIn){
+  const variantId = variant.id;
+
+  if (this.isInWishlist(variant)) {
+    // If already in wishlist → remove
+    this.productService.removeFromWishlist(variantId).subscribe({
+      next: () => {
+        this.wishlistVariantIds.delete(variantId);
+      },
+      error: () => {
+        // Optionally show error toast
+      }
+    });
+  } else {
+    // If not in wishlist → add
+    this.productService.addToWishlist(variantId).subscribe({
+      next: () => {
+        this.wishlistVariantIds.add(variantId);
+      },
+      error: () => {
+        // Optionally show error toast
+      }
+    });
+  }
+}else{
+  this.showSignupPanel=true;
+}
+}
+
+toggleSignupPanel() {
+  this.showSignupPanel = !this.showSignupPanel;
+
+  // Optional: reset to signup when panel opens
+  if (this.showSignupPanel) {
+    this.showLogin = false;
+  }
+}
+toggleLogin() {
+  this.showLogin = !this.showLogin;
+}
+getSizeGuide(unit: 'cm' | 'inch') {
+  return this.sizeGuideData[unit];
+}
 }

@@ -1,176 +1,205 @@
 @if (!loading && product) {
-  <div class="mb-4 mt-11"></div>
+<div class="mb-4 mt-11"></div>
 
-  <div class="flex flex-col lg:flex-row items-start gap-6">
-    <!-- Product Carousel -->
-    <p-galleria
-      [value]="images"
-      [showItemNavigators]="true"
-      [responsiveOptions]="responsiveOptions"
-      [circular]="true"
-      [numVisible]="3"
-      [containerStyle]="{ 'width': '100%', 'maxWidth': '640px' }"
-      class="w-full lg:w-1/2"
-    >
-      <ng-template #item let-item>
-        <div class="relative aspect-w-4 aspect-h-3">
-          <img
-            [src]="item.itemImageSrc"
-            (load)="onImageLoad($event)"
-            class="object-contain w-full h-full rounded-lg shadow"
-          />
-          <p-button
-            severity="secondary"
-            class="absolute bottom-2 left-2 p-1 rounded"
-            pTooltip="View Similar"
-            label="View Similar"
-            tooltipPosition="top"
-            (click)="viewSimilar(product.variant.id); $event.stopPropagation()"
-            type="button"
-          >
-            <i class="pi pi-clone text-xl"></i>
-          </p-button>
+<div class="flex flex-col lg:flex-row items-start gap-6">
+  <!-- Product Carousel -->
+  <p-galleria [value]="images" [showItemNavigators]="true" [responsiveOptions]="responsiveOptions" [circular]="true"
+    [numVisible]="3" [containerStyle]="{ 'width': '100%', 'maxWidth': '640px' }" class="w-full lg:w-1/2">
+    <ng-template #item let-item>
+      <div class="relative aspect-w-4 aspect-h-3">
+        <img [src]="item.itemImageSrc" (load)="onImageLoad($event)"
+          class="object-contain w-full h-full rounded-lg shadow" />
+        <p-button severity="secondary" class="absolute bottom-2 left-2 p-1 rounded uppercase dune-font"
+          pTooltip="View Similar" label="View Similar" tooltipPosition="top"
+          (click)="viewSimilar(product.variant.id); $event.stopPropagation()" type="button">
+          <i class="pi pi-clone text-xl"></i>
+        </p-button>
 
-          @if (product.variant.rating != null) {
-            <div class="absolute bottom-2 right-2 bg-grey-500 text-green-600 font-semibold px-2 py-1 rounded flex items-center space-x-1 shadow">
-              <i class="pi pi-star-fill "></i>
-              <span class="dune-font">{{ product.variant.rating }}</span>
-            </div>
-          }
-        </div>
-      </ng-template>
-
-      <ng-template #thumbnail let-item>
-        <img [src]="item.thumbnailImageSrc" class="h-20 w-20 object-cover rounded" />
-      </ng-template>
-    </p-galleria>
-
-    <!-- Product Info -->
-    <div class="card w-full lg:w-1/2 space-y-4">
-    
-  <p class="text-lg font-semibold">{{ product.variant.variantName }}</p> 
-
-      <div class="flex items-center gap-4">
-        <p-tag severity="warn" class="whitespace-nowrap ">{{ product.category }}</p-tag>
+        @if (product.variant.rating != null) {
         <div
-          class="p-2 rounded-full flex items-center gap-2"
-          [ngClass]="getRatingSeverity(product.variant.rating)"
-        >
-          <span class="font-medium text-lg dune-font">{{ product.variant.rating }}</span>
-          <i
-  class="pi pi-star-fill text-xs"
-  [ngClass]="{
+          class="absolute bottom-2 right-2 bg-grey-500 text-green-600 font-semibold px-2 py-1 rounded flex items-center space-x-1 shadow">
+          <i class="pi pi-star-fill "></i>
+          <span class="dune-font">{{ product.variant.rating }}</span>
+        </div>
+        }
+      </div>
+    </ng-template>
+
+    <ng-template #thumbnail let-item>
+      <img [src]="item.thumbnailImageSrc" class="h-20 w-20 object-cover rounded" />
+    </ng-template>
+  </p-galleria>
+
+  <!-- Product Info -->
+  <div class="card w-full lg:w-1/2 space-y-4">
+
+    <p class="text-lg font-semibold dune-font font-semibold">{{ product.variant.variantName }}</p>
+
+    <div class="flex items-center gap-4">
+      <p-tag severity="warn" class="whitespace-nowrap dune-font">{{ product.category }}</p-tag>
+      <div class="p-2 rounded-full flex items-center gap-2" [ngClass]="getRatingSeverity(product.variant.rating)">
+        <span class="font-medium text-lg dune-font">{{ product.variant.rating }}</span>
+        <i class="pi pi-star-fill text-xs" [ngClass]="{
     'text-green-600': product.variant.rating != null && product.variant.rating >= 4,
     'text-yellow-600': product.variant.rating != null && product.variant.rating >= 3 && product.variant.rating < 4,
     'text-red-600': product.variant.rating != null && product.variant.rating < 3
-  }"
-></i>
-        </div>
+  }"></i>
       </div>
+    </div>
 
-      <!-- Tags -->
-      <div class="flex flex-wrap gap-2 p-4 bg-gray-100 rounded-md">
-        <p-tag icon="pi pi-palette" severity="secondary" value="Color: {{ product.variant.color }}"></p-tag>
-        <p-tag icon="pi pi-tag" severity="secondary" value="Style: {{ product.variant.styleCategory }}"></p-tag>
-        <p-tag icon="pi pi-align-justify" severity="secondary" value="Fit: {{ product.variant.fit }}"></p-tag>
-        <p-tag icon="pi pi-th-large" severity="secondary" value="Pattern: {{ product.variant.pattern }}"></p-tag>
-        <p-tag icon="pi pi-calendar" severity="secondary" value="Season: {{ product.variant.season }}"></p-tag>
-        <p-tag icon="pi pi-star" severity="secondary" value="Occasion: {{ product.variant.occasion }}"></p-tag>
-      </div>
-
-      <!-- Price Display -->
-      @if (product && product.variant && product.variant.sizes && product.variant.sizes.length > 0 && hasUniformPrice(product.variant.sizes)) {
-  @let price = getDiscountedPrice(product.variant.sizes[0]);
-  <div class="flex items-center gap-3 ">
-    <span class=" font-bold text-green-600  dune-font">₹{{ price }}</span>
-    <span class="line-through text-red-500 text-lg ">₹{{ product.variant.sizes[0].price }}</span>
-    <span class="text-sm text-gray-600 ">({{ product.variant.sizes[0].discountPercentage }}% OFF)</span>
-    @if (product.variant.sizes[0].price >= 999) {
+    <h3 class="text-lg font-semibold mb-2 dune-font uppercase">Price</h3>
+    <!-- Price Display -->
+    @if (product && product.variant && product.variant.sizes && product.variant.sizes.length > 0 &&
+    hasUniformPrice(product.variant.sizes)) {
+    @let price = getDiscountedPrice(product.variant.sizes[0]);
+    <div class="flex items-center gap-3 ">
+      <span class=" font-bold text-green-600  dune-font">₹{{ price }}</span>
+      <span class="line-through text-red-500 text-lg ">₹{{ product.variant.sizes[0].price }}</span>
+      <span class="text-sm text-gray-600 ">({{ product.variant.sizes[0].discountPercentage }}% OFF)</span>
+      @if (product.variant.sizes[0].price >= 999) {
       <p-tag severity="success" class=" ml-4 ">Free Delivery</p-tag>
-    }
-  </div>
-}
-
-      @else {
-        <p class="text-sm text-orange-400 italic ">NOTE: Price varies by size. Select a size to view its price.</p>
-        @if (selectedSize) {
-          @let dp = getDiscountedPrice(selectedSize);
-          <div class="mt-4 flex items-center gap-3">
-            <span class="text-lg font-bold text-green-600">₹{{ dp }}</span>
-            <span class="line-through text-red-500 text-sm">₹{{ selectedSize.price }}</span>
-            <span class="text-sm text-gray-600">({{ selectedSize.discountPercentage }}% OFF)</span>
-            @if (selectedSize.price >= 999) {
-              <p-tag severity="success" class="ml-4">Free Delivery</p-tag>
-            }
-          </div>
-        }
       }
+    </div>
+    }
 
-      <!-- Size Selector -->
-      @if (product && product.variant && product.variant.sizes && product.variant.sizes.length > 0) {
-        <div>
-          <h3 class="text-lg font-semibold mb-2">Select Size</h3>
-          <div class="flex flex-wrap gap-3">
-            @for (s of product.variant.sizes; track s.id) {
-              <div class="flex flex-col items-center">
-                <button
-                  type="button"
-                  (click)="selectSize(s)"
-                  [disabled]="s.availableQuantity === 0"
-                  [ngClass]="{
+    @else {
+    <p class="text-sm text-orange-400 italic ">NOTE: Price varies by size. Select a size to view its price.</p>
+    @if (selectedSize) {
+    @let dp = getDiscountedPrice(selectedSize);
+    <div class="mt-4 flex items-center gap-3">
+      <span class="text-lg font-bold text-green-600">₹{{ dp }}</span>
+      <span class="line-through text-red-500 text-sm">₹{{ selectedSize.price }}</span>
+      <span class="text-sm text-gray-600">({{ selectedSize.discountPercentage }}% OFF)</span>
+      @if (selectedSize.price >= 999) {
+      <p-tag severity="success" class="ml-4">Free Delivery</p-tag>
+      }
+    </div>
+    }
+    }
+
+    <!-- Size Selector -->
+    @if (product && product.variant && product.variant.sizes && product.variant.sizes.length > 0) {
+    <div>
+      <div class="flex items-center justify-between mt-4">
+  <h3 class="text-lg font-semibold mb-2 dune-font uppercase">Select Size</h3>
+
+  <button
+    class="text-sm text-orange-600 underline dune-font uppercase"
+    type="button"
+    (click)="showSizeGuide = true"
+  >
+    Size Guide
+  </button>
+</div>
+      <div class="flex flex-wrap gap-3">
+        @for (s of product.variant.sizes; track s.id) {
+        <div class="flex flex-col items-center">
+          <button type="button" (click)="selectSize(s)" [disabled]="s.availableQuantity === 0" [ngClass]="{
                     'border border-black bg-black text-white': selectedSize?.id === s.id,
                     'border border-gray-300': selectedSize?.id !== s.id,
                     'bg-gray-100 text-gray-400 cursor-not-allowed': s.availableQuantity === 0
                   }"
-                  class="w-15 h-12 rounded text-sm font-medium flex items-center justify-center transition flex-col  font-semibold"
-                >
-                  {{ s.size }}
-                </button>
-                @if (s.availableQuantity > 0 && s.availableQuantity <= s.lowStockThreshold) {
-                  <span class="text-xs text-red-600 mt-1">{{ s.availableQuantity }} left</span>
-                }
-              </div>
+            class="dune-font w-15 h-12 rounded text-sm font-medium flex items-center justify-center transition flex-col  font-semibold">
+            {{ s.size }}
+          </button>
+          @if (s.availableQuantity > 0 && s.availableQuantity <= s.lowStockThreshold) { <span
+            class="text-xs  text-red-600 mt-1 ">{{ s.availableQuantity }} left</span>
             }
-          </div>
         </div>
-      }
-
-      <!-- Description -->
-      <p class="text-gray-700 text-sm">{{ product.variant.variantDescription || 'No description available' }}</p>
-
-      <!-- Action Buttons -->
-      <div class="flex flex-col sm:flex-row gap-3 mt-4">
-        <p-button
-          label="Add to Bag"
-          icon="pi pi-shopping-bag"
-          styleClass="w-full sm:w-auto"
-          severity="contrast"
-          outlined
-          raised
-          size="large"
-          (onClick)="addToCart(product.variant, $event)"
-        ></p-button>
-        <p-button
-          label="Buy Now"
-          icon="pi pi-credit-card"
-          styleClass="w-full sm:w-auto"
-          severity="warn"
-          raised
-          size="large"
-          (onClick)="buyNow(product.variant, $event)"
-        ></p-button>
+        }
       </div>
     </div>
+    }
+
+    <!-- Size Guide Button near size selector -->
+
+
+<!-- PrimeNG Dialog -->
+<p-dialog
+  header="Size Guide"
+  [(visible)]="showSizeGuide"
+  [modal]="true"
+  [style]="{ width: '90vw', maxWidth: '500px' }"
+  [breakpoints]="{ '960px': '95vw' }"
+  [dismissableMask]="true" class="dune-font uppercase"
+>
+  <!-- Toggle Buttons -->
+  <div class="flex justify-end mb-4">
+    <button
+      type="button"
+      class="px-3 py-1 text-sm font-semibold rounded-l border border-gray-300"
+      [ngClass]="{ 'bg-orange-500 text-white': unit === 'cm', 'bg-white text-gray-700': unit !== 'cm' }"
+      (click)="unit = 'cm'"
+    >
+      CM
+    </button>
+    <button
+      type="button"
+      class="px-3 py-1 text-sm font-semibold rounded-r border border-gray-300"
+      [ngClass]="{ 'bg-orange-500 text-white': unit === 'inch', 'bg-white text-gray-700': unit !== 'inch' }"
+      (click)="unit = 'inch'"
+    >
+      INCH
+    </button>
   </div>
 
-  <!-- Slide-Up Bottom Panel -->
+  <!-- Table -->
+  <div class="text-sm text-gray-700 dune-font space-y-2">
+    <p class="text-xs text-gray-500 italic">All measurements are approximate.</p>
+
+    <table class="w-full text-left border border-gray-300 text-sm">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="p-2 border uppercase">Size</th>
+          <th class="p-2 border uppercase">Chest ({{ unit }})</th>
+          <th class="p-2 border uppercase">Waist ({{ unit }})</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of getSizeGuide(unit)">
+          <td class="p-2 border">{{ row.size }}</td>
+          <td class="p-2 border">{{ row.chest }}</td>
+          <td class="p-2 border">{{ row.waist }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</p-dialog>
+
+
+    <!-- Tags -->
+    <div class="flex flex-wrap gap-2 p-4 bg-gray-100 rounded-md">
+      <p-tag icon="pi pi-palette" severity="secondary" value="Color: {{ product.variant.color }}"></p-tag>
+      <p-tag icon="pi pi-tag" severity="secondary" value="Style: {{ product.variant.styleCategory }}"></p-tag>
+      <p-tag icon="pi pi-align-justify" severity="secondary" value="Fit: {{ product.variant.fit }}"></p-tag>
+      <p-tag icon="pi pi-th-large" severity="secondary" value="Pattern: {{ product.variant.pattern }}"></p-tag>
+      <p-tag icon="pi pi-calendar" severity="secondary" value="Season: {{ product.variant.season }}"></p-tag>
+      <p-tag icon="pi pi-star" severity="secondary" value="Occasion: {{ product.variant.occasion }}"></p-tag>
+    </div>
+
+
+    <!-- Description -->
+    <p class="text-gray-700 text-sm">{{ product.variant.variantDescription || 'No description available' }}</p>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-3 mt-4">
+      <p-button label="ADD TO BAG" icon="pi pi-shopping-bag" styleClass="w-full sm:w-auto " severity="contrast" outlined
+        class="dune-font font-bold font-semibold " raised size="large"
+        (onClick)="addToCart(product.variant, $event)"></p-button>
+      <p-button label="Buy Now" icon="pi pi-credit-card" styleClass="w-full sm:w-auto" severity="warn"
+        class="dune-font font-bold text-black" raised size="large"
+        (onClick)="buyNow(product.variant, $event)"></p-button>
+    </div>
+  </div>
+</div>
+
+<!-- Slide-Up Bottom Panel -->
 <div
   class="fixed bottom-0 left-0 w-full h-1/2 bg-white shadow-xl rounded-t-2xl transform transition-transform duration-300 ease-in-out z-40"
-  [class.translate-y-full]="!showStylePanel"
->
+  [class.translate-y-full]="!showStylePanel">
   <!-- Gradient Header -->
   <div class="p-4  flex justify-between items-center text-black">
-    <h4 class="text-lg font-semibold">Similar Items</h4>
+    <h4 class="text-lg font-semibold dune-font">Similar Items</h4>
     <button (click)="toggleStylePanel()" class="hover:text-yellow-500">
       <i class="pi pi-times text-xl"></i>
     </button>
@@ -178,27 +207,151 @@
 
   <!-- Carousel for Related Items -->
   <div class="p-4 h-[calc(100%-64px)] overflow-y-auto">
-    <p-carousel
-      [value]="relatedItems"
-      [numVisible]="2"
-      [numScroll]="1"
-      [circular]="true"
-      [showIndicators]="true"
-      [showNavigators]="false"
-      class="h-full"
-    >
+    <p-carousel [value]="relatedItems" [numVisible]="2" [numScroll]="1" [circular]="true" [showIndicators]="true"
+      [showNavigators]="false" class="h-full">
       <ng-template pTemplate="item" let-item>
         <div class="flex flex-col items-center justify-center">
-          <img
-            [src]="item.image"
-            alt="{{ item.label }}"
+          <img [src]="item.image" alt="{{ item.label }}"
             class="object-contain max-h-60 w-auto rounded-md shadow cursor-pointer"
-            (click)="goToProductDetails(item.variantId.toString())"
-          />
+            (click)="goToProductDetails(item.variantId.toString())" />
           <p class="text-sm font-semibold text-center mt-4">{{ item.label }}</p>
         </div>
       </ng-template>
     </p-carousel>
   </div>
+</div>
+}
+
+<!-- Mobile Sticky Footer (Only Visible on Mobile) -->
+<div class="fixed bottom-0 left-0 w-full rounded-lg flex lg:hidden z-50 bg-white shadow-[0_-2px_6px_rgba(0,0,0,0.1)]">
+  <!-- Wishlist Button -->
+  <button
+    class="w-1/2 h-16 flex rounded-t-2xl items-center justify-center text-sm font-semibold dune-font text-gray-800 border-r border-gray-300  active:bg-gray-100"
+    type="button" (click)="toggleWishlist(product.variant, $event)">
+    @if(isInWishlist(product.variant)){<i class="pi pi-heart-fill mr-2 text-lg text-red-500"></i>}
+    @else{<i class="pi pi-heart mr-2 text-lg text-black-500"></i>}
+    {{isInWishlist(product.variant) ? 'Remove' : ' Wishlist'}}
+  </button>
+
+  <!-- Add to Bag Button -->
+  <button
+    class="w-1/2 h-16 flex rounded-t-2xl  items-center justify-center text-sm font-bold dune-font text-white bg-black active:bg-gray-900"
+    type="button" (click)="openSizeSelector()">
+    <i class="pi pi-shopping-bag mr-2 text-lg"></i>
+    ADD TO BAG
+  </button>
+</div>
+
+
+<!-- Mobile Size Selector Bottom Sheet -->
+<div
+  class="fixed bottom-0 left-0 w-full bg-white shadow-xl rounded-t-2xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden"
+  [class.translate-y-full]="!showSizeSelector">
+  <div class="p-5  flex justify-between items-center">
+    <h4 class="text-lg font-semibold dune-font">Select Size</h4>
+    
+    <button (click)="closeSizeSelector()" class="hover:text-red-500">
+      <i class="pi pi-times text-xl"></i>
+    </button>
+  </div>
+<div class="p-2 flex justify-between items-center"><button
+    class="text-sm text-orange-600 underline dune-font"
+    type="button"
+    (click)="showSizeGuide = true"
+  >
+    Size Guide
+  </button></div>
+  <div class="p-4">
+    <!-- Size Buttons Reuse -->
+    <div class="flex flex-wrap gap-3">
+      @for (s of product.variant.sizes; track s.id) {
+      <button type="button" (click)="selectSize(s)" [disabled]="s.availableQuantity === 0" [ngClass]="{
+            'border border-black bg-black text-white': selectedSize?.id === s.id,
+            'border border-gray-300': selectedSize?.id !== s.id,
+            'bg-gray-100 text-gray-400 cursor-not-allowed': s.availableQuantity === 0
+          }" class="dune-font w-16 h-12 rounded text-sm font-medium">
+        {{ s.size }}
+      </button>
+      }
+    </div>
+
+    <!-- Price on Size Selection -->
+    @if (selectedSize) {
+    @let dp = getDiscountedPrice(selectedSize);
+    <div class="mt-4 flex items-center gap-3">
+      <span class="text-lg font-bold text-green-600">₹{{ dp }}</span>
+      <span class="line-through text-red-500 text-sm">₹{{ selectedSize.price }}</span>
+      <span class="text-sm text-gray-600">({{ selectedSize.discountPercentage }}% OFF)</span>
+      @if (selectedSize.price >= 999) {
+      <p-tag severity="success" class="ml-4">Free Delivery</p-tag>
+      }
+    </div>
+
+    <!-- Add to Cart Final Button -->
+    <div class="mt-6">
+      <p-button label="Confirm & Add to Bag" icon="pi pi-check" class="w-full dune-font font-bold" severity="contrast"
+        size="large" (onClick)="addToCart(selectedSize, $event); closeSizeSelector()"></p-button>
+    </div>
+    }
+  </div>
+</div>
+
+
+<!-- BACKDROP (only if modal open and not logged in) -->
+@if (showSignupPanel && !isLoggedIn) {
+<div class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300"></div>
+}
+
+<!-- SLIDE-UP MODAL PANEL (only on mobile and not logged in) -->
+@if (showSignupPanel && !isLoggedIn) {
+<div
+  class="fixed bottom-0 left-0 w-full h-3/4 bg-white/80 backdrop-blur-md shadow-xl rounded-t-2xl transform transition-transform duration-300 ease-in-out z-50"
+  [class.translate-y-full]="!showSignupPanel">
+  <!-- Close Button -->
+  <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 z-50 
+         flex items-center gap-3 px-5 py-2 rounded-full 
+         shadow-md border border-yellow-400 
+         bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee] 
+         text-[#8a5c1d] font-semibold cursor-pointer 
+         hover:scale-105 transition-transform duration-200" (click)="toggleSignupPanel()">
+    <i class="pi pi-times text-xl"></i>
+    <span class="font-medium whitespace-nowrap text-sm sm:text-base">Close</span>
+  </div>
+
+  <!-- Modal Header -->
+  <div class="p-4 pt-10 border-b border-yellow-100 flex justify-between items-center 
+            rounded-t-2xl text-[#8a5c1d] 
+            bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee]">
+    <h2 class="text-lg font-semibold">
+      {{ showLogin ? 'Login' : 'Sign up' }}
+    </h2>
+
+    <p-button (click)="toggleLogin()" class="text-white text-sm font-medium hover:underline" raised
+      severity="secondary">
+      {{ showLogin ? 'Sign up' : 'Login instead' }}
+    </p-button>
+  </div>
+
+  <!-- Modal Content -->
+  <div class="p-4 h-[calc(100%-64px)] overflow-y-auto">
+    @if (showLogin) {
+    <app-login (loginSuccess)="handleLoginSuccess($event)" />
+    } @else {
+    <app-signup />
+    }
+  </div>
+</div>
+}
+
+<!-- Floating CTA Button (only if modal closed and not logged in) -->
+@if (!showSignupPanel && !isLoggedIn) {
+<div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 
+         flex items-center gap-3 px-5 py-3 rounded-full 
+         shadow-md border border-yellow-400 
+         bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee] 
+         text-[#8a5c1d] font-semibold cursor-pointer 
+         hover:scale-105 transition-transform duration-200" (click)="toggleSignupPanel()">
+  <i class="pi pi-user-plus text-xl"></i>
+  <span class="font-medium whitespace-nowrap text-sm sm:text-base dune-font">SIGN UP / SIGN IN</span>
 </div>
 }

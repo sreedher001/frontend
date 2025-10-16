@@ -34,10 +34,10 @@ import { DrawerModule } from 'primeng/drawer';
   <div class="layout-topbar-logo-container flex items-center">
     <!-- Menu button -->
     @if(isAdmin){<button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
-      <i class="pi pi-bars"></i>
+      <i class="pi pi-bars text-orange-500"></i>
     </button>}@else{
       <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
-      <i class="pi pi-filter"></i>
+      <i class="pi pi-filter text-orange-500"></i>
     </button>
     }
 
@@ -102,12 +102,12 @@ import { DrawerModule } from 'primeng/drawer';
         -->
   <div class="sm:hidden">
   <button 
-    class="layout-topbar-action" 
+    class="layout-topbar-action relative flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-full shrink-0 " 
     (click)="showMobileSearch = true"
     pTooltip="Search"
     tooltipPosition="bottom"
   >
-    <i class="pi pi-search text-xl"></i>
+    <i class="pi pi-search text-xl text-orange-500"></i>
   </button>
 </div>
         <!-- Search (hidden on mobile, full width below) -->
@@ -142,13 +142,13 @@ import { DrawerModule } from 'primeng/drawer';
         <!-- Cart Button -->
         <button 
           type="button" 
-          class="relative flex items-center justify-center bg-pink-100 dark:bg-pink-400/10 rounded-lg shrink-0" 
-          style="width: 2.5rem; height: 2.5rem;" 
+          class="relative flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-full shrink-0" 
+          style="width: 2.3rem; height: 2.3rem;" 
           (click)="viewCart()"
           pTooltip="View items in your bag" 
           tooltipPosition="top"
         > 
-          <i class="cart-button pi pi-shopping-bag text-pink-500 text-xl"></i>
+          <i class="cart-button pi pi-shopping-bag text-orange-500 text-xl"></i>
           @if(cartCount > 0) {
             <span class="absolute -top-0 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-lg flex items-center justify-center leading-none z-10">
               {{ cartCount }}
