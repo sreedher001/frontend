@@ -235,10 +235,10 @@
 
   <!-- Add to Bag Button -->
   <button
-    class="w-1/2 h-16 flex rounded-t-2xl  items-center justify-center text-sm font-bold dune-font text-white bg-black active:bg-gray-900"
+    class="w-1/2 h-16 flex rounded-t-2xl  items-center justify-center text-sm font-bold dune-font text-white bg-orange-500 active:bg-gray-900"
     type="button" (click)="openSizeSelector()">
     <i class="pi pi-shopping-bag mr-2 text-lg"></i>
-    ADD TO BAG
+    Add to bag
   </button>
 </div>
 
@@ -289,8 +289,8 @@
 
     <!-- Add to Cart Final Button -->
     <div class="mt-6">
-      <p-button label="Confirm & Add to Bag" icon="pi pi-check" class="w-full dune-font font-bold" severity="contrast"
-        size="large" (onClick)="addToCart(selectedSize, $event); closeSizeSelector()"></p-button>
+      <p-button label="Confirm & Add to bag" icon="pi pi-check" class="w-full dune-font font-bold" severity="warn"
+        size="large" (onClick)="addToCart(product.variant, $event); closeSizeSelector()"></p-button>
     </div>
     }
   </div>
@@ -345,7 +345,7 @@
 
 <!-- Floating CTA Button (only if modal closed and not logged in) -->
 @if (!showSignupPanel && !isLoggedIn) {
-<div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 
+<div class="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-40 
          flex items-center gap-3 px-5 py-3 rounded-full 
          shadow-md border border-yellow-400 
          bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee] 

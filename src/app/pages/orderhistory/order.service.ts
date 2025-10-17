@@ -3,6 +3,8 @@ import { CommonService } from '@/layout/service/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { OrderDetailResponse } from '../orderstatus/orderstatus';
+
 
 export interface OrderSummaryDto {
   orderNumber: string;
@@ -25,4 +27,9 @@ export class OrderService {
     // Assuming JWT token stored in localStorage or managed by interceptor
     return this.http.get<OrderSummaryDto[]>(`${this.baseUrl}/orders/history`);
   }
+getOrderStatus(orderNumber: string): Observable<OrderDetailResponse> {
+  return this.http.get<OrderDetailResponse>(`${this.baseUrl}/orders/details/${orderNumber}`);
+}
+
+
 }

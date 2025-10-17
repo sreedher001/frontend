@@ -24,6 +24,7 @@ import { Invoice } from '@/pages/admin/invoice/invoice';
 import { Invoicelist } from '@/pages/admin/invoicelist/invoicelist';
 import { Searchresult } from '@/pages/searchresult/searchresult';
 import { Home } from '@/pages/home/home';
+import { Orderstatus } from '@/pages/orderstatus/orderstatus';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -49,6 +50,7 @@ export const appRoutes: Routes = [
             { path: 'checkout', component: Checkout,canActivate:[LoginGuard]},
             { path: 'auth/signup', component: Signup},
             { path: 'home', component: Home},
+            { path: 'order-status', component: Orderstatus},
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             // { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

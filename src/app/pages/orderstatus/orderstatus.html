@@ -1,0 +1,172 @@
+<!-- Make sure you're not loading -->
+@if (!loading) {
+  <p-card class="order-card mt-10">
+    <h2>Order #{{ order.orderNumber }}</h2>
+    <p><strong>Order Date:</strong> {{ order.orderDate | date: 'dd MMM yyyy, hh:mm a' }}</p>
+    <p><strong>Payment Mode:</strong> {{ order.paymentMode }}</p>
+
+    <!-- Stepper -->
+   <p-stepper [(value)]="activeStep" (onChange)="onStepSelect($event)" orientation="horizontal">
+    <p-step-item
+      *ngFor="let step of steps"
+      [value]="step.stepId"
+      (click)="isStepClickable(step.stepId) && onStepSelect(step.stepId)"
+      [class.p-disabled]="!isStepClickable(step.stepId)"
+      style="cursor: pointer;"
+    >
+      <p-step>
+        <span
+          class="rounded-lg border-2 w-12 h-12 inline-flex items-center justify-center text-warning  bg-opacity-20"
+          [ngClass]="{ 'opacity-50 cursor-not-allowed': !isStepClickable(step.stepId) }"
+        >
+          <i
+            class="pi"
+            [class.pi-shopping-bag]="step.stepId === 1"
+            [class.pi-credit-card]="step.stepId === 2"
+            [class.pi-cog]="step.stepId === 3"
+            [class.pi-truck]="step.stepId === 4"
+            [class.pi-check-circle]="step.stepId === 5"
+          ></i>
+        </span>
+      </p-step>
+      <p-step-panel>
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="flex flex-col h-48 justify-center items-center text-center px-4">
+            <div class="text-lg font-semibold mb-2"><p-tag value="{{ step.label }}" severity="success" class="text-lg font-semibold mb-2"></p-tag></div>
+            <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <!-- Description based on step status -->
+              @if(step.status === 'completed'){<ng-container >Step completed</ng-container>}
+              @if(step.status === 'current'){<ng-container >
+                <!-- Custom description per step -->
+                <ng-container [ngSwitch]="step.stepId">
+                  @if(step.stepId === 1){<p >Your order has been placed.</p>}
+                  @if(step.stepId === 2){<p >Payment has been received.</p>}
+                  @if(step.stepId === 3){<p >We are preparing your order.</p>}
+                  @if(step.stepId === 4){<p >Your order is on the way.</p>}
+                  @if(step.stepId === 5){<p >Your order has been delivered.</p>}
+                </ng-container>
+              </ng-container>}
+              @if(step.status === 'pending'){<ng-container >Pending step</ng-container>}
+            </div>
+
+            <!-- Details for each step -->
+            @if(step.stepId === 1 && step.details){<div >
+              <p><strong>Order Number:</strong> {{ step.details.orderNumber }}</p>
+              <p><strong>Order Date:</strong> {{ step.details.orderDate | date:'medium' }}</p>
+              <p><strong>Items:</strong></p>
+              <ul class="text-left">
+                @for (item of step.details.items; track item) {
+  <li>
+    {{ item.productName }} ({{ item.color }}, {{ item.size }}) x
+    {{ item.quantity }} - ₹{{ item.total }}
+  </li>
+}
+
+              </ul>
+            </div>}
+
+            @if(step.stepId === 2 && step.details){<div  >
+              <p><strong>Payment Mode:</strong> {{ step.details.paymentMode }}</p>
+              <p><strong>Total Amount:</strong> ₹{{ step.details.totalAmount }}</p>
+              <p><strong>Order Number:</strong> {{ step.details.orderNumber }}</p>
+            </div>}
+
+            <!-- Add more details for other steps if desired -->
+
+          </div>
+
+          @if(step.stepId > 1 && step.stepId < 5){<div
+            class="py-6 flex justify-between"
+            
+          >
+            <p-button
+               icon="pi pi-arrow-left"  raised outlined
+              severity="warn"
+              (onClick)="activateCallback(step.stepId - 1)"
+            ></p-button>
+            <p-button
+               icon="pi pi-arrow-right" raised outlined
+              class="p-button-warning"
+              (onClick)="activateCallback(step.stepId + 1)"
+            ></p-button>
+          </div>}
+
+          @if(step.stepId === 1){<div class="py-6 flex justify-end" >
+            <p-button
+              icon="pi pi-arrow-right" raised outlined
+              class="p-button-warning"
+              (onClick)="activateCallback(2)"
+            ></p-button>
+          </div>}
+
+          @if(step.stepId === 5){<div class="py-6 flex justify-start" >
+            <p-button
+              icon="pi pi-arrow-left"  raised outlined
+              severity="warn"
+              (onClick)="activateCallback(4)"
+            ></p-button>
+          </div>}
+        </ng-template>
+      </p-step-panel>
+    </p-step-item>
+  </p-stepper>
+
+
+    <!-- Address -->
+    <h3>Shipping Address</h3>
+    <ul>
+      <li><strong>Name:</strong> {{ order.shippingAddress.name }}</li>
+      <li><strong>Address:</strong> {{ order.shippingAddress.address }}</li>
+      <li><strong>City:</strong> {{ order.shippingAddress.city }}</li>
+      <li><strong>State:</strong> {{ order.shippingAddress.state }}</li>
+      <li><strong>Country:</strong> {{ order.shippingAddress.country }}</li>
+      <li><strong>Pin Code:</strong> {{ order.shippingAddress.pinCode }}</li>
+      <li><strong>Phone Number:</strong> {{ order.shippingAddress.phoneNumber }}</li>
+    </ul>
+
+    <!-- Items -->
+    <h3>Items</h3>
+    <p-table [value]="order.items" [paginator]="false">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Product</th>
+          <th>Size</th>
+          <th style="text-align: center;">Qty x Price</th>
+          <th style="text-align: right;">Total</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>
+            <img [src]="item.imageUrl" alt="{{ item.productName }}"
+              style="height: 50px; width: 50px; object-fit: contain; margin-right: 8px" />
+            {{ item.productName }}
+          </td>
+          <td>{{ item.size }}</td>
+          <td style="text-align: center;">
+            {{ item.quantity }} x ₹{{ item.price | number: '1.2-2' }}
+          </td>
+          <td style="text-align: right;">₹{{ item.total | number: '1.2-2' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <tr>
+            
+          <td colspan="3" style="text-align: right; font-weight: bold;">Subtotal</td>
+           @if(order.subtotal>999){<td style="text-align: right;">₹{{ order.totalAmount | number: '1.2-2' }}</td>}
+          @else{<td style="text-align: right;">₹{{ order.subtotal | number: '1.2-2' }}</td>}
+        </tr>
+        <tr>
+          <td colspan="3" style="text-align: right; font-weight: bold;">Shipping Fee</td>
+          @if(order.subtotal>999){<td style="text-align: right;">-₹{{ order.shippingFee | number: '1.2-2' }}</td>}
+          @else{<td style="text-align: right;">+₹{{ order.shippingFee | number: '1.2-2' }}</td>}
+        </tr>
+        <tr>
+          <td colspan="3" style="text-align: right; font-weight: bold; font-size: 1.2em;">Total Amount</td>
+           @if(order.subtotal>999){<td style="text-align: right; font-weight: bold; font-size: 1.2em;">₹{{ order.subtotal | number: '1.2-2' }}</td>}
+          @else{<td style="text-align: right; font-weight: bold; font-size: 1.2em;">₹{{ order.totalAmount | number: '1.2-2' }}</td>}
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+}
