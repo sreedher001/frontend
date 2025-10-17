@@ -1,17 +1,21 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
-import { catchError, throwError } from 'rxjs';
+import { catchError, finalize, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { LoaderService } from './loaderservice';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const messageService = inject(MessageService); // Inject MessageService
   const router = inject(Router);
+  const loaderService = inject(LoaderService); // inject loader service
   const token = localStorage.getItem('authToken');
 
   const authReq = token
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : req;
+// Show loader
+  loaderService.show();
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -24,12 +28,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         detail: error?.error?.message || 'Something went wrong!',
       });
 
-      // // Optional: redirect to login if 401
-      // if (error.status === 401||error.status === 400||error.status ===500) {
-      //     router.navigate(['/auth/login']);
-      // }
-
+      
       return throwError(() => error);
+    }),
+    finalize(() => {
+      // Always hide loader regardless of success or error
+      loaderService.hide();
     })
   );
 };
