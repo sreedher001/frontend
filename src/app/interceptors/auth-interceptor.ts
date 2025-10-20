@@ -23,10 +23,19 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       // Show toast message
       messageService.add({
+        // key:'global',
         severity: 'error',
         summary: 'Error',
         detail: error?.error?.message || 'Something went wrong!',
       });
+
+      if (error.status === 401 && error?.error?.message === 'Token has expired') {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('userName');
+  localStorage.removeItem('isLoggedIn');
+  messageService.add({key:'global', severity: 'warn', summary: 'Session Expired', detail: 'Please log in again.' });
+  
+}
 
       
       return throwError(() => error);
