@@ -5,12 +5,14 @@ import {
   OnDestroy,
   OnInit
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { LoaderService } from '@/interceptors/loaderservice';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
+
+declare let gtag: any;
 
 @Component({
   selector: 'app-root',
@@ -42,12 +44,20 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private loaderService: LoaderService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,private router: Router
+  ) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        gtag('config', 'G-N9H6833QQL', {
+          page_path: event.urlAfterRedirects,
+        });
+      }
+    });
+  }
 
   ngOnInit() {
     this.loadingSub = this.loaderService.loading$.subscribe((loading) => {
-      // ✅ Defer to avoid NG0100 error
+      //  Defer to avoid NG0100 error
       setTimeout(() => {
         this.isLoading = loading;
         this.cdr.markForCheck();
