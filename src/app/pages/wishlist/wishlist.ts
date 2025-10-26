@@ -5,8 +5,9 @@ import { AvatarModule } from 'primeng/avatar';
 import { CardModule } from 'primeng/card';
 import { Button, ButtonModule } from "primeng/button";
 import { WishlistService } from './wishlist.service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ProductService } from '../products/product.service';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 
 interface WishlistItem {
@@ -19,7 +20,7 @@ interface WishlistItem {
 }
 @Component({
   selector: 'app-wishlist',
-  imports: [AvatarModule, CardModule, CommonModule,ButtonModule],
+  imports: [AvatarModule, CardModule, CommonModule,ButtonModule,ConfirmDialogModule],
   templateUrl: './wishlist.html',
   styleUrl: './wishlist.scss'
 })
@@ -28,7 +29,8 @@ export class Wishlist implements OnInit {
   wishlist: WishlistItem[] = [];
 
   constructor(private router: Router,private wishlistService: WishlistService,private messageService:MessageService,
-    private productService:ProductService) {}
+    private productService:ProductService,
+    private confirmationService: ConfirmationService) {}
 
   ngOnInit() {
     this.loading = true;
@@ -65,23 +67,61 @@ export class Wishlist implements OnInit {
 goToProducts(): void {
   this.router.navigate(['/']); // Adjust route if needed
 }
+// removeItemFromWishlist(variantId: number, event: MouseEvent): void {
+//   event.stopPropagation();
+
+//   this.productService.removeFromWishlist(variantId).subscribe({
+//     next: () => {
+//       this.wishlist = this.wishlist.filter(item => item.variantId !== variantId);
+//       this.messageService.add({
+//         key:'global',
+//         severity:'success',
+//         summary:'Item removed',
+//         icon:'pi pi-check'
+//       });
+//     },
+//     error: (err) => {
+//       console.error('Remove failed', err);
+//     }
+//   });
+// }
+
+
 removeItemFromWishlist(variantId: number, event: MouseEvent): void {
-  event.stopPropagation();
+    event.stopPropagation();
 
-  this.productService.removeFromWishlist(variantId).subscribe({
-    next: () => {
-      this.wishlist = this.wishlist.filter(item => item.variantId !== variantId);
-      this.messageService.add({
-        key:'global',
-        severity:'success',
-        summary:'Item removed',
-        icon:'pi pi-check'
-      });
-    },
-    error: (err) => {
-      console.error('Remove failed', err);
-    }
-  });
-}
-
+    // 🔒 Confirmation before delete
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to remove this item from your wishlist?',
+      header: 'Confirm Removal',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Yes, Remove',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-warn p-button-sm',
+      rejectButtonStyleClass: 'p-button-warn p-button-outlined p-button-sm',
+      accept: () => {
+        this.productService.removeFromWishlist(variantId).subscribe({
+          next: () => {
+            this.wishlist = this.wishlist.filter(item => item.variantId !== variantId);
+            this.messageService.add({
+              key: 'global',
+              severity: 'success',
+              summary: 'Removed',
+              detail: 'Item removed from wishlist',
+              icon: 'pi pi-check'
+            });
+          },
+          error: (err) => {
+            console.error('Remove failed', err);
+            this.messageService.add({
+              key: 'global',
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to remove item.'
+            });
+          }
+        });
+      }
+    });
+  }
 }

@@ -21,27 +21,54 @@ declare let gtag: any;
   imports: [
     RouterModule,
     ToastModule,
-    ProgressSpinner, // ✅ Make sure this is included
     CommonModule
   ],
   template: `
     <p-toast key="global" position="top-center" [baseZIndex]="10000"></p-toast>
-
-    <!-- Spinner conditionally rendered -->
-    <p-progressSpinner
+<div
   *ngIf="isLoading"
-  styleClass="overlay-spinner"
-  style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;"
-></p-progressSpinner>
-
+  class="zfc-loader fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-md z-50"
+>
+  <div class="zfc-text dune-font">
+    <span>Z</span><span>F</span><span>C</span>
+  </div>
+</div>
 
     <router-outlet></router-outlet>
-  `
+  `,styles: [`
+    .zfc-text {
+      
+  font-size: 4rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  display: flex;
+  gap: 0.4rem;
+  background: linear-gradient(90deg, #c9892b, #f5d77c, #c9892b);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldFlow 3s linear infinite;
+}
+
+@keyframes goldFlow {
+  0% { background-position: 0%; }
+  100% { background-position: 200%; }
+}
+
+.zfc-loader {
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+  `]
 })
 export class AppComponent implements OnInit, OnDestroy {
   isLoading = false;
   private loadingSub!: Subscription;
-
+letters = ['Z', 'F', 'C'];
   constructor(
     private loaderService: LoaderService,
     private cdr: ChangeDetectorRef,private router: Router

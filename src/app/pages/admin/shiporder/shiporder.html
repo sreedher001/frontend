@@ -1,0 +1,118 @@
+@if(!loading){
+<form #shipForm="ngForm" id="shippingForm" (ngSubmit)="onSubmitShipping(shipForm)" novalidate>
+  <p-fluid class="flex mt-5">
+    <div class="card flex flex-col gap-6 w-full">
+      <div class="font-semibold text-xl">
+        Enter Shipping Details
+        @if(shipForm.invalid && shipForm.touched){
+          <span class="p-error text-red-800">(NOTE: All fields are mandatory to be filled)</span>
+        }
+      </div>
+
+      <!-- Responsive Grid (4 per row on desktop) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <!-- Order Number -->
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText id="orderNumber" name="orderNumber" [(ngModel)]="shippingDto.orderNumber" required class="w-full" readonly />
+            <label for="orderNumber">Order Number</label>
+          </p-floatlabel>
+        </div>
+
+       
+      </div>
+
+     <!-- Comment: Full Width -->
+<div class=" mb-4">
+  <p-floatlabel variant="on">
+    <textarea 
+      pTextarea required
+      id="comment" 
+      name="comment" 
+      [(ngModel)]="shippingDto.comment" 
+      class="w-full" 
+      rows="3"
+    ></textarea>
+    <label for="comment">Comment about the parcel*</label>
+  </p-floatlabel>
+</div>
+
+
+      <!-- Dimensions Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText type="number" id="length" name="length" [(ngModel)]="shippingDto.length" required class="w-full" />
+            <label for="length">Length of the parcel</label>
+          </p-floatlabel>
+        </div>
+
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText type="number" id="breadth" name="breadth" [(ngModel)]="shippingDto.breadth" required class="w-full" />
+            <label for="breadth">Breadth of the parcel</label>
+          </p-floatlabel>
+        </div>
+
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText type="number" id="height" name="height" [(ngModel)]="shippingDto.height" required class="w-full" />
+            <label for="height">Height of the parcel</label>
+          </p-floatlabel>
+        </div>
+
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText type="number" id="weight" name="weight" [(ngModel)]="shippingDto.weight" required class="w-full" />
+            <label for="weight">Weight of the parcel - (KG)</label>
+          </p-floatlabel>
+        </div>
+      </div>
+
+      <!-- Charges Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText type="number" disabled="true" id="giftwrapCharge" name="giftwrapCharge" [(ngModel)]="shippingDto.giftwrapCharge" required class="w-full" />
+            <label for="giftwrapCharge">Giftwrap Charge</label>
+          </p-floatlabel>
+        </div>
+
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText type="number" disabled="true" id="transactionCharges" name="transactionCharges" [(ngModel)]="shippingDto.transactionCharges" required class="w-full" />
+            <label for="transactionCharges">Transaction Charges</label>
+          </p-floatlabel>
+        </div>
+<!-- Pickup Location Autocomplete -->
+ <div>
+  <p-floatlabel variant="on">
+    <p-autoComplete
+      inputId="pickupLocation"
+      [(ngModel)]="shippingDto.pickupLocation"
+      name="pickupLocation"
+      [suggestions]="filteredPickupLocations"
+      (completeMethod)="filterPickupLocations($event)"
+      [dropdown]="true"
+      [forceSelection]="true"
+      required
+      class="w-full"
+    ></p-autoComplete>
+    <label for="pickupLocation">Pickup Location</label>
+  </p-floatlabel>
+</div>
+        
+      </div>
+
+      
+
+      <!-- Submit Button -->
+      <div class="flex justify-end px-2">
+        <p-button severity="warn" type="submit" label="Submit Shipping Details" raised ></p-button>
+      </div>
+    </div>
+  </p-fluid>
+</form>
+}

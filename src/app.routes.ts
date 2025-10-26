@@ -25,6 +25,7 @@ import { Invoicelist } from '@/pages/admin/invoicelist/invoicelist';
 import { Searchresult } from '@/pages/searchresult/searchresult';
 import { Home } from '@/pages/home/home';
 import { Orderstatus } from '@/pages/orderstatus/orderstatus';
+import { Shiporder } from '@/pages/admin/shiporder/shiporder';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -47,6 +48,7 @@ export const appRoutes: Routes = [
             { path: 'admin/invoice-list', component: Invoicelist,canActivate: [AuthGuard]},
             { path: 'admin/order-details/:id', component: Adminorderdetails,canActivate: [AuthGuard]},
             { path: 'admin/sales/trend', component: Salestrend,canActivate: [AuthGuard]},
+            { path: 'admin/order/ship/:id', component: Shiporder,canActivate: [AuthGuard]},
             { path: 'checkout', component: Checkout,canActivate:[LoginGuard]},
             { path: 'auth/signup', component: Signup},
             { path: 'home', component: Home},

@@ -40,7 +40,7 @@ editingAddressId: any =0;
   showAddAddressForm = false;
   userId:number=0;
   userInfo:any;
-  selectedPaymentMode:any;
+  selectedPaymentMode='Prepaid';
 
   constructor(private fb: FormBuilder, private messageService: MessageService, private checkoutService: CheckoutService,
     private jwtHelper: JwtHelper,private confirmationService: ConfirmationService
@@ -112,7 +112,7 @@ editingAddressId: any =0;
     isDefault: false // or true if needed
   };
 if (this.isEditMode && this.editingAddressId !== null) {
-    // 🔁 Update address
+    //  Update address
     this.checkoutService
       .updateShippingAddress(this.userId, this.editingAddressId, addressData)
       .subscribe({
@@ -184,7 +184,7 @@ if (this.isEditMode && this.editingAddressId !== null) {
     this.checkoutService.Checkout(checkoutRequest).subscribe({
   next: (res:any) => {
     console.log('Order placed successfully:', res);
-    if (this.selectedPaymentMode === 'UPI') {
+    if (this.selectedPaymentMode === 'Prepaid') {
         this.createRazorpayOrder(res);
         this.messageService.add({
           key:'global',

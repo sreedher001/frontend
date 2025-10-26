@@ -1,11 +1,16 @@
+
 <div class="bg-gray-50 min-h-screen py-12">
+  @if(!isLoggedIn && hasCartItems){
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-2">
+    <p-message severity="error">Note: You're not logged in. You must be logged in to edit the selected size.</p-message>
+</div>}
   <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-2">
 
     <!-- Left: Cart Items -->
     <div class="flex-1 bg-white rounded-lg shadow p-4">
       <h1 class="text-xl font-semibold mb-4">My cart</h1>
 
-      @if (cart.items.length > 0) {
+      @if (hasCartItems) {
       @for (item of cart.items; track item.id) {
       <div class="relative flex flex-col border-b border-gray-200 py-4 gap-3 mt-2  rounded rounded-2xl" [ngClass]="{
     'bg-green-10': item.selectedSizeObj?.availableQuantity > 0,
@@ -76,7 +81,7 @@
                   (keydown)="preventTyping($event)" (onSelect)="onSizeChange(item)"
                   [inputStyle]="{ 'caretColor': 'transparent' }" class="w-full">
                 </p-autocomplete>
-                @if(item.selectedSizeObj?.availableQuantity <= 0 && item.availableSizes.length>1){ <span>
+                @if(item?.selectedSizeObj?.availableQuantity <= 0 && getItemLength(item)>1){ <span>
                   <p-tag value="Check other sizes" severity="danger" class="text-xs font-medium">
                   </p-tag>
                   </span>
@@ -101,7 +106,7 @@
     </div>
 
     <!-- Right: Summary -->
-    @if(cart.items.length > 0){<div class="lg:w-72 flex-shrink-0 w-full">
+    @if(hasCartItems){<div class="lg:w-72 flex-shrink-0 w-full">
       <div class="bg-white rounded-lg shadow p-4">
         <p class="text-base font-medium">
           Subtotal ({{ cart.items.length }} items):

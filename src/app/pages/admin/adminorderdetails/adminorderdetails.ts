@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminOrder, AdminOrderService } from '../adminorder/adminorder.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from '@/pages/orderhistory/order.service';
 import { TagModule } from 'primeng/tag';
 import { TableModule } from 'primeng/table';
@@ -20,11 +20,14 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './adminorderdetails.scss'
 })
 export class Adminorderdetails implements OnInit {
+
   orderId!: number;
   orderDetails!: AdminOrder;
   loading = true;
 
-  constructor(private route: ActivatedRoute, private orderService: AdminOrderService,private messageService:MessageService) {}
+  constructor(private route: ActivatedRoute, private orderService: AdminOrderService,private messageService:MessageService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.orderId = Number(this.route.snapshot.paramMap.get('id'));
@@ -85,6 +88,10 @@ updateOrderStatus(id:any,newStatus: any): void {
       });
     }
   });
+}
+
+shipOrder(id: any) {
+  this.router.navigate(['/admin/order/ship', id]);
 }
 
 }

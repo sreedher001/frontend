@@ -61,7 +61,7 @@
 
     <!-- Admin Controls -->
 <div class="flex flex-wrap gap-3 mt-4">
-  <p-button 
+  <p-button outlined
     label="Mark as Shipped" 
     icon="pi pi-truck" 
     severity="success" 
@@ -69,7 +69,7 @@
     [disabled]="orderDetails.status === 'SHIPPED' || orderDetails.status === 'REJECTED'"
   ></p-button>
 
-  <p-button 
+  <p-button outlined
     label="Reject Order" 
     icon="pi pi-times" 
     severity="danger" 
@@ -95,6 +95,13 @@
     severity="warn"
     (click)="updateOrderStatus(orderDetails.id, selectedStatus)" 
     [disabled]="!selectedStatus || selectedStatus.value === orderDetails.status"
+  ></p-button>
+
+  <p-button 
+    label="Ship this order" 
+    icon="pi pi-truck" 
+    severity="help"
+    (click)="shipOrder(orderDetails.id)" 
   ></p-button>
 </div>
   }

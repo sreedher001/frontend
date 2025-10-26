@@ -293,7 +293,7 @@ if (isLoggedIn) {
       size: this.selectedSize.size,
       price: this.selectedSize.price,
       discountPercentage: this.selectedSize.discountPercentage,
-      image: variant.productImage?.[0]?.imageUrl || ''
+      imageUrl: variant.productImage?.[0]?.imageUrl || ''
     };
 
     // Check if already in guest cart
@@ -313,7 +313,7 @@ if (isLoggedIn) {
     this.messageService.add({
       key: 'global',
       severity: 'success',
-      summary: 'Added to Bag (Guest)',
+      summary: 'Added to Bag',
       detail: `${variant.variantName} added. Login to checkout.`
     });
 
@@ -324,6 +324,8 @@ if (isLoggedIn) {
   }
   
   }
+
+  
 
   buyNow(variant: any,event: Event): void {
    

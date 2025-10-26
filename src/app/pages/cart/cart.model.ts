@@ -10,7 +10,6 @@ export interface CartItemDto {
   total: number;
   availableSizes:any[];
   availableQuantity:number;
-
   sizeOptions: any[];       
   selectedSizeObj:any;    // All sizes for autocomplete
   filteredSizeOptions: any[];   // Filtered for search

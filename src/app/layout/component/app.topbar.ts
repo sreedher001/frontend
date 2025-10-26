@@ -139,6 +139,23 @@ import { DrawerModule } from 'primeng/drawer';
           </p-autoComplete>
         </div>
 
+        <!-- wishlist Button -->
+        <button 
+          type="button" 
+          class="relative flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-full shrink-0" 
+          style="width: 2.3rem; height: 2.3rem;" 
+          (click)="wishList()"
+          pTooltip="your wishList" 
+          tooltipPosition="top"
+        > 
+          <i class="cart-button pi pi-heart text-orange-500 text-xl"></i>
+          @if(wishlistCount > 0) {
+            <span class="absolute -top-0 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-lg flex items-center justify-center leading-none z-10">
+              {{ wishlistCount }}
+            </span>
+          }
+        </button>
+
         <!-- Cart Button -->
         <button 
           type="button" 
@@ -270,6 +287,7 @@ export class AppTopbar implements OnInit {
 
     isLoggedIn: boolean = false;
     cartCount: number = 0;
+    wishlistCount:number=0;
     userName:any ='';
     overlayMenuItems: MenuItem[] = [];
      ngOnInit(): void {
@@ -281,6 +299,7 @@ const roles = this.jwtHelper.getUserRoles(); // assuming this returns an array
     this.isAdmin=true;
   }
   this.getcart();
+  this.getWishList();
 }
 
     }
@@ -345,13 +364,8 @@ const loggedIn = localStorage.getItem('isLoggedIn');
             label: 'Wishlist',
             icon: 'pi pi-heart',command:()=>this.goTOWishList()
         },{ separator: true },
-        {
-            label: 'Settings',
-            icon: 'pi pi-cog'
-        },
-        {
-            separator: true
-        },
+        
+        
         { label: 'Logout',icon: 'pi pi-sign-out', command: () => this.logout()}
     ];}
     else{
@@ -397,6 +411,9 @@ this.drawerVisible=false;
         this.router.navigate(['/cart']);
 
     }
+    wishList(){
+      this.router.navigate(['/wishlist']);
+    }
     signup() {
         this.router.navigate(['/auth/signup']);
     }
@@ -431,4 +448,15 @@ getcart(){
       console.error('Failed to load cart', err);
     }
   });
-}}
+}
+
+getWishList(){
+ this.productService.getWishlist().subscribe({
+    next: (items: any[]) => {
+      this.wishlistCount = items.length;
+    },
+    error: (err) => {
+      console.error('Failed to load wishlist', err);
+    }
+  });}
+}
