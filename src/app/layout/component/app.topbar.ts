@@ -354,7 +354,7 @@ const loggedIn = localStorage.getItem('isLoggedIn');
         { separator: true },
         {
             label: 'My Profile',
-            icon: 'pi pi-id-card',
+            icon: 'pi pi-id-card', command: () => this.myProfile()
         },{ separator: true },
         {
             label: 'My Orders',
@@ -376,26 +376,37 @@ const loggedIn = localStorage.getItem('isLoggedIn');
     }}
   
 
-    logout() {
-      this.messageService.add({
-        key:'global',
-        severity: 'warn',
-        summary: 'You have been logged out successfully',
-        detail: 'Come back soon..',
-      });
-        this.isLoggedIn = false;
-        localStorage.setItem('isLoggedIn', "false");
-this.drawerVisible=false;
-        localStorage.removeItem('username');
-       this.jwtHelper.logout();
-       window.location.reload();
-       this.router.navigate(['']);
+   logout() {
+  this.messageService.add({
+    key: 'global',
+    severity: 'warn',
+    summary: 'You have been logged out successfully',
+    detail: 'Come back soon..',
+  });
 
-    }
+  localStorage.clear();
+  sessionStorage.clear();
+  this.jwtHelper.logout();
+  this.drawerVisible = false;
+  this.isLoggedIn = false;
+
+  // Navigate first, then full reload
+  this.router.navigate(['']).then(() => {
+    setTimeout(() => {
+      window.location.href = '/'; // refresh at root (cleaner than reload)
+    }, 300);
+  });
+}
+  
+
     myOrders(): void {
       this.drawerVisible=false;
     this.router.navigate(['/order/order-history']);
     
+  }
+  myProfile(){
+     this.drawerVisible=false;
+    this.router.navigate(['/myprofile']);
   }
 
    goTOWishList(): void {

@@ -26,6 +26,7 @@ import { Searchresult } from '@/pages/searchresult/searchresult';
 import { Home } from '@/pages/home/home';
 import { Orderstatus } from '@/pages/orderstatus/orderstatus';
 import { Shiporder } from '@/pages/admin/shiporder/shiporder';
+import { Profile } from '@/pages/profile/profile';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -42,6 +43,7 @@ export const appRoutes: Routes = [
             { path: 'cart', component: Cart},
             { path: 'order/order-history', component: Orderhistory},
             { path: 'wishlist', component: Wishlist},
+            { path: 'myprofile', component: Profile},
             { path: 'search/:style', component: Searchresult},
             { path: 'admin/orders', component: Adminorder,canActivate: [AuthGuard]},
             { path: 'admin/invoice', component: Invoice,canActivate: [AuthGuard]},

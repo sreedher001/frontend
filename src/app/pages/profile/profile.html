@@ -1,0 +1,99 @@
+<div class="min-h-screen bg-gradient-to-b from-[#fff8f0] via-[#fffdf8] to-[#fff] flex flex-col items-center py-16 px-6">
+  <!-- Avatar -->
+  <p-avatar
+    image="https://cdn-icons-png.flaticon.com/512/847/847969.png"
+    shape="circle"
+    size="xlarge"
+    class="mb-6 shadow-md border border-amber-100"
+  ></p-avatar>
+
+  <!-- Name -->
+  <h1 class="text-3xl font-semibold text-[#3b2a12] tracking-wide mb-8">
+    {{ user.name }}
+  </h1>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl">
+    <!-- EMAIL CARD -->
+    <!-- EMAIL CARD -->
+<p-card class="bg-white/80 backdrop-blur-md border border-amber-100 rounded-xl shadow-sm p-4 hover:shadow-lg transition">
+  <h3 class="text-sm text-gray-500 mb-1">Email</h3>
+
+  <div *ngIf="!editing.email">
+    <p class="text-[#3b2a12] font-medium">{{ user.email }}</p>
+    <p-button  label="Edit" icon="pi pi-pencil" class=" mt-2" severity="warn" outlined  (click)="enableEdit('email')"></p-button>
+  </div>
+
+  <div *ngIf="editing.email" class="flex flex-col gap-2">
+    <input
+      type="email"
+      pInputText
+      [(ngModel)]="editable.email"
+      placeholder="Enter new email"
+      class="w-full"
+      [ngClass]="{ 'p-invalid': !valid.email && attempted.email }"
+    />
+
+    <div class="flex justify-end gap-2 mt-2">
+      <p-button  label="Cancel" severity="warn" outlined (click)="cancelEdit('email')"></p-button>
+      <p-button
+        severity="warn" 
+        label="Save"
+        icon="pi pi-check"
+        (click)="validateAndSendOtp('email')"
+      ></p-button>
+    </div>
+
+    <small *ngIf="!valid.email && attempted.email" class="text-red-500 animate-pulse mt-1">Please enter a valid email</small>
+
+    <!-- OTP Section -->
+    <div *ngIf="otpVisible.email" class="mt-3">
+      <input type="text" pInputText [(ngModel)]="otp.email" placeholder="Enter OTP" maxlength="6" class="w-full" />
+      <p-button  label="Verify" icon="pi pi-shield" severity="warn"  (click)="verifyOtp('email')"></p-button>
+    </div>
+  </div>
+</p-card>
+
+<!-- PHONE CARD -->
+<p-card class="bg-white/80 backdrop-blur-md border border-amber-100 rounded-xl shadow-sm p-4 hover:shadow-lg transition">
+  <h3 class="text-sm text-gray-500 mb-1">Phone</h3>
+
+  <div *ngIf="!editing.phone">
+    <p class="text-[#3b2a12] font-medium">{{ user.phone }}</p>
+    <p-button severity="warn" outlined label="Edit" icon="pi pi-pencil" class="p-button-text mt-2 " (click)="enableEdit('phone')"></p-button>
+  </div>
+
+  <div *ngIf="editing.phone" class="flex flex-col gap-2">
+    <input
+      type="text"
+      pInputText
+      [(ngModel)]="editable.phone"
+      placeholder="Enter new phone"
+      maxlength="10"
+      class="w-full"
+      [ngClass]="{ 'p-invalid': !valid.phone && attempted.phone }"
+    />
+
+    <div class="flex justify-end gap-2 mt-2">
+      <p-button  label="Cancel" severity="warn"  outlined (click)="cancelEdit('phone')"></p-button>
+      <p-button
+        
+        label="Save" severity="warn" 
+        icon="pi pi-check"
+        (click)="validateAndSendOtp('phone')"
+      ></p-button>
+    </div>
+
+    <small *ngIf="!valid.phone && attempted.phone" class="text-red-500 animate-pulse mt-1">Please enter a valid phone number</small>
+
+    <!-- OTP Section -->
+    <div *ngIf="otpVisible.phone" class="mt-3">
+      <input type="text" pInputText [(ngModel)]="otp.phone" placeholder="Enter OTP" maxlength="6" class="w-full" />
+      <p-button pButton label="Verify" icon="pi pi-shield" severity="warn" (click)="verifyOtp('phone')"></p-button>
+    </div>
+  </div>
+</p-card>
+
+  </div>
+
+  <p-toast key="global"></p-toast>
+</div>
