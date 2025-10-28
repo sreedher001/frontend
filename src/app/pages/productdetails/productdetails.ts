@@ -307,7 +307,7 @@ if (isLoggedIn) {
     } else {
       guestCart.push(newItem);
     }
-
+console.log("guestCart",guestCart);
     localStorage.setItem(guestCartKey, JSON.stringify(guestCart));
 
     this.messageService.add({

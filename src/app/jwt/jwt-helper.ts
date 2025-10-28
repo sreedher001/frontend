@@ -48,5 +48,7 @@ export class JwtHelper {
 
   logout(): void {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('isLoggedeIn');
+    localStorage.removeItem('userName');
   }
 }

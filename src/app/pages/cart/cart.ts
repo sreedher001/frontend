@@ -16,16 +16,21 @@ import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocompl
 import { Router } from '@angular/router';
 import { BadgeModule } from 'primeng/badge';
 import { Message, MessageModule } from "primeng/message";
+import { LoginComponent } from "../auth/login";
+import { Signup } from "../auth/signup/signup";
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-cart',
   standalone:true,
-  imports: [ButtonModule, NgClass, FormsModule, BadgeModule, CardModule, DecimalPipe, TagModule, AutoCompleteModule, ButtonModule, MessageModule],
+  imports: [ButtonModule, NgClass, FormsModule, BadgeModule, CardModule, DecimalPipe, TagModule, AutoCompleteModule, ButtonModule, MessageModule, LoginComponent, Signup],
   templateUrl: './cart.html',
   styleUrl: './cart.scss'
 })
 export class Cart implements OnInit {
 
+  showSignupPanel = false;
+showLogin = false;
 
 
   product: Product | undefined ;
@@ -54,87 +59,109 @@ autoFilteredSizeValue: any[] = [];
 
   }
 
+  // ---------- Helper functions for guest cart ----------
+private guestCartKey = 'guestCart';
+
+private getGuestCartRaw(): any[] {
+  try {
+    return JSON.parse(localStorage.getItem(this.guestCartKey) || '[]') || [];
+  } catch {
+    return [];
+  }
+}
+
+private saveGuestCartRaw(arr: any[]) {
+  localStorage.setItem(this.guestCartKey, JSON.stringify(arr || []));
+}
+
+/**
+ * Normalize a raw guest item into the format your UI expects.
+ * Ensures variantId, sizeId, selectedSizeObj, total and imageUrl exist.
+ */
+private normalizeGuestItem(raw: any) {
+  return {
+    // id for UI uses productId/id sometimes — keep both to be safe
+    id: raw.variantId ?? raw.id ?? 0,
+    variantId: raw.variantId ?? raw.id ?? raw.productId ?? 0,
+    productId: raw.variantId ?? raw.productId ?? raw.id ?? 0,
+    variantName: raw.variantName ?? raw.name ?? '',
+    quantity: raw.quantity ?? 1,
+    size: raw.size ?? (raw.selectedSizeObj?.size) ?? null,
+    sizeId: raw.sizeId ?? raw.selectedSizeObj?.sizeId ?? null,
+    color: raw.color ?? null,
+    price: raw.price ?? (raw.selectedSizeObj?.price) ?? 0,
+    discountPercentage: raw.discountPercentage ?? (raw.selectedSizeObj?.discountPercentage) ?? 0,
+    availableQuantity: raw.availableQuantity ?? (raw.selectedSizeObj?.availableQuantity) ?? 1,
+    imageUrl: raw.imageUrl ?? raw.productImage ?? '',
+    // keep array of size options (minimal)
+    sizeOptions: raw.sizeOptions ?? [ raw.selectedSizeObj ?? {
+      size: raw.size,
+      sizeId: raw.sizeId,
+      price: raw.price,
+      discountPercentage: raw.discountPercentage,
+      availableQuantity: raw.availableQuantity ?? 1
+    }],
+    selectedSizeObj: raw.selectedSizeObj ?? {
+      size: raw.size,
+      sizeId: raw.sizeId,
+      price: raw.price,
+      discountPercentage: raw.discountPercentage,
+      availableQuantity: raw.availableQuantity ?? 1
+    },
+    total: ( () => {
+      const p = raw.price ?? (raw.selectedSizeObj?.price) ?? 0;
+      const d = raw.discountPercentage ?? (raw.selectedSizeObj?.discountPercentage) ?? 0;
+      const qty = raw.quantity ?? 1;
+      const final = Math.round(p - (p * d / 100));
+      return final * qty;
+    })()
+  };
+}
+
+/**
+ * Rebuilds this.cart.items from guest localStorage (normalizing).
+ */
+private buildCartFromGuest() {
+  const raw = this.getGuestCartRaw();
+  this.cart = {
+    cartId: 0,
+    items: raw.map(r => ({
+      ...this.normalizeGuestItem(r),
+      availableSizes: r.availableSizes || [],
+      filteredSizeOptions: r.filteredSizeOptions || []
+    }))
+  };
+}
+
+
+
   getItemLength(item: CartItemDto) {
 return item?.availableSizes?.length;
 }
 
-  // addToCart(product: Product,event: Event): void {
-  //   event.stopPropagation();
-  //   this.cartService.addToCart({ productId: product.id, quantity: 1 }).subscribe({
-  //     next: () => {
-  //       this.messageService.add({
-  //         key: 'global',
-  //         severity: 'info',
-  //         summary: 'Added to cart',
-  //         detail: `${product.name} was added successfully.`
-  //       });
-  //     },
-  //     error: (err) => {
-  //       console.error(err);
-  //       this.messageService.add({
-  //         key: 'global',
-  //         severity: 'error',
-  //         summary: 'Add Failed',
-  //         detail: 'Could not add to cart. Please try again.'
-  //       });
-  //     }
-  //   });
-  // }
-  loadCart(): void {
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+loadCart(): void {
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   if (isLoggedIn) {
-    // Load from backend
-  this.cartService.getCart().subscribe({
-    next: (res) => {
-      this.cart = res;
-      
-      this.cart.items.forEach((item) => {
-       item.sizeOptions = item.availableSizes;
-
-        item.selectedSizeObj = item.sizeOptions.find(
-    (opt: any) => opt.size === item.size
-  );
-      });
-    },
-    error: (err) => {
-      console.error('Failed to load cart', err);
-    }
-  });
-}else {
-    // Load from localStorage (guest cart)
-    const guestCartKey = 'guestCart';
-    const guestCart = JSON.parse(localStorage.getItem(guestCartKey) || '[]');
-
-    // Map guest cart into same format as backend `CartResponse`
-    this.cart = {
-      cartId: 0, // No ID for guest cart
-      items: guestCart.map((item: any) => ({
-        id: item.variantId, // or another identifier
-        productId: item.variantId,
-        variantName: item.variantName,
-        quantity: item.quantity,
-        size: item.size,
-        sizeOptions: [ // single option or placeholder
-          {
-            size: item.size,
-            price: item.price,
-            availableQuantity: 1,
-            discountPercentage: item.discountPercentage
-          }
-        ],
-        selectedSizeObj: {
-          size: item.size,
-          price: item.price,
-          availableQuantity: 1,
-          discountPercentage: item.discountPercentage
-        },
-        total: this.calculateItemTotal(item),
-        imageUrl: item.imageUrl
-      }))
-    };
+    this.cartService.getCart().subscribe({
+      next: (res) => {
+        this.cart = res;
+        this.cart.items.forEach((item) => {
+          item.sizeOptions = item.availableSizes;
+          item.selectedSizeObj = item.sizeOptions.find((opt: any) => opt.size === item.size);
+        });
+      },
+      error: (err) => {
+        console.error('Failed to load cart', err);
+      }
+    });
+  } else {
+    // Guest: rebuild with normalized shape
+    this.buildCartFromGuest();
   }
 }
+
 //for guest cart
 calculateItemTotal(item: any): number {
   const price = item.price;
@@ -196,7 +223,12 @@ goToShop() {
   }
 
    goToCheckout(): void {
-    this.router.navigate(['/checkout']);
+    if(this.isLoggedIn){
+      this.router.navigate(['/checkout']);
+    }
+  else{
+    this.toggleSignupPanel();
+    }
   }
   removeItem(productId: number): void {
     this.cartService.removeItem(productId).subscribe(() => {
@@ -251,19 +283,65 @@ decreaseQuantity(item: any) {
   }
 }
 
+// updateCartItem(item: any) {
+//   this.cartService.updateCartItem(item.id, item.quantity, item.size)
+//       .subscribe({
+//         next: (res: any) => {
+//           console.log('Cart updated:', res);
+          
+//     window.location.reload();
+//         },
+//         error: (err:any) => {
+//           console.error('Update failed:', err);
+//         }
+//       });
+// }
+
 updateCartItem(item: any) {
-  this.cartService.updateCartItem(item.id, item.quantity, item.size)
+  if (localStorage.getItem("isLoggedIn") === "true") {
+    // Logged-in: call backend
+    this.cartService.updateCartItem(item.id, item.quantity, item.size)
       .subscribe({
         next: (res: any) => {
           console.log('Cart updated:', res);
-          
-    window.location.reload();
+          // prefer to update UI without full reload - but for now refresh:
+          window.location.reload();
         },
         error: (err:any) => {
           console.error('Update failed:', err);
         }
       });
+  } else {
+    // Guest: update localStorage
+    const guestCart = this.getGuestCartRaw();
+    const idx = guestCart.findIndex((ci: any) => {
+      const ciVariant = ci.variantId ?? ci.id ?? ci.productId;
+      const ciSizeId = ci.sizeId ?? ci.size?.sizeId ?? ci.size;
+      const itemVariant = item.variantId ?? item.id ?? item.productId;
+      const itemSizeId = item.sizeId ?? item.selectedSizeObj?.sizeId ?? item.size;
+      return (ciVariant === itemVariant) && (ciSizeId === itemSizeId);
+    });
+
+    if (idx >= 0) {
+      // update quantity & total
+      guestCart[idx].quantity = item.quantity;
+      // keep price/discount etc as they are
+      this.saveGuestCartRaw(guestCart);
+      this.buildCartFromGuest();
+    } else {
+      // item not found — fallback: search by variant then update that
+      const byVariant = guestCart.find((ci: any) => (ci.variantId ?? ci.id ?? ci.productId) === (item.variantId ?? item.id));
+      if (byVariant) {
+        byVariant.quantity = item.quantity;
+        this.saveGuestCartRaw(guestCart);
+        this.buildCartFromGuest();
+      } else {
+        console.warn('Guest cart item to update not found', item);
+      }
+    }
+  }
 }
+
  onSizeChange(item: any) {
   if (item.selectedSizeObj) {
     item.size = item.selectedSizeObj.size; // keep string for backend
@@ -272,28 +350,7 @@ updateCartItem(item: any) {
   }
 }
 
-// removeFromCart(item: any): void {
-//   this.cartService.removeItem(item.id).subscribe({
-//     next: (res: any) => {
-//       this.cart.items = this.cart.items.filter(i => i.id !== item.id);
-//       this.messageService.add({
-//       key: 'global',
-//       severity: 'success',
-//       summary: 'Removed',
-//       icon:'pi pi-trash',
-//       detail: `${item.variantName} removed from cart.`
-//     });
-//     },
-//     error: (error) => {
-//       this.messageService.add({
-//       key: 'global',
-//       severity: 'danger',
-//       summary: 'Failed to remove!',
-//       icon:'pi pi-times'
-//     });
-//     }
-//   });
-// }
+
 
 removeFromCart(item: any): void {
   if (this.isLoggedIn) {
@@ -319,31 +376,26 @@ removeFromCart(item: any): void {
       }
     });
   } else {
-   const guestCartKey = 'guestCart';
-  const guestCart = JSON.parse(localStorage.getItem(guestCartKey) || '[]');
+  // Guest: remove from localStorage
+  const guestCart = this.getGuestCartRaw();
 
-  // Remove matching variant + size
-  const updatedCart = guestCart.filter(
-    (ci: any) => !(ci.variantId === item.variantId && ci.sizeId === item.sizeId)
-  );
+  // Remove matching variant + sizeId (use size & sizeId both)
+  const updatedCart = guestCart.filter((ci: any) => {
+    const ciVariant = ci.variantId ?? ci.id ?? ci.productId;
+    const ciSizeId = ci.sizeId ?? ci.size?.sizeId ?? ci.sizeId;
+    const itemVariant = item.variantId ?? item.id ?? item.productId;
+    const itemSizeId = item.sizeId ?? item.selectedSizeObj?.sizeId ?? item.size;
 
-  // Rebuild selectedSizeObj
-  const rebuiltCart = updatedCart.map((ci:any) => ({
-    ...ci,
-    selectedSizeObj: {
-      size: ci.size,
-      sizeId: ci.sizeId,
-      availableQuantity: ci.availableQuantity ?? 1 // default to 1 if undefined
-    }
-  }));
+    // compare both variant and size (fallback to size string comparision)
+    const variantMatch = (ciVariant === itemVariant);
+    const sizeMatch = (ciSizeId != null && itemSizeId != null) ? (ciSizeId === itemSizeId) : (ci.size === item.size);
+    return !(variantMatch && sizeMatch);
+  });
 
-  // Update localStorage
-  localStorage.setItem(guestCartKey, JSON.stringify(updatedCart));
+  // Save back and rebuild UI
+  this.saveGuestCartRaw(updatedCart);
+  this.buildCartFromGuest();
 
-  // THIS is the key step you're missing:
-  this.cart.items = this.rebuildGuestCartItems(guestCart);
-
-  // Optional toast
   this.messageService.add({
     key: 'global',
     severity: 'success',
@@ -351,11 +403,7 @@ removeFromCart(item: any): void {
     icon: 'pi pi-trash',
     detail: `${item.variantName} removed from cart.`
   });
-
-  console.log('updatedCart:', updatedCart);
-  console.log('this.cart.items (after rebuild):', this.cart.items);
-}
-}
+}}
 get hasCartItems(): boolean {
   return this.cart.items.length > 0;
 }
@@ -369,6 +417,55 @@ rebuildGuestCartItems(cart: any[]): any[] {
       availableQuantity: item.availableQuantity ?? 1 // Default if missing
     }
   }));
+}
+
+toggleSignupPanel() {
+  this.showSignupPanel = !this.showSignupPanel;
+
+  // Optional: reset to signup when panel opens
+  if (this.showSignupPanel) {
+    this.showLogin = false;
+  }
+}
+
+async handleLoginSuccess($event: any) {
+  if ($event) {
+    this.isLoggedIn = true;
+    this.showSignupPanel = false;
+
+    const guestCart = this.getGuestCartRaw();
+
+    if (guestCart.length) {
+      try {
+        for (const item of guestCart) {
+          await firstValueFrom(
+            this.cartService.addToCart({
+              variantId: item.variantId,
+              sizeId: item.sizeId,
+              color: item.color,
+              quantity: item.quantity
+            })
+          );
+        }
+
+        localStorage.removeItem(this.guestCartKey);
+        this.loadCart();
+
+        setTimeout(() => window.location.reload(), 300);
+      } catch (err) {
+        console.error('Cart merge failed:', err);
+      }
+    } else {
+      window.location.reload();
+    }
+  }
+}
+
+
+
+
+toggleLogin() {
+  this.showLogin = !this.showLogin;
 }
 
 }

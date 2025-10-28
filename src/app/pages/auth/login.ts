@@ -154,7 +154,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 `
 })
 export class LoginComponent implements OnInit {
-  @Output() loginSuccess = new EventEmitter<void>();
+  @Output() loginSuccess = new EventEmitter<any>();
     email: string = '';
 
     password: string = '';
@@ -210,7 +210,7 @@ confirmPassword = '';
 
         this.loginService.loginUser(loginPayload).subscribe({
             next: (res) => {
-              this.loginSuccess.emit();
+              
                 this.messageService.add({
                     key: 'global',
                     severity: 'success',
@@ -228,9 +228,10 @@ confirmPassword = '';
                     localStorage.setItem('userName', userInfo?.name);
                 }
 
-                this.router.navigate(['/']);
+               // this.router.navigate(['/']);
                 this.email = "";
                 this.password = "";
+                this.loginSuccess.emit(res);
             },
             error: (err) => {
 

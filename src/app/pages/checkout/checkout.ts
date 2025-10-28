@@ -151,6 +151,11 @@ if (this.isEditMode && this.editingAddressId !== null) {
 }
 }
 
+onPhoneInput(event: any) {
+  const input = event.target.value.replace(/\D/g, ''); // remove non-digits
+  event.target.value = input.slice(0, 10); // limit to 10 digits
+  this.addressForm.get('phoneNumber')?.setValue(event.target.value, { emitEvent: false });
+}
 
   placeOrder() {
     const selectedAddress = this.addresses.find(a => a.id === this.selectedAddressId);
