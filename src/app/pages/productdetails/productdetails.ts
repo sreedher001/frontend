@@ -18,6 +18,7 @@ import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
 import { LoginComponent } from "../auth/login";
 import { Signup } from "../auth/signup/signup";
 import { DialogModule } from 'primeng/dialog';
+import { AccordionModule, AccordionPanel } from 'primeng/accordion';
 
 interface RelatedItem {
   variantId:number;
@@ -26,7 +27,7 @@ interface RelatedItem {
 }
 @Component({
   selector: 'app-productdetails',
-  imports: [GalleriaModule, ButtonModule,DialogModule, FormsModule, BadgeModule, TagModule, PanelMenuModule, CarouselModule, LoginComponent, Signup],
+  imports: [GalleriaModule,ButtonModule,AccordionPanel,AccordionModule,DialogModule, FormsModule, BadgeModule, TagModule, PanelMenuModule, CarouselModule, LoginComponent, Signup],
   templateUrl: './productdetails.html',
   styleUrl: './productdetails.scss'
 })
@@ -88,7 +89,19 @@ product: Product = {
     rating: 0,
     variantDescription: '',
     productImage: [],
-    sizes: []
+    sizes: [],
+
+    fabricType: '',
+    materialComposition: '',
+    liningMaterial: '',
+    transparencyLevel: '',
+    stretchability: '',
+    workType: '',
+    careInstructions: '',
+    madeBy: '',
+    sizeRecommendation: '',
+    modelInfo: ''
+
   },
   sizes: []
 };

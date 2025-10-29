@@ -16,4 +16,15 @@ export interface ProductVariantResponseDto{
     variantDescription:string;
     productImage:ProductImage[];
     sizes:SizeInventoryDto[];
+
+    fabricType: string;
+    materialComposition: string;
+    liningMaterial: string;
+    transparencyLevel: string;
+    stretchability: string;
+    workType: string;
+    careInstructions: string;
+    madeBy: string;
+    sizeRecommendation: string;
+    modelInfo: string;
 }

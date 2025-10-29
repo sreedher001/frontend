@@ -603,7 +603,18 @@ filterStyleCategory(event: AutoCompleteCompleteEvent) {
       isFeatured: this.variant.isFeatured,
       variantName:this.variant.variantName,
       variantDescription:this.variant.variantDescription,
-      sizes: this.variant.sizes
+      sizes: this.variant.sizes,
+
+      fabricType: this.variant.fabricType,
+  materialComposition: this.variant.materialComposition,
+  liningMaterial: this.variant.liningMaterial,
+  transparencyLevel: this.variant.transparencyLevel,
+  stretchability: this.variant.stretchability,
+  workType: this.variant.workType,
+  careInstructions: this.variant.careInstructions,
+  madeBy: this.variant.madeBy,
+  sizeRecommendation: this.variant.sizeRecommendation,
+  modelInfo: this.variant.modelInfo
     };
 
     const formData = new FormData();

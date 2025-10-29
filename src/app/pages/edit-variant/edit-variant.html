@@ -204,6 +204,99 @@
           </div>
         </div>
 
+        <!-- ============ FABRIC & PRODUCT DETAILS SECTION ============ -->
+
+<!-- Fabric Type -->
+<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <input pInputText [(ngModel)]="product.variant.fabricType" name="fabricType" id="fabricType"
+      placeholder="e.g. Cotton, Silk, Georgette" class="w-full" required />
+    <label for="fabricType">Fabric Type</label>
+  </p-floatlabel>
+</div>
+
+<!-- Material Composition -->
+<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <input pInputText [(ngModel)]="product.variant.materialComposition" name="materialComposition"
+      id="materialComposition" placeholder="e.g. 80% Cotton, 20% Polyester" class="w-full" required />
+    <label for="materialComposition">Material Composition</label>
+  </p-floatlabel>
+</div>
+
+<!-- Lining Material -->
+<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <input pInputText [(ngModel)]="product.variant.liningMaterial" name="liningMaterial"
+      id="liningMaterial" placeholder="e.g. Cotton Lining / No Lining" class="w-full" />
+    <label for="liningMaterial">Lining Material</label>
+  </p-floatlabel>
+</div>
+
+<!-- Transparency Level -->
+<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <input pInputText [(ngModel)]="product.variant.transparencyLevel" name="transparencyLevel"
+      id="transparencyLevel" placeholder="e.g. Opaque / Semi Transparent / Transparent" class="w-full" />
+    <label for="transparencyLevel">Transparency Level</label>
+  </p-floatlabel>
+</div>
+
+<!-- Stretchability -->
+<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <input pInputText [(ngModel)]="product.variant.stretchability" name="stretchability"
+      id="stretchability" placeholder="e.g. Non-Stretchable / Slight Stretch / High Stretch" class="w-full" />
+    <label for="stretchability">Stretchability</label>
+  </p-floatlabel>
+</div>
+
+<!-- Work Type -->
+<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <input pInputText [(ngModel)]="product.variant.workType" name="workType" id="workType"
+      placeholder="e.g. Embroidery, Zari, Mirror Work" class="w-full" />
+    <label for="workType">Work Type</label>
+  </p-floatlabel>
+</div>
+
+<!-- Care Instructions -->
+<div class="w-full sm:w-1/2 lg:w-1/2 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <textarea pInputTextarea [(ngModel)]="product.variant.careInstructions" name="careInstructions"
+      id="careInstructions" rows="2" placeholder="e.g. Hand wash cold, Do not bleach" class="w-full"></textarea>
+    <label for="careInstructions">Care Instructions</label>
+  </p-floatlabel>
+</div>
+
+<!-- Made By -->
+<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <input pInputText [(ngModel)]="product.variant.madeBy" name="madeBy" id="madeBy"
+      placeholder="e.g. ZFC Studio / Local Artisans" class="w-full" />
+    <label for="madeBy">Made By</label>
+  </p-floatlabel>
+</div>
+
+<!-- Size Recommendation -->
+<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <input pInputText [(ngModel)]="product.variant.sizeRecommendation" name="sizeRecommendation"
+      id="sizeRecommendation" placeholder="e.g. True to Size / Order One Size Up" class="w-full" />
+    <label for="sizeRecommendation">Size Recommendation</label>
+  </p-floatlabel>
+</div>
+
+<!-- Model Info -->
+<div class="w-full sm:w-full lg:w-1/2 px-2 mb-4">
+  <p-floatlabel variant="on">
+    <textarea pInputTextarea [(ngModel)]="product.variant.modelInfo" name="modelInfo" id="modelInfo"
+      rows="2" placeholder="e.g. Model is 5’7” and wearing size S" class="w-full"></textarea>
+    <label for="modelInfo">Model Info</label>
+  </p-floatlabel>
+</div>
+
+
         <div class="flex w-full mt-4">
           <div class="basis-4/4 px-2 ">
             <p-floatlabel variant="on">

@@ -108,6 +108,11 @@ export class Addproduct implements OnInit {
   hasGenderCategory:boolean=false;
   hasSubCategory:boolean=false;
   maxFilesize:any;
+
+  autoFabricTypeValue: any[] | undefined;
+autoFilteredFabricTypeValue: any[] = [];
+autoWorkTypeValue: any[] | undefined;
+autoFilteredWorkTypeValue: any[] = [];
   hasInvalidSizes(): boolean {
     if (this.product.sizes === null || this.product.sizes.length === 0) return false;
     return this.product.sizes.some((size: any) =>
@@ -174,6 +179,17 @@ export class Addproduct implements OnInit {
     variantDescription:'',
     color: '',
     sizes: [],  // start with empty table
+
+    fabricType: '',
+  materialComposition: '',
+  liningMaterial: '',
+  transparencyLevel: '',
+  stretchability: '',
+  workType: '',
+  careInstructions: '',
+  madeBy: '',
+  sizeRecommendation: '',
+  modelInfo: ''
   };
 
   removeSize(size: any) {
@@ -500,7 +516,18 @@ onGenderCategorySelect(event: any) {
       color: this.product.color.name,
       sizes: this.product.sizes,
       variantName:this.product.variantName,
-      variantDescription:this.product.variantDescription
+      variantDescription:this.product.variantDescription,
+
+      fabricType: this.product.fabricType,
+  materialComposition: this.product.materialComposition,
+  liningMaterial: this.product.liningMaterial,
+  transparencyLevel: this.product.transparencyLevel,
+  stretchability: this.product.stretchability,
+  workType: this.product.workType,
+  careInstructions: this.product.careInstructions,
+  madeBy: this.product.madeBy,
+  sizeRecommendation: this.product.sizeRecommendation,
+  modelInfo: this.product.modelInfo
       
     };
 

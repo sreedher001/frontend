@@ -170,19 +170,186 @@
 </p-dialog>
 
 
-    <!-- Tags -->
-    <div class="flex flex-wrap gap-2 p-4 bg-gray-100 rounded-md">
-      <p-tag icon="pi pi-palette" severity="secondary" value="Color: {{ product.variant.color }}"></p-tag>
-      <p-tag icon="pi pi-tag" severity="secondary" value="Style: {{ product.variant.styleCategory }}"></p-tag>
-      <p-tag icon="pi pi-align-justify" severity="secondary" value="Fit: {{ product.variant.fit }}"></p-tag>
-      <p-tag icon="pi pi-th-large" severity="secondary" value="Pattern: {{ product.variant.pattern }}"></p-tag>
-      <p-tag icon="pi pi-calendar" severity="secondary" value="Season: {{ product.variant.season }}"></p-tag>
-      <p-tag icon="pi pi-star" severity="secondary" value="Occasion: {{ product.variant.occasion }}"></p-tag>
-    </div>
+  <!-- ====== Luxurious Product Attributes (PrimeNG v20) ====== -->
+<p-accordion [value]="0" class="space-y-4">
+
+  <!-- 🌈 Core Style Group -->
+  <p-accordion-panel [value]="0" class="rounded-xl  overflow-hidden">
+    <p-accordion-header>
+      🎨 Core Style
+    </p-accordion-header>
+    <p-accordion-content>
+      <div class="grid  gap-3 p-3">
+        <!-- Color -->
+        <div
+          class="flex items-center gap-3 p-3 bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-50 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <i class="pi pi-palette text-yellow-600 text-xl"></i>
+          <div class="min-w-0">
+            <p class="text-gray-600 text-sm font-medium">Color</p>
+            <p class="text-gray-900 font-semibold text-sm truncate" title="{{ product.variant.color }}">
+              {{ product.variant.color || '-' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Style -->
+        <div
+          class="flex items-center gap-3 p-3 bg-gradient-to-r from-pink-50 via-pink-100 to-pink-50 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <i class="pi pi-tag text-pink-600 text-xl"></i>
+          <div class="min-w-0">
+            <p class="text-gray-600 text-sm font-medium">Style</p>
+            <p class="text-gray-900 font-semibold text-sm truncate" title="{{ product.variant.styleCategory }}">
+              {{ product.variant.styleCategory || '-' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Fit -->
+        <div
+          class="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <i class="pi pi-align-justify text-blue-600 text-xl"></i>
+          <div class="min-w-0">
+            <p class="text-gray-600 text-sm font-medium">Fit</p>
+            <p class="text-gray-900 font-semibold text-sm truncate" title="{{ product.variant.fit }}">
+              {{ product.variant.fit || '-' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </p-accordion-content>
+  </p-accordion-panel>
+
+  <!-- 🧵 Fabric & Quality -->
+  <p-accordion-panel [value]="1" class="rounded-xl  overflow-hidden">
+    <p-accordion-header>
+      🧵 Fabric & Quality
+    </p-accordion-header>
+    <p-accordion-content>
+      <div class="grid  gap-3 p-3">
+        <!-- Fabric -->
+        <div
+          class="flex items-center gap-3 p-3 bg-gradient-to-r from-green-50 via-green-100 to-green-50 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <i class="pi pi-book text-green-600 text-xl"></i>
+          <div class="min-w-0">
+            <p class="text-gray-600 text-sm font-medium">Fabric</p>
+            <p class="text-gray-900 font-semibold text-sm truncate" title="{{ product.variant.fabricType }}">
+              {{ product.variant.fabricType || '-' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Material Composition -->
+        <div
+          class="flex items-center gap-3 p-3 bg-gradient-to-r from-teal-50 via-teal-100 to-teal-50 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <i class="pi pi-cog text-teal-600 text-xl"></i>
+          <div class="min-w-0">
+            <p class="text-gray-600 text-sm font-medium">Material Composition</p>
+            <p class="text-gray-900 font-semibold text-sm truncate" title="{{ product.variant.materialComposition }}">
+              {{ product.variant.materialComposition || '-' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Lining -->
+        <div
+          class="flex items-center gap-3 p-3 bg-gradient-to-r from-indigo-50 via-indigo-100 to-indigo-50 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <i class="pi pi-box text-indigo-600 text-xl"></i>
+          <div class="min-w-0">
+            <p class="text-gray-600 text-sm font-medium">Lining</p>
+            <p class="text-gray-900 font-semibold text-sm truncate" title="{{ product.variant.liningMaterial }}">
+              {{ product.variant.liningMaterial || '-' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </p-accordion-content>
+  </p-accordion-panel>
+
+  <!-- 🧘 Lifestyle & Care -->
+  <p-accordion-panel [value]="2" class="rounded-xl  overflow-hidden">
+    <p-accordion-header>
+      💛 Lifestyle & Care
+    </p-accordion-header>
+    <p-accordion-content>
+      <div class="grid  gap-3 p-3">
+        <!-- Work Type -->
+        <div
+          class="flex items-center gap-3 p-3 bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-50 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <i class="pi pi-star-fill text-yellow-600 text-xl"></i>
+          <div class="min-w-0">
+            <p class="text-gray-600 text-sm font-medium">Work Type</p>
+            <p class="text-gray-900 font-semibold text-sm truncate" title="{{ product.variant.workType }}">
+              {{ product.variant.workType || '-' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Care Instructions -->
+        <div
+          class="flex items-center  p-3 bg-gradient-to-r from-green-50 via-green-100 to-green-50 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <i class="pi pi-heart text-green-600 text-xl"></i>
+          <div class="min-w-0">
+            <p class="text-gray-600 text-sm font-medium">Care Instructions</p>
+            <p class="text-gray-900 font-semibold text-sm truncate" title="{{ product.variant.careInstructions }}">
+              {{ product.variant.careInstructions || '-' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </p-accordion-content>
+  </p-accordion-panel>
+
+  <!-- 🌸 Season & Occasion -->
+  <p-accordion-panel [value]="3" class="rounded-xl  overflow-hidden">
+    <p-accordion-header>
+      🌸 Season & Occasion
+    </p-accordion-header>
+    <p-accordion-content>
+      <div class="grid  gap-3 ">
+        <!-- Season -->
+        <div
+          class="flex items-center gap-3 p-3 bg-gradient-to-r from-indigo-50 via-indigo-100 to-indigo-50 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <i class="pi pi-calendar text-indigo-600 text-xl"></i>
+          <div class="min-w-0">
+            <p class="text-gray-600 text-sm font-medium">Season</p>
+            <p class="text-gray-900 font-semibold text-sm truncate" title="{{ product.variant.season }}">
+              {{ product.variant.season || '-' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Occasion -->
+        <div
+          class="flex items-center gap-3 p-3 bg-gradient-to-r from-pink-50 via-pink-100 to-pink-50 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <i class="pi pi-star text-pink-600 text-xl"></i>
+          <div class="min-w-0">
+            <p class="text-gray-600 text-sm font-medium">Occasion</p>
+            <p class="text-gray-900 font-semibold text-sm truncate" title="{{ product.variant.occasion }}">
+              {{ product.variant.occasion || '-' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </p-accordion-content>
+  </p-accordion-panel>
+
+</p-accordion>
 
 
-    <!-- Description -->
-    <p class="text-gray-700 text-sm">{{ product.variant.variantDescription || 'No description available' }}</p>
+
+
+
+
+   <!-- Product Description -->
+<div class="mt-6 p-5 bg-gradient-to-r from-gray-50 via-gray-100 to-gray-50 rounded-2xl ">
+  <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+    <i class="pi pi-align-left text-yellow-600"></i>
+    Description
+  </h3>
+  <p class="text-gray-700 text-sm leading-relaxed">
+    {{ product.variant.variantDescription || 'No description available' }}
+  </p>
+</div>
 
     <!-- Action Buttons -->
     <div class="flex flex-col sm:flex-row gap-3 mt-4">

@@ -44,7 +44,7 @@ isAdmin: boolean = false;
 
     constructor(private productService: ProductService,private router: Router,private jwtHelper: JwtHelper,
 
-    private messageService: MessageService,private route: ActivatedRoute
+    private messageService: MessageService,public route: ActivatedRoute
   ) { }
     ngOnInit(): void {
       const roles = this.jwtHelper.getUserRoles();
@@ -75,19 +75,46 @@ isAdmin: boolean = false;
   });
     }
 
-   getWearType(style: string | null) {
-    this.products=[];
-    this.loading = true;
-    this.productService.getWearType(style, 0, 20).subscribe(res => {
-      this.productResponseDto = res;
-      this.products.push(...res.content);
-     console.log("products===",this.products);
+  //  getWearType(style: string | null) {
+  //   this.products=[];
+  //   this.loading = true;
+  //   this.productService.getWearType(style, 0, 20).subscribe(res => {
+  //     this.productResponseDto = res;
+  //     this.products.push(...res.content);
+  //    console.log("products===",this.products);
       
-      this.lastPage = res.last; // comes from Spring Data Page
-      this.page++; // increment for next call
+  //     this.lastPage = res.last; // comes from Spring Data Page
+  //     this.page++; // increment for next call
+  //     this.loading = false;
+  //   });
+  // }
+
+  getWearType(style: string | null, append: boolean = false) {
+  if (this.loading || this.lastPage) return;
+  this.loading = true;
+
+  this.productService.getWearType(style, this.page, this.size).subscribe({
+    next: (res) => {
+      this.productResponseDto = res;
+
+      // only reset when it's the first page (fresh load)
+      if (!append) {
+        this.products = [];
+      }
+
+      this.products.push(...res.content);
+      console.log('products===', this.products);
+
+      this.lastPage = res.last;
+      this.page++; // prepare for next page
       this.loading = false;
-    });
-  }
+    },
+    error: (err) => {
+      console.error('Failed to fetch products', err);
+      this.loading = false;
+    }
+  });
+}
 
   onCardClick(product:Product,variant:ProductVariantResponseDto) {
   this.router.navigate(['/product-details',variant.id]);

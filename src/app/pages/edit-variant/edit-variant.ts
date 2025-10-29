@@ -492,7 +492,18 @@ pattern: typeof this.product.variant.pattern === 'string'
     occasion:this.product.variant.occasion.map((s:any) => s.name).join(','),
     isFeatured:this.product.variant.isFeatured,
     imagesToRemove: this.deletedImageIds, 
-    sizes: this.product.variant.sizes
+    sizes: this.product.variant.sizes,
+
+    fabricType: this.product.variant.fabricType,
+  materialComposition: this.product.variant.materialComposition,
+  liningMaterial: this.product.variant.liningMaterial,
+  transparencyLevel: this.product.variant.transparencyLevel,
+  stretchability: this.product.variant.stretchability,
+  workType: this.product.variant.workType,
+  careInstructions: this.product.variant.careInstructions,
+  madeBy: this.product.variant.madeBy,
+  sizeRecommendation: this.product.variant.sizeRecommendation,
+  modelInfo: this.product.variant.modelInfo
   };
 
   // --- Create FormData for multipart ---
