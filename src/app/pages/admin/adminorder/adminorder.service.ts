@@ -13,6 +13,8 @@ export interface AdminOrder {
   paymentMode:String;
   shippingAddressDto:any;
   items:any
+  shippingFee:any;subTotal:any;
+  finalTotal:any;
 }
 
 export interface ShippingDto {

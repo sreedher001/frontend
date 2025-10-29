@@ -156,11 +156,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let row of getSizeGuide(unit)">
-          <td class="p-2 border">{{ row.size }}</td>
-          <td class="p-2 border">{{ row.chest }}</td>
-          <td class="p-2 border">{{ row.waist }}</td>
-        </tr>
+        @for (row of getSizeGuide(unit); track row) {
+  <tr>
+    <td class="p-2 border">{{ row.size }}</td>
+    <td class="p-2 border">{{ row.chest }}</td>
+    <td class="p-2 border">{{ row.waist }}</td>
+  </tr>
+}
+
       </tbody>
     </table>
   </div>

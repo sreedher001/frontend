@@ -14,7 +14,9 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 declare var Razorpay: any;
 
 interface Address {
+
   id: number;
+  name:string;
   address: string;
   phoneNumber: string;
   country: string;
@@ -46,6 +48,7 @@ editingAddressId: any =0;
     private jwtHelper: JwtHelper,private confirmationService: ConfirmationService
   ) {
     this.addressForm = this.fb.group({
+      name:['', Validators.required],
       address: ['', Validators.required],
       phoneNumber: ['', Validators.required],
       country: ['', Validators.required],
@@ -121,7 +124,10 @@ if (this.isEditMode && this.editingAddressId !== null) {
           if (index !== -1) {
             this.addresses[index] = updated;
           }
+          this.showAddAddressDialog = false;
+      this.showAddAddressForm = false;
           this.addressForm.reset();
+          
         },
         error: err => {
           console.error('Update failed', err);

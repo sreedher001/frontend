@@ -5,6 +5,7 @@ import { CommonService } from '@/layout/service/common';
 
 export interface ShippingAddress {
   id: number;
+  name:string;
   country: string;
   state: string;
   pinCode: string;

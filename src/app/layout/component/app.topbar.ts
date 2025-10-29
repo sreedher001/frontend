@@ -22,13 +22,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DrawerModule } from 'primeng/drawer';
 
 @Component({
-    selector: 'app-topbar',
-    standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule,//AppConfigurator, 
-    BadgeModule,FormsModule,InputTextModule,
-    ButtonModule,DrawerModule,
-        MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule,AutoCompleteModule],
-    template: `<div class="layout-topbar 
+  selector: 'app-topbar',
+  standalone: true,
+  imports: [RouterModule, CommonModule, StyleClassModule,//AppConfigurator, 
+    BadgeModule, FormsModule, InputTextModule,
+    ButtonModule, DrawerModule,
+    MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule, AutoCompleteModule],
+  template: `<div class="layout-topbar 
          bg-gradient-to-r from-[#f9e0bb] via-[#fce7d2] to-[#fff7ed] 
          shadow-md border-b border-[#e2b14c] text-[#8a5c1d]">
   <div class="layout-topbar-logo-container flex items-center">
@@ -148,7 +148,8 @@ import { DrawerModule } from 'primeng/drawer';
           pTooltip="your wishList" 
           tooltipPosition="top"
         > 
-          <i class="cart-button pi pi-heart text-orange-500 text-xl"></i>
+           @if(wishlistCount > 0) {<i class="cart-button pi pi-heart-fill text-orange-500 text-xl"></i>}
+           @else{<i class="cart-button pi pi-heart text-orange-500 text-xl"></i>}
           @if(wishlistCount > 0) {
             <span class="absolute -top-0 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-lg flex items-center justify-center leading-none z-10">
               {{ wishlistCount }}
@@ -273,68 +274,83 @@ export class AppTopbar implements OnInit {
   showMobileSearch = false;
   quickSearchTags: string[] = [];
 
-    searchQuery: string | any='';
+  searchQuery: string | any = '';
   filteredProducts: any[] = [];
-  isAdmin=false;
+  isAdmin = false;
 
   private searchSubject = new Subject<string>();
-    items!: MenuItem[];
-    cart: CartResponse = {
-        cartId: 0,
-        items: []
+  items!: MenuItem[];
+  cart: CartResponse = {
+    cartId: 0,
+    items: []
 
-    };
+  };
 
-    isLoggedIn: boolean = false;
-    cartCount: number = 0;
-    wishlistCount:number=0;
-    userName:any ='';
-    overlayMenuItems: MenuItem[] = [];
-     ngOnInit(): void {
-        this.setUserMenuItem();
-        if (localStorage.getItem("isLoggedIn") === "true") {
-const roles = this.jwtHelper.getUserRoles(); // assuming this returns an array
+  isLoggedIn: boolean = false;
+  cartCount: number = 0;
+  wishlistCount: number = 0;
+  userName: any = '';
+  overlayMenuItems: MenuItem[] = [];
+  ngOnInit(): void {
+    this.setUserMenuItem();
 
-  if (roles && roles.includes("ROLE_ADMIN")) {
-    this.isAdmin=true;
-  }
-  this.getcart();
-  this.getWishList();
-}
+    if (localStorage.getItem("isLoggedIn") === "true") {
+      this.cartService.getCart().subscribe(); // loads and updates BehaviorSubject
+      // this.getWishList();
 
+      // Keep the topbar badge live-updating
+      this.cartService.cartCount$.subscribe((count: any) => {
+        this.cartCount = count;
+        this.cd.detectChanges();
+
+        this.productService.getWishlist().subscribe();
+    this.productService.wishlistCount$.subscribe(count => {
+      this.wishlistCount = count;
+      this.cd.detectChanges();
+    });
+      });
     }
-     constructor(public layoutService: LayoutService, private cartService: CartService,private messageService:MessageService,
-        private router: Router,private jwtHelper:JwtHelper,private productService:ProductService,private cd: ChangeDetectorRef) {
-            // Debounce the search input to avoid spamming API calls
+    if (localStorage.getItem("isLoggedIn") === "true") {
+      const roles = this.jwtHelper.getUserRoles(); // assuming this returns an array
+
+      if (roles && roles.includes("ROLE_ADMIN")) {
+        this.isAdmin = true;
+      }
+    }
+
+  }
+  constructor(public layoutService: LayoutService, private cartService: CartService, private messageService: MessageService,
+    private router: Router, private jwtHelper: JwtHelper, private productService: ProductService, private cd: ChangeDetectorRef) {
+    // Debounce the search input to avoid spamming API calls
     this.searchSubject.pipe(debounceTime(300)).subscribe(query => {
 
-        if (!query || query.trim().length === 0) {
-      this.filteredProducts = [];
-      return;
-    }
+      if (!query || query.trim().length === 0) {
+        this.filteredProducts = [];
+        return;
+      }
       this.productService.getAutocompleteSuggestions(query).subscribe({
-        next: (data:any) => {
-          
+        next: (data: any) => {
+
           this.filteredProducts = [...data];
           this.filteredProducts.forEach(element => {
             this.quickSearchTags.push(element.name);
           });
-          
+
           this.cd.markForCheck();
         },
-        error: (err:any) => {
+        error: (err: any) => {
           this.filteredProducts = [];
         }
       });
     });
 
-    }
-onQuickTagClick(tag: string) {
-  this.searchQuery = tag;
-  this.searchSubject.next(tag); // triggers autocomplete suggestions
-}
+  }
+  onQuickTagClick(tag: string) {
+    this.searchQuery = tag;
+    this.searchSubject.next(tag); // triggers autocomplete suggestions
+  }
 
-    filterProducts(event: any) {
+  filterProducts(event: any) {
     //const query = event.query;
     this.searchSubject.next(event.query);
   }
@@ -342,132 +358,135 @@ onQuickTagClick(tag: string) {
   formatProduct(product: any): string {
     return `${product.name} (${product.category} > ${product.subCategory}) - ${product.genderCategory}`;
   }
-    setUserMenuItem(){
-const loggedIn = localStorage.getItem('isLoggedIn');
-        if (loggedIn === "true") {
-            this.isLoggedIn = true;
-            const name= localStorage.getItem('userName')?localStorage.getItem('userName'):"";
-           this.userName = name;
-        
-        this.overlayMenuItems = [
-        { label: 'Hello, '+this.userName, icon: 'pi pi-user' },
+  setUserMenuItem() {
+    const loggedIn = localStorage.getItem('isLoggedIn');
+    if (loggedIn === "true") {
+      this.isLoggedIn = true;
+      const name = localStorage.getItem('userName') ? localStorage.getItem('userName') : "";
+      this.userName = name;
+
+      this.overlayMenuItems = [
+        { label: 'Hello, ' + this.userName, icon: 'pi pi-user' },
         { separator: true },
         {
-            label: 'My Profile',
-            icon: 'pi pi-id-card', command: () => this.myProfile()
-        },{ separator: true },
+          label: 'My Profile',
+          icon: 'pi pi-id-card', command: () => this.myProfile()
+        }, { separator: true },
         {
-            label: 'My Orders',
-            icon: 'pi pi-box', command: () => this.myOrders()
-        },{ separator: true },
+          label: 'My Orders',
+          icon: 'pi pi-box', command: () => this.myOrders()
+        }, { separator: true },
         {
-            label: 'Wishlist',
-            icon: 'pi pi-heart',command:()=>this.goTOWishList()
-        },{ separator: true },
-        
-        
-        { label: 'Logout',icon: 'pi pi-sign-out', command: () => this.logout()}
-    ];}
-    else{
-        this.overlayMenuItems = [
+          label: 'Wishlist',
+          icon: 'pi pi-heart', command: () => this.goTOWishList()
+        }, { separator: true },
+
+
+        { label: 'Logout', icon: 'pi pi-sign-out', command: () => this.logout() }
+      ];
+    }
+    else {
+      this.overlayMenuItems = [
         { label: 'Login', icon: 'pi pi-sign-in', command: () => this.login() },
         { label: 'Sign Up', icon: 'pi pi-user-plus', command: () => this.signup() }
       ];
-    }}
-  
-
-   logout() {
-  this.messageService.add({
-    key: 'global',
-    severity: 'warn',
-    summary: 'You have been logged out successfully',
-    detail: 'Come back soon..',
-  });
-
-  localStorage.clear();
-  sessionStorage.clear();
-  this.jwtHelper.logout();
-  this.drawerVisible = false;
-  this.isLoggedIn = false;
-
-  // Navigate first, then full reload
-  this.router.navigate(['']).then(() => {
-    setTimeout(() => {
-      window.location.href = '/'; // refresh at root (cleaner than reload)
-    }, 300);
-  });
-}
-  
-
-    myOrders(): void {
-      this.drawerVisible=false;
-    this.router.navigate(['/order/order-history']);
-    
+    }
   }
-  myProfile(){
-     this.drawerVisible=false;
+
+
+  logout() {
+    this.messageService.add({
+      key: 'global',
+      severity: 'warn',
+      summary: 'You have been logged out successfully',
+      detail: 'Come back soon..',
+    });
+
+    localStorage.clear();
+    sessionStorage.clear();
+    this.jwtHelper.logout();
+    this.drawerVisible = false;
+    this.isLoggedIn = false;
+
+    // Navigate first, then full reload
+    this.router.navigate(['']).then(() => {
+      setTimeout(() => {
+        window.location.href = '/'; // refresh at root (cleaner than reload)
+      }, 300);
+    });
+  }
+
+
+  myOrders(): void {
+    this.drawerVisible = false;
+    this.router.navigate(['/order/order-history']);
+
+  }
+  myProfile() {
+    this.drawerVisible = false;
     this.router.navigate(['/myprofile']);
   }
 
-   goTOWishList(): void {
-      this.drawerVisible=false;
+  goTOWishList(): void {
+    this.drawerVisible = false;
     this.router.navigate(['/wishlist']);
-    
+
   }
 
-    toggleDarkMode() {
-        this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
-    }
-    viewCart() {
-        this.router.navigate(['/cart']);
-
-    }
-    wishList(){
-      this.router.navigate(['/wishlist']);
-    }
-    signup() {
-        this.router.navigate(['/auth/signup']);
-    }
-    login() {
-        this.router.navigate(['/auth/login']);
-    }
-
-    onProductSelected(product: any) {
-  this.router.navigate(['/products'], { queryParams: { search: product.name } });
-  this.showMobileSearch = false;
-
-}
-onModelChange(value: any) {
-  this.searchQuery = value;
-}
-toggleMobileSearch() {
-  this.showMobileSearch = !this.showMobileSearch;
-
-  // Show all suggestions immediately on open
-  if (this.showMobileSearch) {
-    this.searchSubject.next('');
+  toggleDarkMode() {
+    this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
   }
-}
+  viewCart() {
+    this.router.navigate(['/cart']);
 
-getcart(){
-  this.cartService.getCart().subscribe({
-    next: (res) => {
-      this.cart = res;
-      this.cartCount = this.cart.items.length;
-    },
-    error: (err) => {
-      console.error('Failed to load cart', err);
-    }
-  });
-}
+  }
+  wishList() {
+    this.router.navigate(['/wishlist']);
+  }
+  signup() {
+    this.router.navigate(['/auth/signup']);
+  }
+  login() {
+    this.router.navigate(['/auth/login']);
+  }
 
-getWishList(){
- this.productService.getWishlist().subscribe({
-    next: (items: any[]) => {
-      this.wishlistCount = items.length;
-    },
-    error: (err) => {
-      console.error('Failed to load wishlist', err);
+  onProductSelected(product: any) {
+    this.router.navigate(['/products'], { queryParams: { search: product.name } });
+    this.showMobileSearch = false;
+
+  }
+  onModelChange(value: any) {
+    this.searchQuery = value;
+  }
+  toggleMobileSearch() {
+    this.showMobileSearch = !this.showMobileSearch;
+
+    // Show all suggestions immediately on open
+    if (this.showMobileSearch) {
+      this.searchSubject.next('');
     }
-  });}
+  }
+
+  getcart() {
+    this.cartService.getCart().subscribe({
+      next: (res) => {
+        this.cart = res;
+        this.cartCount = this.cart.items.length;
+      },
+      error: (err) => {
+        console.error('Failed to load cart', err);
+      }
+    });
+  }
+
+  getWishList() {
+    this.productService.getWishlist().subscribe({
+      next: (items: any[]) => {
+        this.wishlistCount = items.length;
+      },
+      error: (err) => {
+        console.error('Failed to load wishlist', err);
+      }
+    });
+  }
 }

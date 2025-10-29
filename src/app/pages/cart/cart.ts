@@ -244,8 +244,12 @@ goToShop() {
     this.cartCountSubject.next(count);
   }
 increaseQuantity(item: any) {
+  if (!this.isLoggedIn) {
+    this.showSignupPanel=true;
+    return;
+  }
+
   const selectedSize = item.size;
-  // Find the matching available size object
   const sizeInfo = item.sizeOptions.find(
     (size: any) => size.size === selectedSize
   );
@@ -275,13 +279,18 @@ increaseQuantity(item: any) {
   }
 }
 
-
 decreaseQuantity(item: any) {
+  if (!this.isLoggedIn) {
+    this.showSignupPanel=true;
+    return;
+  }
+
   if (item.quantity > 1) {
     item.quantity--;
     this.updateCartItem(item);
   }
 }
+
 
 // updateCartItem(item: any) {
 //   this.cartService.updateCartItem(item.id, item.quantity, item.size)

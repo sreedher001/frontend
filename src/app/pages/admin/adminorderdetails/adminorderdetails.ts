@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from '@/pages/orderhistory/order.service';
 import { TagModule } from 'primeng/tag';
 import { TableModule } from 'primeng/table';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { AvatarGroupModule } from 'primeng/avatargroup';
 import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -15,7 +15,8 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-adminorderdetails',
-  imports: [TagModule,FormsModule,TableModule,DatePipe,AvatarGroupModule,AvatarModule,ProgressSpinnerModule,ButtonModule,AutoCompleteModule],
+  imports: [TagModule,CommonModule,
+    FormsModule,TableModule,DatePipe,AvatarGroupModule,AvatarModule,ProgressSpinnerModule,ButtonModule,AutoCompleteModule],
   templateUrl: './adminorderdetails.html',
   styleUrl: './adminorderdetails.scss'
 })

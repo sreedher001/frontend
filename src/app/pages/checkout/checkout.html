@@ -45,7 +45,7 @@
            [ngClass]="{'bg-orange-500 text-white': selectedAddressId === address.id}">
         <i *ngIf="selectedAddressId === address.id" class="pi pi-check text-xs"></i>
       </div>
-
+<p class="font-semibold text-gray-800">{{ address.name }}</p>
       <p class="font-semibold text-gray-800">{{ address.address }}</p>
       <p class="text-sm text-gray-700">{{ address.city }}, {{ address.state }} - {{ address.pinCode }}</p>
       <p class="text-sm text-gray-700">{{ address.country }}</p>
@@ -73,6 +73,13 @@
     [breakpoints]="{ '768px': '90vw' }" responsive="true" class="p-fluid" (onHide)="addressForm.reset()">
 
     <form [formGroup]="addressForm" (ngSubmit)="submitNewAddress()" class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <p-floatlabel variant="on">
+        <input pInputText formControlName="name" id="name"
+          [ngClass]="{'p-filled': addressForm.get('name')?.value}"
+          class="w-full h-10 border border-gray-300 rounded-md focus:ring-1 focus:ring-orange-500 focus:outline-none" />
+        <label for="name">Name</label>
+      </p-floatlabel>
 
       <p-floatlabel variant="on">
         <input pInputText formControlName="address" id="shippingAddress"

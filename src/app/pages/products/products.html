@@ -243,26 +243,33 @@
           }
         </div>
 
-        @if(variant?.rating != null){<div class="flex justify-start items-center mt-2">
-          <p-badge [value]="'⭐ ' +variant.rating.toString()" severity="secondary"
-            class="text-sm sm:text-base px-3 py-2 font-medium rounded-lg dune-font">
-          </p-badge>
-        </div>}
+       <div *ngIf="variant?.rating != null" class="flex items-center mt-2 space-x-2">
+  <i class="pi pi-star-fill text-yellow-500 text-xl"></i>
+  <span class="font-semibold text-gray-700 dune-font text-sm sm:text-base">
+    {{ variant.rating }}
+  </span>
+</div>
+
+
       </div>
 
       @if (hasDiscount(variant)) {
       <p-badge [value]="getVariantSavings(variant)" severity="success"></p-badge>
       }
 
-      <div class="mt-2 text-xs sm:text-sm text-gray-500">
+      <!-- <div class="mt-2 text-xs sm:text-sm text-gray-500">
         Get it by {{ getDeliveryDate() }}
-      </div>
+      </div> -->
     </div>
   </div>
 
+  
+
 }
   }
+  
   <!-- } -->
+
 
 <!-- BACKDROP (only if modal open and not logged in) -->
 @if (showSignupPanel && !isLoggedIn) {
@@ -337,3 +344,9 @@
 
 
 </div>
+@if(!lastPage){<div class="text-center mt-4" >
+  <p-button label="Load More" (onClick)="fetchProducts()" [disabled]="loading" severity="warn"
+            class="dune-font" outlined >
+    @if(loading){<i class="pi pi-spin pi-spinner"></i>}
+  </p-button>
+</div>}

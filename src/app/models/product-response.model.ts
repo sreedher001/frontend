@@ -7,4 +7,7 @@ export interface ProductResponse {
   size: number;
   number: number;
   product:Product;
+  numberOfElements:number;
+  first:any;
+  last:any;
 }

@@ -33,7 +33,7 @@ import {  LoginComponent } from "../auth/login";
 export class Products implements OnInit {
 
 
-
+Math = Math;
 wishlistVariantIds: Set<number> = new Set(); // Store variant IDs in wishlist
 wishlistItems: any[] = [];
 searchQuery:String='';
@@ -145,28 +145,62 @@ handleLoginSuccess($event:any) {
   window.location.reload();
 }
 
-  fetchProducts(): void {
-    this.loading = true;
-    this.productService.getAllProducts(0, 10).subscribe({
-      next: (res) => {
-        this.productResponseDto=res;
-        this.products = this.productResponseDto.content;
-        this.loading = false;
+  // fetchProducts(): void {
+  //   this.loading = true;
+  //   this.productService.getAllProducts(0, 10).subscribe({
+  //     next: (res) => {
+  //       this.productResponseDto=res;
+  //       this.products = this.productResponseDto.content;
+  //       this.loading = false;
         
-      },
-      error: (err) => {
-        console.error('Failed to fetch products:', err);
-        this.loading = false;
-         this.messageService.add({
-          key: 'global',
-          severity: 'error',
-          summary: 'Oops!',
-          detail: 'Failed to fetch the products'
-        });
-      }
-    });
+  //     },
+  //     error: (err) => {
+  //       console.error('Failed to fetch products:', err);
+  //       this.loading = false;
+  //        this.messageService.add({
+  //         key: 'global',
+  //         severity: 'error',
+  //         summary: 'Oops!',
+  //         detail: 'Failed to fetch the products'
+  //       });
+  //     }
+  //   });
 
-  }
+  // }
+
+  fetchProducts(): void {
+  if (this.lastPage || this.loading) return;
+
+  this.loading = true;
+
+  this.productService.getAllProducts(this.page, this.size).subscribe({
+    next: (res: any) => {
+      const newProducts = Array.isArray(res?.content) ? res.content : [];
+      
+      if (newProducts.length) {
+        this.products = [...this.products, ...newProducts];
+        this.page++;
+      }
+
+      // Check if last page
+      this.lastPage = res?.last || newProducts.length < this.size;
+
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error('Failed to fetch products:', err);
+      this.loading = false;
+      this.messageService.add({
+        key: 'global',
+        severity: 'error',
+        summary: 'Oops!',
+        detail: 'Failed to fetch the products'
+      });
+    }
+  });
+}
+
+
   fetchSearchedProducts(searchQuery:any): void {
     this.products=[];
     this.loading = true;

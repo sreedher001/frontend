@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ProductResponse } from '@/models/product-response.model';
 import { Product } from '@/models/product.model';
 import { CommonService } from '@/layout/service/common';
@@ -14,9 +14,12 @@ export class ProductService {
   commonService:CommonService = new CommonService;
       private apiUrl = this.commonService.baseUrl;
 
+      private wishlistCountSubject = new BehaviorSubject<number>(0);
+wishlistCount$ = this.wishlistCountSubject.asObservable();
+
   constructor(private http: HttpClient) {}
 
-  getAllProducts(page = 0, size = 10): Observable<ProductResponse> {
+  getAllProducts(page:any, size :any): Observable<ProductResponse> {
     const params = new HttpParams()
       .set('page', page)
       .set('size', size);
@@ -102,16 +105,43 @@ getSearchedProducts(query: string,page: number = 0, size: number = 10){
 }
 
 getWishlist(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/wishlist/get-wishlist`);
+    return this.http.get<any[]>(`${this.apiUrl}/wishlist/get-wishlist`).pipe(
+      tap((res) => {
+        //update BehaviorSubject with new count
+        this.wishlistCountSubject.next(res?.length || 0);
+      })
+    );
   }
 
+// addToWishlist(variantId: number): Observable<any> {
+//     return this.http.post(`${this.apiUrl}/wishlist/add/${variantId}`, {});
+//   }
+
+//   removeFromWishlist(variantId: number): Observable<any> {
+//     return this.http.post(`${this.apiUrl}/wishlist/remove/${variantId}`, {});
+//   }
 addToWishlist(variantId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/wishlist/add/${variantId}`, {});
-  }
+  return this.http.post(`${this.apiUrl}/wishlist/add/${variantId}`, {}).pipe(
+    tap(() => this.refreshWishlistCount()) //  update count after add
+  );
+}
 
-  removeFromWishlist(variantId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/wishlist/remove/${variantId}`, {});
-  }
+removeFromWishlist(variantId: number): Observable<any> {
+  return this.http.post(`${this.apiUrl}/wishlist/remove/${variantId}`, {}).pipe(
+    tap(() => this.refreshWishlistCount()) //  update count after remove
+  );
+}
+
+refreshWishlistCount() {
+  this.getWishlist().subscribe({
+    next: (items) => {
+      const count = items?.length || 0;
+      this.wishlistCountSubject.next(count);
+    },
+    error: () => this.wishlistCountSubject.next(0)
+  });
+}
+
 
   getWearType(wearType: any,page: number = 0, size: number = 10){
 
