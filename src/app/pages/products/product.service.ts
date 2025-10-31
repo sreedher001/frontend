@@ -5,6 +5,27 @@ import { ProductResponse } from '@/models/product-response.model';
 import { Product } from '@/models/product.model';
 import { CommonService } from '@/layout/service/common';
 
+// AI
+export interface AiUserPromptRequest {
+  prompt: string;
+}
+//AI
+export interface ProductDto {
+  name: string;
+  productId: string;
+  category: string;
+  subCategory: string;
+  color: string;
+  images: string[]; // list of image URLs (we take the first one for display)
+  rating: number;
+  isFeatured: boolean;
+}
+//AI
+export interface AiSuggestionResponse {
+  products: ProductDto[];
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -151,4 +172,11 @@ refreshWishlistCount() {
     .set('size', size);
   return this.http.get<any>(`${this.apiUrl}/products/search/weartype`,{params });
 }
+
+
+//==================AI API===============
+getRecommendations(prompt: string): Observable<AiSuggestionResponse> {
+    const request: AiUserPromptRequest = { prompt };
+    return this.http.post<AiSuggestionResponse>(`${this.apiUrl}/ai/suggestions`, request);
+  }
 }

@@ -314,7 +314,13 @@ updateCartItem(item: any) {
         next: (res: any) => {
           console.log('Cart updated:', res);
           // prefer to update UI without full reload - but for now refresh:
-          window.location.reload();
+          //window.location.reload();
+          const index = this.cart.items.findIndex((i: any) => i.id === item.id);
+          if (index > -1) {
+            this.cart.items[index].quantity = item.quantity;
+            this.cart.items[index].total = item.price * item.quantity;
+          }
+          
         },
         error: (err:any) => {
           console.error('Update failed:', err);

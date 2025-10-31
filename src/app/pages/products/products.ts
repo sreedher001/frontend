@@ -31,7 +31,30 @@ import {  LoginComponent } from "../auth/login";
   providedIn: 'root' 
 })
 export class Products implements OnInit {
+ showAiAssistant = false;
+  userInput = '';
+  chatMessages: any[] = [];
 
+  aiSuggestions = [
+  '💍 Wedding Guest',
+  '🎉 Festive Party',
+  '🏢 Office Ethnic Day',
+  '🌸 Casual Brunch',
+  '🌙 Evening Gala',
+  '👗 Daily Elegance'
+];
+
+isTyping = false;
+  aiTaglines = [
+    "Tell me your occasion 💬",
+    "Discover your look ✨",
+    "What’s your next event? 👗",
+    "Style. Smart. Simplified.",
+    "Your personal AI stylist 🤖",
+    "Let’s find your vibe 💫"
+  ];
+  aiTagline = this.aiTaglines[0];
+  private index = 0;
 
 Math = Math;
 wishlistVariantIds: Set<number> = new Set(); // Store variant IDs in wishlist
@@ -49,12 +72,16 @@ showLogin = false;
 size: number = 10;
 lastPage: boolean = false;
 showWearSections = true;
+private aiIndex = 0;
 
   constructor(private productService: ProductService,private router: Router,private jwtHelper: JwtHelper,
      private cartService: CartService,
     private messageService: MessageService,private route: ActivatedRoute
   ) { }
   ngOnInit(): void {
+
+    this.startTaglineRotation();
+
 if(localStorage.getItem("isLoggedIn")==="true"){
       this.isLoggedIn=true;}
     
@@ -94,6 +121,12 @@ if(localStorage.getItem("isLoggedIn")==="true"){
   }
 
   }
+
+  startTaglineRotation() {
+  setInterval(() => {
+    this.aiIndex = (this.aiIndex + 1) % this.aiTaglines.length;
+    this.aiTagline = this.aiTaglines[this.aiIndex];
+  }, 4000);}
 selectChip(chip: any) {
   
   this.selectedChip = chip;
@@ -498,4 +531,61 @@ offers = [
 getWearType(style:any){
   this.router.navigate(['/search', style]);
 }
+
+
+
+
+toggleAiAssistant() {
+    this.showAiAssistant = !this.showAiAssistant;
+  }
+autoGrow(event: Event) {
+  const textarea = event.target as HTMLTextAreaElement;
+  textarea.style.height = 'auto'; // reset height
+  textarea.style.height = `${textarea.scrollHeight}px`; // set height based on content
+}
+
+  sendMessage() {
+  if (!this.userInput.trim()) return;
+  const query = this.userInput;
+  this.chatMessages.push({ text: query, sender: 'user' });
+  this.userInput = '';
+
+  // show "typing" indicator
+  this.isTyping = true;
+
+  // Call backend
+  this.productService.getRecommendations(query).subscribe({
+    next: (response) => {
+      this.isTyping = false;
+
+      // Display AI message
+      this.chatMessages.push({
+        text: `Here are some outfit ideas perfect for "${query}":`,
+        sender: 'bot'
+      });
+
+      // You can show product info nicely
+      response.products.forEach((p) => {
+        this.chatMessages.push({
+          text: `${p.name} (${p.color})\nCategory: ${p.category} / ${p.subCategory}\nImage: ${p.images[0] ?? 'No image'}`,
+          sender: 'bot'
+        });
+      });
+    },
+    error: (err:any) => {
+      this.isTyping = false;
+      this.chatMessages.push({
+        text: `⚠️ Sorry, could not get suggestions. Please try again.`,
+        sender: 'bot'
+      });
+      console.error(err);
+    }
+  });
+}
+
+selectSuggestion(text: string) {
+  this.userInput = text;
+  this.sendMessage();
+}
+
 }

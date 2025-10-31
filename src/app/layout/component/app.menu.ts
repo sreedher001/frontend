@@ -140,5 +140,18 @@ styleOptions = ['Casual Wear', 'Ethnic Wear'];
     applyFilters() {
 }
 resetFilters() {
+  this.filters = {
+    gender: '',
+    categories: [],
+    colors: [],
+    styles: [],
+    seasons: [],
+    occasions: [],
+    isFeatured: false,
+    minRating: 0,
+  };
+
+  this.applyFilters(); // optional - auto reapply
 }
+
 }
