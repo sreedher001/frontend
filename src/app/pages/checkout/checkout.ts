@@ -11,6 +11,7 @@ import { CheckoutService, ShippingAddress } from './checkoutservice.service';
 import { JwtHelper } from '@/jwt/jwt-helper';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { Router } from '@angular/router';
 declare var Razorpay: any;
 
 interface Address {
@@ -44,7 +45,7 @@ editingAddressId: any =0;
   userInfo:any;
   selectedPaymentMode='Prepaid';
 
-  constructor(private fb: FormBuilder, private messageService: MessageService, private checkoutService: CheckoutService,
+  constructor(private route: Router,private fb: FormBuilder, private messageService: MessageService, private checkoutService: CheckoutService,
     private jwtHelper: JwtHelper,private confirmationService: ConfirmationService
   ) {
     this.addressForm = this.fb.group({
@@ -198,7 +199,7 @@ onPhoneInput(event: any) {
     if (this.selectedPaymentMode === 'Prepaid') {
         this.createRazorpayOrder(res);
         this.messageService.add({
-          key:'global',
+         // key:'global',
           severity: 'success',
           summary: 'Order placed',
           detail: 'Your order has been placed successfully!'
@@ -249,9 +250,10 @@ openRazorpayWidget(order: any) {
         key:'global',
         severity: 'info',
         summary: 'Payment Processing',
-        detail: 'Your payment was successful. Order confirmation will be sent shortly.'
+        detail: 'Your payment was successful. Order confirmation will be sent shortly to your registered mail id.'
       });
       // Optional: disable further payment attempts, redirect user, etc.
+      this.route.navigate(['/order/order-history']);
     },
     modal: {
       ondismiss: () => {
@@ -279,7 +281,7 @@ openRazorpayWidget(order: any) {
       wallet: false,
     },
     upi: {
-      flow: 'qr'
+      flow: 'collect'
     }
   };
 
@@ -294,6 +296,7 @@ loadRazorpayScript(): Promise<void> {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+
     script.onload = () => resolve();
     script.onerror = () => reject('Razorpay SDK failed to load');
     document.body.appendChild(script);

@@ -1,50 +1,83 @@
 
-<div class=" mx-auto px-4 pt-6 pb-6 sm:px-6 sm:pt-8 flex-col mt-11 
-            bg-gradient-to-r from-[#fdf6ee] via-[#fae8e0] to-[#fff7ed]
-            rounded-b-3xl shadow-md border-b-2 border-yellow-400 text-yellow-800">
-  <p class="mt-2 text-3xl text-center text-yellow-700 ">BEYOND MIRROR</p>
+<div
+  class="mx-auto px-4 sm:px-6 py-8 mt-11 flex flex-col
+  
+   shadow-md  relative overflow-hidden">
 
+  <!-- Animated Background Gradient -->
+  <div class="absolute inset-0 bg-gradient-to-r from-yellow-100 via-pink-100 to-orange-100 animate-gradient-x opacity-30 rounded-3xl"></div>
 
+  <!-- Banner Carousel -->
+  <p-carousel
+    [value]="banners"
+    [numVisible]="1"
+    [numScroll]="1"
+    [circular]="true"
+    [autoplayInterval]="4000"
+    [showIndicators]="false"
+    [showNavigators]="false"
+    class="w-full relative z-10"
+    contentClass="gap-3">
+    <ng-template let-banner pTemplate="item">
+      <div
+        class="rounded-2xl bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 
+        shadow-md border border-yellow-300 overflow-hidden transition-transform duration-500 transform hover:scale-105 cursor-pointer"
+        >
 
-  <!-- Optional festive banner title -->
-  <!-- <h2 class="text-center text-2xl sm:text-3xl font-bold text-red-600 mb-3">
-    ✨ ZFC Beyond mirror ✨
-  </h2> -->
+        <img [src]="banner.imageUrl" alt="{{ banner.title }}"
+          class="w-full h-52 sm:h-72 object-cover" />
 
-  <!-- Deals Carousel -->
-  <p-carousel [value]="offers" [numVisible]="1" [numScroll]="1" [circular]="true" [autoplayInterval]="4000"
-    [showIndicators]="false" [showNavigators]="false" class="w-full" contentClass="gap-3">
-    <ng-template let-offer pTemplate="item">
-      <div class="rounded-xl bg-gradient-to-r from-pink-900 to-gray-800 shadow-lg text-white 
-            border border-gray-700 flex items-center justify-center px-6 py-4 w-full h-[90px] text-center">
-
-
-        <div class="flex flex-col text-sm sm:text-base">
-          <span class="font-semibold text-yellow-800">{{ offer.title }}</span>
-          <span class="text-xs text-yellow-600">{{ offer.subtitle }}</span>
+        <div class="p-3 text-center">
+          <p class="font-semibold text-yellow-900 text-base sm:text-lg">
+            {{ banner.title }}
+          </p>
         </div>
-
-        
-
       </div>
     </ng-template>
   </p-carousel>
+</div>
+
+
+<div class=" mx-auto px-4 pt-6 pb-6 sm:px-6 sm:pt-8 flex-col ">
 
   <!-- Chip Carousel -->
   <div class="w-full overflow-x-auto scrollbar-hide">
-    <div class="flex space-x-1 px-2 py-2 min-w-max w-full overflow-x-auto scrollbar-hide">
-      @for (chip of chips; track chip.label) {
-      <div class="flex items-center space-x-1 px-4 py-1.5 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 whitespace-nowrap shrink-0
-        " [ngClass]="{
-          'bg-gradient-to-br from-yellow-200 via-orange-100 to-pink-100 text-gray-900 shadow hover:shadow-md': selectedChip?.label === chip.label,
-          'bg-gray-200 text-gray-800': selectedChip?.label !== chip.label
-        }" (click)="selectChip(chip)">
-        <!-- <img [src]="chip.image" alt="{{ chip.label }}" class="w-6 h-6 rounded-full" /> -->
-        <span>{{ chip.label }}</span>
+  <div class="flex space-x-4 px-4 py-3 min-w-max w-full overflow-x-auto scrollbar-hide">
+    @for (chip of chips; track chip.label) {
+      <div
+        class="flex flex-col items-center justify-center space-y-1 cursor-pointer transition-all duration-200 shrink-0"
+        [ngClass]="{
+          'scale-105': selectedChip?.label === chip.label
+        }"
+        (click)="selectChip(chip)"
+      >
+        <div
+          class="w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all duration-200"
+          [ngClass]="{
+            'border-yellow-400 shadow-lg': selectedChip?.label === chip.label,
+            'border-gray-300': selectedChip?.label !== chip.label
+          }"
+        >
+          <img
+            [src]="chip.image"
+            alt="{{ chip.label }}"
+            class="w-12 h-12 rounded-full object-cover"
+          />
+        </div>
+        <span
+          class="text-sm font-medium text-center"
+          [ngClass]="{
+            'text-gray-900': selectedChip?.label === chip.label,
+            'text-gray-600': selectedChip?.label !== chip.label
+          }"
+        >
+          {{ chip.label }}
+        </span>
       </div>
-      }
-    </div>
+    }
   </div>
+</div>
+
 </div>
 
 <!-- Ethnic Wear Section -->

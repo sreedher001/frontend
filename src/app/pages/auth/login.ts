@@ -228,7 +228,7 @@ confirmPassword = '';
                     localStorage.setItem('userName', userInfo?.name);
                 }
 
-               // this.router.navigate(['/']);
+                this.router.navigate(['/']);
                 this.email = "";
                 this.password = "";
                 this.loginSuccess.emit(res);

@@ -130,7 +130,9 @@ styleOptions = ['Casual Wear', 'Ethnic Wear'];
                 { label: 'Manage Orders', icon: 'pi pi-fw pi-cog', routerLink: ['/admin/orders'] },
                 { label: 'Register Expense', icon: 'pi pi-receipt', routerLink: ['/admin/invoice'] },
                 
-                { label: 'View Expense', icon: 'pi pi-eye', routerLink: ['/admin/invoice-list'] }
+                { label: 'View Expense', icon: 'pi pi-eye', routerLink: ['/admin/invoice-list'] },
+                { label: 'Banners', icon: 'pi pi-image', routerLink: ['/admin/banner'] }
+
             ]
             },
             

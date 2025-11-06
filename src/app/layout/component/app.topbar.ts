@@ -20,6 +20,7 @@ import { ProductService } from '@/pages/products/product.service';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { DrawerModule } from 'primeng/drawer';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-topbar',
@@ -36,9 +37,9 @@ import { DrawerModule } from 'primeng/drawer';
     @if(isAdmin){<button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
       <i class="pi pi-bars text-orange-500"></i>
     </button>}@else{
-      <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
+      <!-- <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
       <i class="pi pi-filter text-orange-500"></i>
-    </button>
+    </button> -->
     }
 
     <!-- Logo -->
@@ -111,7 +112,7 @@ import { DrawerModule } from 'primeng/drawer';
   </button>
 </div>
         <!-- Search (hidden on mobile, full width below) -->
-        <div class="hidden sm:block w-64">
+        <!-- <div class="hidden sm:block w-64">
           <p-autoComplete
             [(ngModel)]="searchQuery"
             [suggestions]="filteredProducts"
@@ -137,7 +138,34 @@ import { DrawerModule } from 'primeng/drawer';
               <span>{{ formatProduct(product) }}</span>
             </ng-template>
           </p-autoComplete>
-        </div>
+        </div> -->
+        <div class="hidden sm:block w-80">
+  <p-autoComplete
+    [(ngModel)]="searchQuery"
+    [suggestions]="filteredProducts"
+    (completeMethod)="filterProducts($event)"
+    (onSelect)="onProductSelected($event)"
+    [dropdown]="false"
+    [minLength]="1"
+    [forceSelection]="false"
+    placeholder="Search it..."
+    appendTo="body"
+    class="w-full"
+  >
+    <ng-template let-product pTemplate="item">
+      <div class="flex flex-col">
+        <span class="font-semibold" [innerHTML]="highlightSearch(product, searchQuery)"></span>
+        <small class="text-gray-600">{{ formatProduct(product) }}</small>
+      </div>
+    </ng-template>
+    <ng-template let-product pTemplate="selectedItem">
+      <span>{{ product.productName }}</span>
+    </ng-template>
+  </p-autoComplete>
+</div>
+
+
+
 
         <!-- wishlist Button -->
         <button 
@@ -243,18 +271,15 @@ import { DrawerModule } from 'primeng/drawer';
       <!-- Suggestions List -->
      @if(filteredProducts.length > 0){ <div  class="space-y-2 max-h-64 overflow-y-auto">
         @for (product of filteredProducts; track product.id) {
-          <div 
-            class="flex items-start gap-3 p-2 rounded-md hover:bg-gray-100 cursor-pointer transition"
-            (click)="onProductSelected(product)"
-          >
-            
-            <div>
-              <p class="font-medium text-gray-800">{{ product.name }}</p>
-              <p class="text-sm text-gray-500">
-                {{ product.category }} • {{ product.subCategory }} • {{ product.genderCategory }}
-              </p>
-            </div>
-          </div>
+          
+         <div
+  class="flex flex-col p-2 hover:bg-gray-100 rounded cursor-pointer"
+  (click)="onProductSelected(product)"
+>
+  <span class="font-medium" [innerHTML]="highlightSearch(product, searchQuery)"></span>
+  <small class="text-gray-500">{{ formatProduct(product) }}</small>
+</div>
+
         }
       </div>
       }
@@ -319,15 +344,15 @@ export class AppTopbar implements OnInit {
     }
 
   }
-  constructor(public layoutService: LayoutService, private cartService: CartService, private messageService: MessageService,
+  constructor(public layoutService: LayoutService, private cartService: CartService, private messageService: MessageService,private sanitizer: DomSanitizer,
     private router: Router, private jwtHelper: JwtHelper, private productService: ProductService, private cd: ChangeDetectorRef) {
     // Debounce the search input to avoid spamming API calls
     this.searchSubject.pipe(debounceTime(300)).subscribe(query => {
 
-      if (!query || query.trim().length === 0) {
-        this.filteredProducts = [];
-        return;
-      }
+      // if (!query || query.trim().length === 0) {
+      //   this.filteredProducts = [];
+      //   return;
+      // }
       this.productService.getAutocompleteSuggestions(query).subscribe({
         next: (data: any) => {
 
@@ -350,14 +375,104 @@ export class AppTopbar implements OnInit {
     this.searchSubject.next(tag); // triggers autocomplete suggestions
   }
 
-  filterProducts(event: any) {
-    //const query = event.query;
-    this.searchSubject.next(event.query);
-  }
+  // filterProducts(event: any) {
+  //   //const query = event.query;
+  //   this.searchSubject.next(event.query);
+  // }
 
-  formatProduct(product: any): string {
-    return `${product.name} (${product.category} > ${product.subCategory}) - ${product.genderCategory}`;
-  }
+  filterProducts(event: any) {
+  const query = event.query.trim().toLowerCase();
+  this.productService.getAutocompleteSuggestions(query).subscribe((data: any[]) => {
+    // Prioritize results where query appears earlier or in variantName/color
+    this.filteredProducts = data.sort((a, b) => {
+      const aStr = JSON.stringify(a).toLowerCase();
+      const bStr = JSON.stringify(b).toLowerCase();
+
+      const aIndex = aStr.indexOf(query);
+      const bIndex = bStr.indexOf(query);
+
+      if (aIndex === -1 && bIndex === -1) return 0;
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    });
+  });
+}
+
+
+  // formatProduct(product: any): string {
+  //   return `${product.name} (${product.category} > ${product.subCategory}) - ${product.genderCategory}`;
+  // }
+
+//   formatProduct(product: any): string {
+//   const parts = [
+//     product.category,
+//     product.subCategory,
+//     product.genderCategory,
+//     product.color ? `Color: ${product.color}` : null,
+//     product.fit ? `Fit: ${product.fit}` : null,
+//     product.pattern ? `Pattern: ${product.pattern}` : null,
+//     product.styleCategory ? `Style: ${product.styleCategory}` : null,
+//   ].filter(Boolean);
+
+//   return parts.join(" • ");
+// }
+
+formatProduct(product: any): string {
+  const genderPart = product.genderCategory
+    ? `for ${product.genderCategory.toLowerCase()}`
+    : '';
+
+  const base =
+    product.variantName ||
+    product.subCategory ||
+    product.productName ||
+    'Product';
+
+  const colorPart = product.color ? product.color.toLowerCase() : '';
+  const fitPart = product.fit ? `${product.fit.toLowerCase()} fit` : '';
+  const patternPart = product.pattern ? product.pattern.toLowerCase() : '';
+  const stylePart = product.styleCategory
+    ? `${product.styleCategory.toLowerCase()} style`
+    : '';
+  const occasionPart = product.occasion
+    ? `${product.occasion.toLowerCase()} wear`
+    : '';
+  const seasonPart = product.season
+    ? `${product.season.toLowerCase()} collection`
+    : '';
+
+  // Assemble the descriptive sentence
+  const description = [
+    colorPart,
+    fitPart,
+    patternPart,
+    base.toLowerCase(),
+    genderPart,
+    stylePart,
+    occasionPart,
+    seasonPart,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Capitalize first letter for clean UI
+  return description.charAt(0).toUpperCase() + description.slice(1);
+}
+
+highlightSearch(product: any, query: string): SafeHtml {
+  if (!product?.productName || !query) return product?.productName ?? '';
+
+  const regex = new RegExp(`(${query})`, 'gi');
+  const highlighted = product.productName.replace(regex, '<strong style="color:#D4AF37;">$1</strong>');
+
+  // Mark as safe HTML so Angular renders it
+  return this.sanitizer.bypassSecurityTrustHtml(highlighted);
+}
+
+
   setUserMenuItem() {
     const loggedIn = localStorage.getItem('isLoggedIn');
     if (loggedIn === "true") {
@@ -450,11 +565,19 @@ export class AppTopbar implements OnInit {
     this.router.navigate(['/auth/login']);
   }
 
-  onProductSelected(product: any) {
-    this.router.navigate(['/products'], { queryParams: { search: product.name } });
-    this.showMobileSearch = false;
 
+  onProductSelected(event: any) {
+  const product = event.value ? event.value : event; //  works for both mobile + desktop
+  console.log("Selected product:", product);
+
+  if (product && product.productName) {
+    this.router.navigate(['/products'], { queryParams: { search: product.productName } });
+    
+    this.searchQuery = product.productName;
+    this.showMobileSearch = false;
   }
+}
+
   onModelChange(value: any) {
     this.searchQuery = value;
   }

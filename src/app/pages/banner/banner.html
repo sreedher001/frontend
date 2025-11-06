@@ -1,0 +1,116 @@
+<p-confirmDialog icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+<div
+  class="mt-12"
+>
+  <h2 class="text-2xl font-bold text-yellow-800 mb-4"> Banner Management</h2>
+
+  <p-button
+    severity="warn"
+    label="Add Banner"
+    icon="pi pi-plus"
+    class="mb-3"
+    (click)="openNew()"
+  ></p-button>
+
+  <p-table
+    [value]="banners"
+    [paginator]="true"
+    [rows]="5"
+    class="shadow-md rounded-xl"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Image</th>
+        <th>Title</th>
+        <th>Redirect URL</th>
+        <th>Type</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-banner>
+      <tr>
+        <td>
+          <img
+            [src]="banner.imageUrl"
+            class="w-20 h-12 rounded-lg object-cover"
+          />
+        </td>
+        <td>{{ banner.title }}</td>
+        <td>{{ banner.redirectUrl }}</td>
+        <td>{{ banner.bannerType }}</td>
+        <td>
+          <button
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-text text-yellow-700"
+            (click)="editBanner(banner)"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-text text-red-500"
+            (click)="deleteBanner(banner.id)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- Banner Dialog -->
+  <p-dialog
+  [(visible)]="displayDialog"
+  [modal]="true"
+  [closable]="false"
+  header="{{ selectedBannerId ? 'Edit Banner' : 'Add New Banner' }}"
+  [style]="{ width: '600px' }"
+  [contentStyle]="{ height: '500px', overflowY: 'auto' }"
+>
+    <div class="flex flex-col gap-3">
+      <input
+        type="file"
+        multiple
+        (change)="onFileSelect($event)"
+        *ngIf="!selectedBannerId"
+      />
+
+      <input
+        pInputText
+        placeholder="Title"
+        [(ngModel)]="bannerForm.title"
+        class="w-full"
+      />
+      <input
+        pInputText
+        placeholder="Redirect URL"
+        [(ngModel)]="bannerForm.redirectUrl"
+        class="w-full"
+      />
+
+      <!-- Banner Type Autocomplete -->
+      <p-autoComplete
+        [(ngModel)]="bannerForm.bannerType"
+        [suggestions]="filteredBannerTypes"
+        (completeMethod)="filterBannerTypes($event)"
+        [forceSelection]="true"
+        [minLength]="0"
+        dropdown="true"
+        placeholder="Select Banner Type"
+        class="w-full"
+      ></p-autoComplete>
+
+      <div class="flex justify-end mt-4 space-x-2">
+        <button
+          pButton
+          label="Cancel"
+          class="p-button-text"
+          (click)="displayDialog = false"
+        ></button>
+        <button pButton label="Save" (click)="uploadBanner()"></button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <p-toast></p-toast>
+</div>

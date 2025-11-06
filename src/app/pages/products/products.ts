@@ -6,7 +6,7 @@ import { CardModule } from 'primeng/card';
 import { Carousel, CarouselModule } from 'primeng/carousel';
 import { FluidModule } from 'primeng/fluid';
 import { TagModule } from 'primeng/tag';
-import { ProductService } from './product.service';
+import { Banner, ProductService } from './product.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { JwtHelper } from '@/jwt/jwt-helper';
 import { CartService } from '../cart/cart.service';
@@ -20,6 +20,7 @@ import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
 import { ChipModule } from 'primeng/chip';
 import { Signup } from "../auth/signup/signup";
 import {  LoginComponent } from "../auth/login";
+
 @Component({
   selector: 'app-products',
   imports: [CardModule, CommonModule, ButtonModule, FluidModule, TagModule, FormsModule, BadgeModule, Tooltip, CarouselModule,
@@ -34,7 +35,7 @@ export class Products implements OnInit {
  showAiAssistant = false;
   userInput = '';
   chatMessages: any[] = [];
-
+banners: Banner[] = [];
   aiSuggestions = [
   '💍 Wedding Guest',
   '🎉 Festive Party',
@@ -79,7 +80,7 @@ private aiIndex = 0;
     private messageService: MessageService,private route: ActivatedRoute
   ) { }
   ngOnInit(): void {
-
+this.getBanners();
     this.startTaglineRotation();
 
 if(localStorage.getItem("isLoggedIn")==="true"){
@@ -120,6 +121,12 @@ if(localStorage.getItem("isLoggedIn")==="true"){
     this.isAdmin=true;
   }
 
+  }
+  getBanners() {
+   this.productService.getAllBanners().subscribe({
+      next: (data) => (this.banners = data),
+      error: (err) => console.error('Failed to load banners:', err)
+    });
   }
 
   startTaglineRotation() {
@@ -170,7 +177,6 @@ navigateTo(link: string): void {
 }
 
 handleLoginSuccess($event:any) {
-  console.log("triggered...");
   this.isLoggedIn = true;
   this.showSignupPanel = false;
 
@@ -575,7 +581,7 @@ autoGrow(event: Event) {
     error: (err:any) => {
       this.isTyping = false;
       this.chatMessages.push({
-        text: `⚠️ Sorry, could not get suggestions. Please try again.`,
+        text: `Sorry, could not get suggestions. Please try again.`,
         sender: 'bot'
       });
       console.error(err);

@@ -4,7 +4,15 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ProductResponse } from '@/models/product-response.model';
 import { Product } from '@/models/product.model';
 import { CommonService } from '@/layout/service/common';
-
+export interface Banner {
+  id: number;
+  imageUrl: string;
+  title: string;
+  redirectUrl: string;
+  bannerType: string;
+  uploadedAt: string;
+  uploadedBy: number;
+}
 // AI
 export interface AiUserPromptRequest {
   prompt: string;
@@ -178,5 +186,9 @@ refreshWishlistCount() {
 getRecommendations(prompt: string): Observable<AiSuggestionResponse> {
     const request: AiUserPromptRequest = { prompt };
     return this.http.post<AiSuggestionResponse>(`${this.apiUrl}/ai/suggestions`, request);
+  }
+
+  getAllBanners(): Observable<Banner[]> {
+    return this.http.get<Banner[]>(`${this.apiUrl}/banners/all-banners`);
   }
 }
