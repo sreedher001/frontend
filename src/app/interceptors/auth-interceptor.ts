@@ -15,7 +15,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : req;
 // Show loader
-  loaderService.show();
+  //loaderService.show();
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {

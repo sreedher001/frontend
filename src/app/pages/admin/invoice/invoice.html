@@ -181,7 +181,10 @@
             <p-inputnumber
               [(ngModel)]="item.quantity"
               name="quantity_{{ ri }}"
-              required
+              mode="decimal"
+              required 
+  [maxFractionDigits]="3"
+
             ></p-inputnumber>
           </ng-template>
           <ng-template pTemplate="output">{{ item.quantity }}</ng-template>

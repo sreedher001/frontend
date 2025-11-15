@@ -9,7 +9,7 @@
       <div class="relative aspect-w-4 aspect-h-3">
         <img [src]="item.itemImageSrc" (load)="onImageLoad($event)"
           class="object-contain w-full h-full rounded-lg shadow" />
-        <p-button severity="secondary" class="absolute bottom-2 left-2 p-1 rounded uppercase dune-font"
+        <p-button severity="secondary" class="absolute bottom-2 left-2 p-1 rounded"
           pTooltip="View Similar" label="View Similar" tooltipPosition="top"
           (click)="viewSimilar(product.variant.id); $event.stopPropagation()" type="button">
           <i class="pi pi-clone text-xl"></i>
@@ -33,11 +33,12 @@
   <!-- Product Info -->
   <div class="card w-full lg:w-1/2 space-y-4">
 
-    <p class="text-lg font-semibold dune-font font-semibold">{{ product.variant.variantName }}</p>
+    
 
     <div class="flex items-center gap-4">
-      <p-tag severity="warn" class="whitespace-nowrap dune-font">{{ product.category }}</p-tag>
-      <div class="p-2 rounded-full flex items-center gap-2" [ngClass]="getRatingSeverity(product.variant.rating)">
+      <p-tag severity="warn" class="text-lg font-semibold  font-semibold">{{ product.variant.variantName }}</p-tag>
+      <!-- <p-tag severity="warn" class="whitespace-nowrap">{{ product.category }}</p-tag> -->
+     <div class="p-2 rounded-full flex items-center gap-2" [ngClass]="getRatingSeverity(product.variant.rating)">
         <span class="font-medium text-lg dune-font">{{ product.variant.rating }}</span>
         <i class="pi pi-star-fill text-xs" [ngClass]="{
     'text-green-600': product.variant.rating != null && product.variant.rating >= 4,
@@ -47,7 +48,7 @@
       </div>
     </div>
 
-    <h3 class="text-lg font-semibold mb-2 dune-font uppercase">Price</h3>
+    <h3 class="text-lg font-semibold mb-2  ">Price</h3>
     <!-- Price Display -->
     @if (product && product.variant && product.variant.sizes && product.variant.sizes.length > 0 &&
     hasUniformPrice(product.variant.sizes)) {
@@ -81,10 +82,10 @@
     @if (product && product.variant && product.variant.sizes && product.variant.sizes.length > 0) {
     <div>
       <div class="flex items-center justify-between mt-4">
-  <h3 class="text-lg font-semibold mb-2 dune-font uppercase">Select Size</h3>
+  <h3 class="text-sm font-semibold mb-2  ">Select Size</h3>
 
   <button
-    class="text-sm text-orange-600 underline dune-font uppercase"
+    class="text-sm text-orange-600 underline "
     type="button"
     (click)="showSizeGuide = true"
   >
@@ -121,7 +122,7 @@
   [modal]="true"
   [style]="{ width: '90vw', maxWidth: '500px' }"
   [breakpoints]="{ '960px': '95vw' }"
-  [dismissableMask]="true" class="dune-font uppercase"
+  [dismissableMask]="true" 
 >
   <!-- Toggle Buttons -->
   <div class="flex justify-end mb-4">
@@ -144,7 +145,7 @@
   </div>
 
   <!-- Table -->
-  <div class="text-sm text-gray-700 dune-font space-y-2">
+  <div class="text-sm text-gray-700  space-y-2">
     <p class="text-xs text-gray-500 italic">All measurements are approximate.</p>
 
     <table class="w-full text-left border border-gray-300 text-sm">
@@ -354,10 +355,10 @@
     <!-- Action Buttons -->
     <div class="flex flex-col sm:flex-row gap-3 mt-4">
       <p-button label="ADD TO BAG" icon="pi pi-shopping-bag" styleClass="w-full sm:w-auto " severity="contrast" outlined
-        class="dune-font font-bold font-semibold " raised size="large"
+        class="font-bold font-semibold " raised size="large"
         (onClick)="addToCart(product.variant, $event)"></p-button>
       <p-button label="Buy Now" icon="pi pi-credit-card" styleClass="w-full sm:w-auto" severity="warn"
-        class="dune-font font-bold text-black" raised size="large"
+        class=" font-bold text-black" raised size="large"
         (onClick)="buyNow(product.variant, $event)"></p-button>
     </div>
   </div>
@@ -396,7 +397,7 @@
 <div class="fixed bottom-0 left-0 w-full rounded-lg flex lg:hidden z-50 bg-white shadow-[0_-2px_6px_rgba(0,0,0,0.1)]">
   <!-- Wishlist Button -->
   <button
-    class="w-1/2 h-16 flex rounded-t-2xl items-center justify-center text-sm font-semibold dune-font text-gray-800 border-r border-gray-300  active:bg-gray-100"
+    class="w-1/2 h-16 flex rounded-t-sm items-center justify-center text-lg font-semibold  text-gray-800 border-r border-gray-300  active:bg-gray-100"
     type="button" (click)="toggleWishlist(product.variant, $event)">
     @if(isInWishlist(product.variant)){<i class="pi pi-heart-fill mr-2 text-lg text-red-500"></i>}
     @else{<i class="pi pi-heart mr-2 text-lg text-black-500"></i>}
@@ -405,7 +406,7 @@
 
   <!-- Add to Bag Button -->
   <button
-    class="w-1/2 h-16 flex rounded-t-2xl  items-center justify-center text-sm font-bold dune-font text-white bg-orange-500 active:bg-gray-900"
+    class="w-1/2 h-16 flex rounded-t-sm  items-center justify-center text-lg font-bold  text-white bg-orange-500 active:bg-gray-900"
     type="button" (click)="openSizeSelector()">
     <i class="pi pi-shopping-bag mr-2 text-lg"></i>
     Add to bag
@@ -418,14 +419,14 @@
   class="fixed bottom-0 left-0 w-full bg-white shadow-xl rounded-t-2xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden"
   [class.translate-y-full]="!showSizeSelector">
   <div class="p-5  flex justify-between items-center">
-    <h4 class="text-lg font-semibold dune-font">Select Size</h4>
+    <h4 class="text-lg font-semibold ">Select Size</h4>
     
     <button (click)="closeSizeSelector()" class="hover:text-red-500">
       <i class="pi pi-times text-xl"></i>
     </button>
   </div>
 <div class="p-2 flex justify-between items-center"><button
-    class="text-sm text-orange-600 underline dune-font"
+    class="text-lg text-orange-600 underline"
     type="button"
     (click)="showSizeGuide = true"
   >
