@@ -72,7 +72,7 @@ showLogin = false;
   page: number = 0;
 size: number = 10;
 lastPage: boolean = false;
-showWearSections = true;
+showWearSections = false;
 private aiIndex = 0;
 
   constructor(private productService: ProductService,private router: Router,private jwtHelper: JwtHelper,

@@ -38,9 +38,9 @@
 </div>
 
 
-<div class=" mx-auto px-4 pt-6 pb-6 sm:px-6 sm:pt-8 flex-col ">
+<!-- <div class=" mx-auto px-4 pt-6 pb-6 sm:px-6 sm:pt-8 flex-col ">
 
-  <!-- Chip Carousel -->
+
   <div class="w-full overflow-x-auto scrollbar-hide">
   <div class="flex space-x-4 px-4 py-3 min-w-max w-full overflow-x-auto scrollbar-hide">
     @for (chip of chips; track chip.label) {
@@ -78,7 +78,7 @@
   </div>
 </div>
 
-</div>
+</div> -->
 
 <!-- Ethnic Wear Section -->
 @if(showWearSections){<h2 class="px-4 text-center mb-2 text-red-800 dune-font">ETHNIC WEAR</h2>
@@ -182,7 +182,8 @@
 </div>}
 
 <!-- Kids Section -->
-@if(showWearSections){<h2 class="px-4 text-center mb-2 text-red-800 dune-font">kiDs</h2>
+@if(showWearSections){
+  <!-- <h2 class="px-4 text-center mb-2 text-red-800 dune-font">kiDs</h2> -->
 <div class="w-full overflow-x-auto scrollbar-hide">
   <div class="flex space-x-1 px-4 pb-2 min-w-max">
     @for (product of products; track product.id) {
@@ -363,7 +364,7 @@
 }
 
 <!-- Floating CTA Button (only if modal closed and not logged in) -->
-<!-- @if (!showSignupPanel && !isLoggedIn) {
+@if (!showSignupPanel && !isLoggedIn) {
  <div
   class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 
          flex items-center gap-3 px-5 py-3 rounded-full 
@@ -376,10 +377,10 @@
     <i class="pi pi-user-plus text-xl"></i>
     <span class="font-medium whitespace-nowrap text-sm sm:text-base dune-font">SIGN UP / SIGN IN</span>
   </div>
-} -->
+}
 
 <!-- 🌟 Floating Beyond Mirror AI Stylist Badge -->
-<div
+@if(false){<div 
   class="fixed bottom-8 right-1/2 translate-x-1/2 sm:translate-x-0 sm:right-8 z-50
          flex items-center justify-center space-x-4 px-6 py-3 rounded-full 
          shadow-[0_0_25px_rgba(0,0,0,0.2)] border border-gray-300
@@ -414,17 +415,7 @@
 
   <i class="pi pi-sparkles text-yellow-400 text-xl animate-pulse"></i>
 </div>
-
-
-
-
-
-
-
-
-
-
-
+}
 </div>
 @if(!lastPage){<div class="text-center mt-4" >
   <p-button label="Load More" (onClick)="fetchProducts()" [disabled]="loading" severity="warn"
@@ -447,7 +438,6 @@
   aria-modal="true"
   aria-label="AI Stylist Chat"
 >
-  <!-- Header -->
   <div
     class="flex justify-between items-center px-4 py-3 bg-gradient-to-r from-pink-300 via-[#fae8e0] to-[#fdf6ee] 
            border-b border-yellow-300"
