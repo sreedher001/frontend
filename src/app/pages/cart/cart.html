@@ -1,80 +1,99 @@
+<!-- CART ROOT (Drawer Safe) -->
+<div class="cart-drawer-root h-full w-full overflow-x-hidden">
 
-<div class="bg-gray-50 min-h-screen py-12">
-  @if(!isLoggedIn && hasCartItems){
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-2">
-    <p-message severity="error">Note: You're not logged in. You must be logged in to edit the selected size.</p-message>
-</div>}
-  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-2">
+  <!-- CART CONTENT -->
+  <div class="flex flex-col h-full">
 
-    <!-- Left: Cart Items -->
-    <div class="flex-1 bg-white rounded-lg shadow p-4">
-      <h1 class="text-xl font-semibold mb-4">My cart</h1>
+    <!-- CART HEADER
+    <div class="sticky top-0 z-10 bg-white border-b px-4 py-3">
+      <h2 class="text-lg font-semibold">My Bag</h2>
+    </div> -->
+
+    <!-- CART BODY -->
+    <div class="flex-1 overflow-y-auto px-4 py-3">
 
       @if (hasCartItems) {
-      @for (item of cart.items; track item.id) {
-      <div class="relative flex flex-col border-b border-gray-200 py-4 gap-3 mt-2  rounded rounded-2xl" [ngClass]="{
-    'bg-green-10': item.selectedSizeObj?.availableQuantity > 0,
-    'bg-red-50': item.selectedSizeObj?.availableQuantity <= 0}">
-        <!--  Delete Button (Top-Right) -->
-        <!--  Positioning wrapper -->
-        <div class="absolute top-2 right-2 z-10">
-          <p-button icon="pi pi-times" severity="danger" outlined (onClick)="removeFromCart(item)" raised size="small"
-            aria-label="Remove from cart">
-          </p-button>
-        </div>
-        <!-- In Stock / Out of Stock Badge -->
 
+        <div class="space-y-4">
 
+          @for (item of cart.items; track item.id) {
 
+          <!-- CART ITEM -->
+          <div
+            class="relative flex gap-3 p-3 border  bg-white shadow-sm w-full">
 
-        <!-- Top Row: Image + Details -->
-        <div class="flex gap-3">
-          <!-- Product Image -->
-          <div class="w-24 h-24 flex-shrink-0 bg-gray-100 rounded flex items-center justify-center">
-            <img [src]="item.imageUrl" alt="{{ item.variantName }}"
-              class="max-w-full max-h-full object-contain cursor-pointer"
-              (click)="goToProductDetails(item.variantId)" />
-          </div>
-
-          <!-- Product Info -->
-          <div class="flex-1 space-y-1">
-            <p class="font-medium text-sm sm:text-base">{{ item.variantName }}</p>
-            <p-tag value="Color: {{ item.color }}" severity="secondary" class="text-xs"></p-tag>
-
-            <div class="d-flex">
-              @if(item.selectedSizeObj?.availableQuantity > 0){<p-tag value="In Stock" severity="success"
-                class="text-xs font-medium">
-              </p-tag>}
-
-              @if(item.selectedSizeObj?.availableQuantity <= 0){<p-tag value="Out of Stock" severity="danger"
-                class="text-xs font-medium">
-                </p-tag>}
+            <!-- REMOVE -->
+            <div class="absolute top-2 right-2">
+              <p-button
+                icon="pi pi-trash"
+                severity="contrast"
+                size="small"
+                outlined
+                (onClick)="removeFromCart(item)">
+              </p-button>
             </div>
-            <!-- Quantity + Size + Total: Single Row on All Devices -->
-            <div class="flex flex-wrap items-center justify-between gap-2 text-sm">
-              <!-- Quantity Control -->
-              <div class="flex items-center  overflow-hidden w-fit">
 
-                <!-- Decrease Button -->
-                <p-button severity="contrast" outlined raised size="small" (click)="decreaseQuantity(item)"
-                  aria-label="Decrease quantity">
-                  <i class="pi pi-minus"></i>
-                </p-button>
+            <!-- IMAGE -->
+            <div class="w-20 h-25 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center">
+              <img
+                [src]="item.imageUrl"
+                class="max-w-full max-h-full object-contain cursor-pointer"
+                (click)="goToProductDetails(item.variantId)" />
+            </div>
 
-                <!-- Quantity Display -->
-                <span class=" text-sm font-semibold text-orange-500 min-w-[32px] text-center">
+            <!-- DETAILS -->
+            <div class="flex-1  flex-col ">
+
+              <p class="font-medium text-sm sm:text-base">
+                {{ item.variantName }}
+              </p>
+              <div class="flex items-center gap-2 text-sm sm:text-base">
+    <!-- Discounted price -->
+    <span class="font-semibold text-green-600">
+      ₹{{ item.price }}
+    </span>
+
+    <!-- Original price (striked) -->
+    <span class="text-gray-400 text-sm line-through">
+      ₹{{ item.originalPrice }}
+    </span>
+
+    <!-- Discount percentage -->
+    <span class="text-red-500 font-medium">
+      ({{ item.discount }}% OFF)
+    </span>
+  </div>
+              <p class="font-medium text-sm sm:text-base">
+                Color: {{ item.color }}
+              </p>
+
+              
+
+              <!-- STOCK -->
+              @if(item.selectedSizeObj?.availableQuantity > 0){
+                <p-tag value="In Stock" severity="success" class="text-xs"></p-tag>
+              }
+              @if(item.selectedSizeObj?.availableQuantity <= 0){
+                <p-tag value="Out of Stock" severity="danger" class="text-xs"></p-tag>
+              }
+
+              <!-- QTY + SIZE -->
+              <div class="flex flex-col sm:flex-row gap-2 w-full">
+
+                <!-- QUANTITY -->
+                <div class="flex items-center gap-1">
+                  <p-button severity="secondary" size="small" outlined (click)="decreaseQuantity(item)">
+                    <i class="pi pi-minus"></i>
+                  </p-button>
+
                   <p-tag value="{{ item.quantity }}" severity="contrast"></p-tag>
-                </span>
 
-                <!-- Increase Button -->
-                <p-button severity="contrast" outlined raised size="small" (click)="increaseQuantity(item)"
-                  aria-label="Increase quantity">
-                  <i class="pi pi-plus"></i>
-                </p-button>
+                  <p-button severity="secondary" size="small" outlined (click)="increaseQuantity(item)">
+                    <i class="pi pi-plus"></i>
+                  </p-button>
+                </div>
 
-              </div>
-
-              <div class="w-40">
+                <div class="w-40 w-full">
                 <p-autocomplete [(ngModel)]="item.selectedSizeObj" name="size" #size="ngModel" required
                   [suggestions]="autoFilteredSizeValue" optionLabel="size" field="size" dropdown forceSelection="true"
                   type="false" (completeMethod)="filterSize($event,item)" inputId="size"
@@ -82,69 +101,59 @@
                   [inputStyle]="{ 'caretColor': 'transparent' }" class="w-full">
                 </p-autocomplete>
                 @if(item?.selectedSizeObj?.availableQuantity <= 0 && getItemLength(item)>1){ <span>
-                  <p-tag value="Check other sizes" severity="danger" class="text-xs font-medium">
+                  <p-tag value="Check other quantity" severity="danger" class="text-xs font-medium">
                   </p-tag>
                   </span>
                   }
               </div>
+
+              </div>
+
             </div>
           </div>
+          }
         </div>
 
-
-      </div>
-      }
       } @else {
-      <div class="flex flex-col items-center justify-center py-16 text-center text-gray-500">
-        <div class="text-6xl">🛒</div>
-        <p class="mt-4 text-lg">Your cart is empty.</p>
-        <p class="text-sm">Looks like you haven’t added anything yet.</p>
-        <p-button class="mt-3 text-orange-500" severity="warn" raised (click)="goToShop()">Explore Products</p-button>
-      </div>
+
+        <!-- EMPTY STATE -->
+        <div class="flex flex-col items-center justify-center h-full text-center text-gray-500">
+          <div class="text-5xl mb-3">🛒</div>
+          <p class="text-lg">Your cart is empty</p>
+          <p class="text-sm mb-4">Start adding items</p>
+          <p-button severity="contrast" (click)="goToShop()">Explore Products</p-button>
+        </div>
 
       }
+
     </div>
 
-    <!-- Right: Summary -->
-    @if(hasCartItems){<div class="lg:w-72 flex-shrink-0 w-full">
-      <div class="bg-white rounded-lg shadow p-4">
-        <p class="text-base font-medium">
-          Subtotal ({{ cart.items.length }} items):
-          <span class="font-semibold dune-font">₹{{ getCartTotal() | number:'1.2-2' }}</span>
-        </p>
+    <!-- CART FOOTER -->
+    @if(hasCartItems){
+    <div class="sticky bottom-0 bg-white border-t px-4 py-3">
 
-        <p-button severity="warn" size="large" raised label="Proceed to Buy" styleClass="w-full"
-          (click)="goToCheckout()">
-        </p-button>
-
-
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-sm">
+          Subtotal ({{ cart.items.length }} items)
+        </span>
+        <span class="font-semibold">
+          ₹{{ getCartTotal() | number:'1.2-2' }}
+        </span>
       </div>
 
-      <!-- Related Products -->
-      <!-- <div class="bg-white rounded-lg shadow p-4 mt-4">
-        <h2 class="text-sm font-semibold mb-2">Products related to your cart</h2>
-        <small class="text-gray-500 mb-3 block">Sponsored</small>
+      <p-button
+        label="Proceed to Buy"
+        severity="contrast"
+        size="large"
+        styleClass="w-full"
+        (click)="goToCheckout()">
+      </p-button>
 
-        @for (product of relatedProducts; track product.id) {
-          <div class="flex gap-3 mb-4 pb-4 border-b border-gray-200">
-            
-            <div class="flex flex-col flex-1">
-              <p class="text-xs font-medium line-clamp-2">{{ product.name }}</p>
-              <div class="flex items-center gap-1 text-xs text-yellow-500">
-                @for (star of [].constructor(product.rating); track star) {
-                  <i class="pi pi-star-fill"></i>
-                }
-                <span class="text-gray-500 ml-1">{{ product.rating }} ratings</span>
-              </div>
-            </div>
-          </div>
-        }
-      </div> -->
-    </div>}
+    </div>
+    }
 
   </div>
 </div>
-
 <!-- BACKDROP (only if modal open and not logged in) -->
 @if (showSignupPanel && !isLoggedIn) {
 <div class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300"></div>
@@ -158,24 +167,24 @@
   <!-- Close Button -->
   <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 z-50 
          flex items-center gap-3 px-5 py-2 rounded-full 
-         shadow-md border border-yellow-400 
-         bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee] 
-         text-[#8a5c1d] font-semibold cursor-pointer 
+         shadow-md border border-black-400 
+         
+         text-black font-semibold cursor-pointer 
          hover:scale-105 transition-transform duration-200" (click)="toggleSignupPanel()">
     <i class="pi pi-times text-xl"></i>
     <span class="font-medium whitespace-nowrap text-sm sm:text-base">Close</span>
   </div>
 
   <!-- Modal Header -->
-  <div class="p-4 pt-10 border-b border-yellow-100 flex justify-between items-center 
+  <div class="p-4 pt-10 border-b border-black-100 flex justify-between items-center 
             rounded-t-2xl text-[#8a5c1d] 
-            bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee]">
+            ">
     <h2 class="text-lg font-semibold">
       {{ showLogin ? 'Login' : 'Sign up' }}
     </h2>
 
-    <p-button (click)="toggleLogin()" class="text-white text-sm font-medium hover:underline" raised
-      severity="secondary">
+    <p-button (click)="toggleLogin()" class="text-white text-sm font-medium hover:underline" raised size="large"
+      severity="contrast" outlined>
       {{ showLogin ? 'Sign up' : 'Login instead' }}
     </p-button>
   </div>
@@ -193,13 +202,13 @@
 
 <!-- Floating CTA Button (only if modal closed and not logged in) -->
 @if (!showSignupPanel && !isLoggedIn) {
-<div class="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-40 
+<div class="fixed bottom-30 left-1/2 transform -translate-x-1/2 z-40 
          flex items-center gap-3 px-5 py-3 rounded-full 
-         shadow-md border border-yellow-400 
-         bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee] 
-         text-[#8a5c1d] font-semibold cursor-pointer 
+         shadow-md border border-black-400 
+         bg-white
+         text-black font-semibold cursor-pointer 
          hover:scale-105 transition-transform duration-200" (click)="toggleSignupPanel()">
   <i class="pi pi-user-plus text-xl"></i>
-  <span class="font-medium whitespace-nowrap text-sm sm:text-base dune-font">SIGN UP / SIGN IN</span>
+  <span class="font-medium whitespace-nowrap text-sm sm:text-base">SIGN UP / SIGN IN</span>
 </div>
 }

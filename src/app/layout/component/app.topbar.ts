@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, NgModule, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, NgModule, OnInit } from '@angular/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -25,17 +25,17 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [RouterModule, CommonModule, StyleClassModule,//AppConfigurator, 
+  imports: [RouterModule, CommonModule, StyleClassModule, //AppConfigurator, 
     BadgeModule, FormsModule, InputTextModule,
     ButtonModule, DrawerModule,
-    MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule, AutoCompleteModule],
+    MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule, AutoCompleteModule, Cart],
   template: `<div class="layout-topbar 
-         bg-gradient-to-r from-[#f9e0bb] via-[#fce7d2] to-[#fff7ed] 
-         shadow-md border-b border-[#e2b14c] text-[#8a5c1d]">
+         
+         shadow-md  text-[#8a5c1d]">
   <div class="layout-topbar-logo-container flex items-center">
     <!-- Menu button -->
     @if(isAdmin){<button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
-      <i class="pi pi-bars text-orange-500"></i>
+      <i class="pi pi-bars "></i>
     </button>}@else{
       <!-- <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
       <i class="pi pi-filter text-orange-500"></i>
@@ -50,17 +50,17 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   </div>
 
   <div class="layout-topbar-actions flex-1">
-    <!-- <div class="layout-config-menu"> -->
+    <div class="layout-config-menu">
         <!-- Dark Mode Toggle (Commented) -->
-        <!--
+<!--         
         <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
             <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
         </button>
         -->
 
         <!-- Color Picker (Commented) -->
-        <!-- 
-        <div class="relative">
+        
+        <!-- <div class="relative">
             <button
                 class="layout-topbar-action layout-topbar-action-highlight"
                 pStyleClass="@next"
@@ -73,9 +73,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
                 <i class="pi pi-palette"></i>
             </button>
             <app-configurator />
-        </div> 
-        -->
-    <!-- </div> -->
+        </div>  -->
+       
+    </div>
 
     <!-- <button
         class="layout-topbar-menu-button layout-topbar-action"
@@ -103,12 +103,12 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
         -->
   <div class="sm:hidden">
   <button 
-    class="layout-topbar-action relative flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-full shrink-0 " 
+    class="layout-topbar-action relative flex items-center justify-center  rounded-full shrink-0 " 
     (click)="showMobileSearch = true"
     pTooltip="Search"
     tooltipPosition="bottom"
   >
-    <i class="pi pi-search text-xl text-orange-500"></i>
+    <i class="pi pi-search text-xl"></i>
   </button>
 </div>
         <!-- Search (hidden on mobile, full width below) -->
@@ -170,16 +170,16 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
         <!-- wishlist Button -->
         <button 
           type="button" 
-          class="relative flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-full shrink-0" 
+          class="relative flex items-center justify-center  shrink-0" 
           style="width: 2.3rem; height: 2.3rem;" 
           (click)="wishList()"
           pTooltip="your wishList" 
           tooltipPosition="top"
         > 
-           @if(wishlistCount > 0) {<i class="cart-button pi pi-heart-fill text-orange-500 text-xl"></i>}
-           @else{<i class="cart-button pi pi-heart text-orange-500 text-xl"></i>}
+           @if(wishlistCount > 0) {<i class="cart-button pi pi-heart-fill text-black  text-xl"></i>}
+           @else{<i class="text-black pi pi-heart "></i>}
           @if(wishlistCount > 0) {
-            <span class="absolute -top-0 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-lg flex items-center justify-center leading-none z-10">
+            <span class="absolute -top-0 -right-1 bg-black text-white text-[10px] font-bold w-4 h-4 rounded-lg flex items-center justify-center leading-none z-10">
               {{ wishlistCount }}
             </span>
           }
@@ -188,15 +188,15 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
         <!-- Cart Button -->
         <button 
           type="button" 
-          class="relative flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-full shrink-0" 
+          class="relative flex items-center justify-center  shrink-0" 
           style="width: 2.3rem; height: 2.3rem;" 
           (click)="viewCart()"
           pTooltip="View items in your bag" 
           tooltipPosition="top"
         > 
-          <i class="cart-button pi pi-shopping-bag text-orange-500 text-xl"></i>
+          <i class="cart-button pi pi-shopping-bag text-black text-xl"></i>
           @if(cartCount > 0) {
-            <span class="absolute -top-0 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-lg flex items-center justify-center leading-none z-10">
+            <span class="absolute -top-0 -right-1 bg-black text-white text-[10px] font-bold w-4 h-4 rounded-lg flex items-center justify-center leading-none z-10">
               {{ cartCount }}
             </span>
           }
@@ -206,12 +206,12 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
         <!-- User Button -->
         <button 
           type="button" 
-          class="flex items-center justify-center bg-orange-100 dark:bg-blue-400/10 rounded-full shrink-0" 
+          class="flex items-center justify-center rounded-full shrink-0" 
           style="width: 2.5rem; height: 2.5rem;" 
           (click)="drawerVisible = true"
           #menuButton
         >
-          <i class="pi pi-user text-orange-500 text-xl"></i>
+          <i class="pi pi-user text-black text-xl"></i>
         </button>
 
         <!-- User Menu -->
@@ -244,6 +244,14 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     
   </div>
 </div>
+<p-drawer
+  [(visible)]="visibleCartDrawer"
+  position="right"
+  header="My Cart"
+ [style]="{ width: drawerWidth }"
+>
+  <app-cart></app-cart>
+</p-drawer>
 <!-- Mobile Search Modal -->
 @if (showMobileSearch) {
   <div class="fixed inset-0 bg-black/40 z-50 flex items-start justify-start px-4x mt-15">
@@ -316,11 +324,16 @@ export class AppTopbar implements OnInit {
   wishlistCount: number = 0;
   userName: any = '';
   overlayMenuItems: MenuItem[] = [];
+  visibleCartDrawer=false;
+  drawerWidth = '520px';
   ngOnInit(): void {
+     this.cartService.drawerVisible$.subscribe(
+    visible => this.visibleCartDrawer = visible
+  );
     this.setUserMenuItem();
-
+this.setDrawerWidth();
     if (localStorage.getItem("isLoggedIn") === "true") {
-      this.cartService.getCart().subscribe(); // loads and updates BehaviorSubject
+     // this.cartService.getCart().subscribe(); // loads and updates BehaviorSubject
       // this.getWishList();
 
       // Keep the topbar badge live-updating
@@ -328,7 +341,7 @@ export class AppTopbar implements OnInit {
         this.cartCount = count;
         this.cd.detectChanges();
 
-        this.productService.getWishlist().subscribe();
+        //this.productService.getWishlist().subscribe();
     this.productService.wishlistCount$.subscribe(count => {
       this.wishlistCount = count;
       this.cd.detectChanges();
@@ -370,6 +383,11 @@ export class AppTopbar implements OnInit {
     });
 
   }
+
+   @HostListener('window:resize')
+setDrawerWidth() {
+  this.drawerWidth = window.innerWidth < 640 ? '99vw' : '520px';
+}
   onQuickTagClick(tag: string) {
     this.searchQuery = tag;
     this.searchSubject.next(tag); // triggers autocomplete suggestions
@@ -552,7 +570,8 @@ highlightSearch(product: any, query: string): SafeHtml {
     this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
   }
   viewCart() {
-    this.router.navigate(['/cart']);
+    // this.router.navigate(['/cart']);
+    this.visibleCartDrawer=true;
 
   }
   wishList() {

@@ -23,7 +23,7 @@ import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-cart',
   standalone:true,
-  imports: [ButtonModule, NgClass, FormsModule, BadgeModule, CardModule, DecimalPipe, TagModule, AutoCompleteModule, ButtonModule, MessageModule, LoginComponent, Signup],
+  imports: [ButtonModule, FormsModule, BadgeModule, CardModule, DecimalPipe, TagModule, AutoCompleteModule, ButtonModule, MessageModule, LoginComponent, Signup],
   templateUrl: './cart.html',
   styleUrl: './cart.scss'
 })
@@ -90,6 +90,8 @@ private normalizeGuestItem(raw: any) {
     sizeId: raw.sizeId ?? raw.selectedSizeObj?.sizeId ?? null,
     color: raw.color ?? null,
     price: raw.price ?? (raw.selectedSizeObj?.price) ?? 0,
+    originalPrice: raw.originalPrice ?? (raw.selectedSizeObj?.originalPrice) ?? 0,
+    discount: raw.discount ?? (raw.selectedSizeObj?.discount) ?? 0,
     discountPercentage: raw.discountPercentage ?? (raw.selectedSizeObj?.discountPercentage) ?? 0,
     availableQuantity: raw.availableQuantity ?? (raw.selectedSizeObj?.availableQuantity) ?? 1,
     imageUrl: raw.imageUrl ?? raw.productImage ?? '',
@@ -224,6 +226,7 @@ goToShop() {
 
    goToCheckout(): void {
     if(this.isLoggedIn){
+      this.cartService.closeDrawer();
       this.router.navigate(['/checkout']);
     }
   else{
@@ -309,7 +312,7 @@ decreaseQuantity(item: any) {
 updateCartItem(item: any) {
   if (localStorage.getItem("isLoggedIn") === "true") {
     // Logged-in: call backend
-    this.cartService.updateCartItem(item.id, item.quantity, item.size)
+    this.cartService.updateCartItem(item.id, item.quantity, item.size,item.sizeId)
       .subscribe({
         next: (res: any) => {
           console.log('Cart updated:', res);
@@ -361,8 +364,13 @@ updateCartItem(item: any) {
   if (item.selectedSizeObj) {
     item.size = item.selectedSizeObj.size; // keep string for backend
     item.quantity=1;
+    item.price=item.selectedSizeObj.priceAfterDiscount;
+    item.sizeId=item.selectedSizeObj.id;
+    item.originalPrice=item.selectedSizeObj.price;
+    item.discount=item.selectedSizeObj.discountPercentage;
     this.updateCartItem(item);
   }
+
 }
 
 

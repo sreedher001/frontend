@@ -5,7 +5,7 @@
    shadow-md  relative overflow-hidden">
 
   <!-- Animated Background Gradient -->
-  <div class="absolute inset-0 bg-gradient-to-r from-yellow-100 via-pink-100 to-orange-100 animate-gradient-x opacity-30 rounded-3xl"></div>
+  <div class="absolute inset-0  animate-gradient-x opacity-30 "></div>
 
   <!-- Banner Carousel -->
   <p-carousel
@@ -14,14 +14,14 @@
     [numScroll]="1"
     [circular]="true"
     [autoplayInterval]="4000"
-    [showIndicators]="false"
-    [showNavigators]="false"
+    [showIndicators]="true"
+    [showNavigators]="true"
     class="w-full relative z-10"
     contentClass="gap-3">
     <ng-template let-banner pTemplate="item">
       <div
-        class="rounded-2xl bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 
-        shadow-md border border-yellow-300 overflow-hidden transition-transform duration-500 transform hover:scale-105 cursor-pointer"
+        class=" bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 
+        shadow-md overflow-hidden transition-transform duration-500 transform hover:scale-105 cursor-pointer"
         >
 
         <img [src]="banner.imageUrl" alt="{{ banner.title }}"
@@ -88,7 +88,7 @@
     @for (variant of product.variants; track variant.id) {
     @if (variant.styleCategory === 'Ethnic Wear' && variant.isFeatured) { 
     <div (click)="onCardClick(product, variant)"
-      class="bg-red-100 relative min-w-[140px] sm:min-w-[160px] h-[600px] rounded-xl overflow-hidden shadow-md border border-gray-100 bg-white cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl group">
+      class="bg-red-100 relative min-w-[140px] sm:min-w-[160px] h-[600px]  overflow-hidden shadow-md border border-gray-100 bg-white cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl group">
 
       <!-- PrimeNG Icon Button for Wishlist -->
       <p-button [icon]="isInWishlist(variant) ? 'pi pi-heart-fill' : 'pi pi-heart'"
@@ -142,7 +142,7 @@
     @for (variant of product.variants; track variant.id) {
       
     @if((!(variant.styleCategory==='Ethnic Wear'))&& (!(variant.styleCategory==='Zfc Special'))   && variant.isFeatured){<div (click)="onCardClick(product, variant)"
-      class="bg-red-100 relative min-w-[140px] sm:min-w-[160px] h-[500px] rounded-xl overflow-hidden shadow-md border border-gray-100 bg-white cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl group">
+      class="bg-red-100 relative min-w-[140px] sm:min-w-[160px] h-[500px]  overflow-hidden shadow-md border border-gray-100 bg-white cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl group">
 
       <!-- PrimeNG Icon Button for Wishlist -->
       <p-button [icon]="isInWishlist(variant) ? 'pi pi-heart-fill' : 'pi pi-heart'"

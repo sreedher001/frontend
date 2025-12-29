@@ -20,6 +20,19 @@ export class CartService {
     private cartCountSubject = new BehaviorSubject<number>(0);
   cartCount$ = this.cartCountSubject.asObservable();
 
+  private cartRefreshSubject = new BehaviorSubject<boolean>(false);
+cartRefresh$ = this.cartRefreshSubject.asObservable();
+  private drawerVisibleSubject = new BehaviorSubject<boolean>(false);
+  drawerVisible$ = this.drawerVisibleSubject.asObservable();
+
+  openDrawer() {
+    this.drawerVisibleSubject.next(true);
+  }
+
+  closeDrawer() {
+    this.drawerVisibleSubject.next(false);
+  }
+
     constructor(private http: HttpClient) { }
 
     addToCart(payload: AddToCartPayload): Observable<any> {
@@ -54,13 +67,14 @@ export class CartService {
 }
 
 
-    updateCartItem(productId: number, quantity: number, size: string) {
+    updateCartItem(productId: number, quantity: number, size: string,sizeId:number) {
 
 
     const params = new HttpParams()
       .set('productId', productId)
       .set('quantity', quantity)
-      .set('size', size);
+      .set('size', size)
+      .set('sizeId', sizeId);
 
     return this.http.post(`${this.baseUrl}/cart/update`, null, {params });
   }
