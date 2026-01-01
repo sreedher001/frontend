@@ -432,7 +432,7 @@
   </div>
 </p-fluid>
 
-<p-fluid class="w-full mt-5">
+<!-- <p-fluid class="w-full mt-5">
   <div class="w-full">
     <div class="card flex flex-col gap-4 p-4">
       <h5 class="text-lg font-semibold">Upload Product Images</h5>
@@ -456,16 +456,146 @@
         chooseLabel="Choose"
         uploadLabel="Upload"
         cancelLabel="Cancel"
+        [showUploadButton]="false"
+  [showCancelButton]="false"
       >
-        <ng-template #empty>
-          <div class="text-center text-gray-500">
-            Drag and drop files here to upload.
-          </div>
-        </ng-template>
+        
+         <ng-template pTemplate="file"></ng-template>
+  <ng-template pTemplate="content"></ng-template>
       </p-fileupload>
     </div>
+    <p-orderList
+  [value]="uploadedFiles"
+  dragdrop="true"
+>
+  <ng-template pTemplate="header">
+    (First = Front Image) Arrange Images by dragging
+  </ng-template>
+
+  <ng-template let-item pTemplate="item" let-i="index">
+    <div class="flex items-center gap-4 p-2">
+      <img
+        [src]="item.preview"
+        class="w-20 h-20 object-cover rounded border"
+      />
+
+      <div>
+        <div class="font-semibold">
+          {{ i === 0 ? '⭐ Front Image' : 'Gallery Image' }}
+        </div>
+        <small class="text-gray-500">
+          {{ item.file.name }}
+        </small>
+      </div>
+      <button
+        pButton
+        icon="pi pi-times"
+        class="p-button-rounded p-button-text p-button-danger"
+        (click)="removeFromOrderList(item)"
+      ></button>
+    </div>
+  </ng-template>
+</p-orderList>
+  </div>
+</p-fluid> -->
+<p-fluid class="w-full mt-5">
+  <div class="card p-4">
+
+    <h5 class="text-lg font-semibold mb-3">
+      Upload Product Images
+    </h5>
+
+    <p-fileupload
+        name="files[]"
+        (onSelect)="onFileSelect($event)"
+        (onRemove)="onFileRemove($event)"
+        (onClear)="onClearFiles()"
+        [multiple]="true"
+        accept="image/*"
+        maxFileSize="1000000"
+        mode="advanced"
+        styleClass="w-full"
+        chooseLabel="Choose"
+        uploadLabel="Upload"
+        cancelLabel="Cancel"
+        [showUploadButton]="false"
+  [showCancelButton]="false"
+      >
+      <ng-template pTemplate="file"></ng-template>
+  <ng-template pTemplate="content"></ng-template>
+</p-fileupload>
+   <div
+  *ngIf="uploadedFiles.length"
+  class="flex flex-col lg:flex-row gap-6 mt-4"
+>
+
+  <!-- FRONT IMAGE -->
+  <div class="lg:w-1/3 w-full">
+    <div class="border rounded-xl p-4 bg-gray-50 h-full border border-d">
+      <h6 class="font-semibold mb-3 flex items-center gap-2">
+  <i class="pi pi-image"></i>
+  Front Image
+</h6>
+
+      <div class="relative">
+        <img
+          [src]="uploadedFiles[0].preview"
+          class="w-full h-[200px] object-contain rounded-lg border bg-white"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="lg:w-2/3 w-full">
+    <div class="border rounded-xl p-4 bg-white h-full">
+      <h6 class="font-semibold mb-3">
+        Gallery (Drag to reorder)
+      </h6>
+
+      <div
+        cdkDropList
+        cdkDropListOrientation="horizontal"
+        class="flex gap-4 overflow-x-auto pb-2"
+        (cdkDropListDropped)="drop($event)"
+      >
+        <div
+          *ngFor="let item of uploadedFiles; let i = index"
+          cdkDrag
+          class="relative w-28 flex-shrink-0 group"
+        >
+          <img
+            [src]="item.preview"
+            class="w-28 h-28 object-cover rounded-lg border cursor-move"
+          />
+
+          <!-- FRONT BADGE -->
+          <span
+            *ngIf="i === 0"
+            class="absolute top-1 left-1 bg-black/80 text-white text-[10px] px-2 py-1 rounded"
+          >
+            Front
+          </span>
+
+          <!-- MODERN REMOVE BUTTON -->
+          <button
+            type="button"
+            class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center"
+            (click)="removeFromOrderList(item)"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
   </div>
 </p-fluid>
+
 
 <p-fluid class="flex flex-col md:flex-row gap-6 mt-5">
   <div class="w-full md:w-1/2 flex ">

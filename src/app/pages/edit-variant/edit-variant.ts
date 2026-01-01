@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
@@ -49,6 +49,15 @@ import { OccasionService } from '../service/occation.service';
 import { Addproductservice } from '../admin/addproduct/addproductservice';
 import { BadgeModule } from 'primeng/badge';
 import { TagModule } from 'primeng/tag';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+interface VariantImage {
+  id?: number;      
+  file?: File;        
+  preview: string;    
+  isExisting: boolean;
+  viewType?: 'front' | 'gallery';
+}
+
 
 @Component({
   selector: 'app-input-demo',
@@ -83,7 +92,7 @@ import { TagModule } from 'primeng/tag';
     ListboxModule,
     InputGroupAddonModule,
     TextareaModule, FileUploadModule, GalleriaModule,
-    Tooltip,DialogModule,BadgeModule
+    Tooltip,DialogModule,BadgeModule,DragDropModule
 ],
   templateUrl: './edit-variant.html',
   providers: [ NodeService]
@@ -127,6 +136,8 @@ productResponse !: ProductResponse;
 uploadedFiles: any[] = [];
 images:any[]=[];
 deletedImageIds: number[] = [];
+variantImages: VariantImage[] = [];
+
 filteredStatuses: any[] = [];
 displayConfirmation:boolean=false;
 styleCategory:any[] =[];
@@ -281,13 +292,12 @@ if (typeof occasionStr === 'string') {
         this.isProductLoaded = true;
         
         this.tryMapStyleCategory();
-        this.images = (this.product.variant.productImage || []).map((img:any) => ({
-          
-          itemImageSrc: img.imageUrl,
-          thumbnailImageSrc: img.imageUrl,
-          id:img.id,
-          alt: this.product.name,
-        }));
+        this.variantImages = (this.product.variant.productImage || []).map((img: any) => ({
+  id: img.id,
+  preview: img.imageUrl,
+  isExisting: true,
+  viewType:img.viewType
+}));
         
         this.messageService.add({
           key: 'global',
@@ -410,18 +420,82 @@ removeSize(sizeId: number) {
 
         this.messageService.add({ key: 'global',severity: 'info', summary: 'Success', detail: 'File Uploaded' });
     }
-    onFileSelect(event: any) {
-         for (const file of event.files) {
+    // onFileSelect(event: any) {
+    //      for (const file of event.files) {
       
-      if(! (file.size > this.maxFilesize)){
+    //   if(! (file.size > this.maxFilesize)){
        
-      this.uploadedFiles.push(file);
-       this.messageService.add({ key: 'global', severity: 'info', summary: 'Success!', detail: file.name+' selected',sticky:true });
-      }else{
-        this.messageService.add({ key: 'global', severity: 'warn', summary: 'Too Large!', detail: file.name+' not selected',sticky:true });
-      }
+    //   this.uploadedFiles.push(file);
+    //    this.messageService.add({ key: 'global', severity: 'info', summary: 'Success!', detail: file.name+' selected',sticky:true });
+    //   }else{
+    //     this.messageService.add({ key: 'global', severity: 'warn', summary: 'Too Large!', detail: file.name+' not selected',sticky:true });
+    //   }
+    // }
+    // }
+    onFileSelect(event: any) {
+  for (const file of event.files) {
+    if (file.size <= this.maxFilesize) {
+      this.variantImages.push({
+        file,
+        preview: URL.createObjectURL(file),
+        isExisting: false
+      });
     }
-    }
+  }
+}
+onClearFiles() {
+  this.uploadedFiles = [];
+}
+onFileRemove(event: any) {
+  const removedFile = event.file;
+  this.uploadedFiles = this.uploadedFiles.filter(
+    f => f.file !== removedFile
+  );
+}
+@ViewChild('fileUploader') fileUploader!: any;
+openFilePicker() {
+  this.fileUploader.choose();
+}
+get orderedVariantImages(): VariantImage[] {
+  if (!this.variantImages?.length) return [];
+
+  const front = this.variantImages.find(img => img.viewType === 'front');
+  const gallery = this.variantImages.filter(img => img.viewType !== 'front');
+
+  return front ? [front, ...gallery] : this.variantImages;
+}
+
+removeVariantImage(item: VariantImage) {
+
+  // If existing image → mark for deletion
+  if (item.isExisting && item.id) {
+    this.deletedImageIds.push(item.id);
+  }
+
+  // Cleanup object URL if new image
+  if (!item.isExisting && item.preview.startsWith('blob:')) {
+    URL.revokeObjectURL(item.preview);
+  }
+
+  this.variantImages = this.variantImages.filter(img => img !== item);
+}
+// drop(event: CdkDragDrop<VariantImage[]>) {
+//   moveItemInArray(
+//     this.variantImages,
+//     event.previousIndex,
+//     event.currentIndex
+//   );
+// }
+drop(event: CdkDragDrop<VariantImage[]>) {
+  moveItemInArray(this.variantImages, event.previousIndex, event.currentIndex);
+
+  // Update viewType immediately for UI consistency
+  this.variantImages.forEach(img => img.viewType = 'gallery');
+  this.variantImages[0].viewType = 'front';
+}
+
+
+
     responsiveOptions = [
     { breakpoint: '1024px', numVisible: 3 },
     { breakpoint: '768px', numVisible: 2 },
@@ -473,7 +547,7 @@ updateVariant() {
   const variantId = this.product.variant.id;
 
   // --- Build metadata (excluding images) ---
-  const metadata = {
+  const metadata :any = {
     id: this.product.variant.id,
     color: this.product.variant.color,
     description:this.product.variant.variantDescription,
@@ -506,13 +580,39 @@ pattern: typeof this.product.variant.pattern === 'string'
   modelInfo: this.product.variant.modelInfo
   };
 
+ const frontImage = this.variantImages[0];
+ const frontMarker = this.generateShortId();
+  if (frontImage?.isExisting && frontImage.id) {
+    metadata.frontImageId = frontImage.id;
+  }
+  if (!frontImage.isExisting) {
+  metadata.frontMarker = frontMarker;
+}
+//   if (!frontImage.isExisting && frontImage.file) {
+//   metadata.frontTempKey = frontImage.; 
+// }
   // --- Create FormData for multipart ---
   const formData = new FormData();
   formData.append('metadata', JSON.stringify(metadata));
 
-  // --- Append new uploaded files if any ---
-  this.uploadedFiles.forEach((file: File) => {
-    formData.append('file', file, file.name);
+  
+
+  this.variantImages
+  .filter(img => !img.isExisting && img.file)
+  .forEach((img, index) => {
+let fileToSend = img.file!;
+    if (img === frontImage) {
+      const ext = fileToSend.name.split('.').pop();
+      fileToSend = new File(
+        [fileToSend],
+        `img_${frontMarker}.${ext}`,
+        { type: fileToSend.type }
+      );
+      metadata.frontMarker = frontMarker;
+    }
+
+   // formData.append('file', img.file!, img.file!.name);
+   formData.append('file', fileToSend, fileToSend.name);
   });
 
   // --- Call API via service ---
@@ -525,7 +625,7 @@ pattern: typeof this.product.variant.pattern === 'string'
         detail: res.message || 'Variant updated successfully'
       });
       this.displayConfirmation = false;
-      window.location.reload();
+     // window.location.reload();
     },
     error: (err:any) => {
       this.messageService.add({
@@ -537,6 +637,9 @@ pattern: typeof this.product.variant.pattern === 'string'
     }
   });
 }
+private generateShortId(): string {
+  return Math.random().toString(36).substring(2, 7); // e.g. "a9k3x"
+}
 openConfirmation() {
         this.displayConfirmation = true;
     }
@@ -544,4 +647,16 @@ openConfirmation() {
     closeConfirmation() {
         this.displayConfirmation = false;
     }
+//     frontImage(): VariantImage | undefined {
+//   return (
+//     this.variantImages.find(img => img.viewType === 'front') ||
+//     this.variantImages[0] // fallback for newly added images
+//   );
+// }
+get frontImage(): VariantImage | undefined {
+  return this.variantImages.find(img => img.viewType === 'front');
 }
+
+}
+
+

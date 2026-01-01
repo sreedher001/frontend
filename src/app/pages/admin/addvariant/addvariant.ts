@@ -43,7 +43,8 @@ import { FitService } from '@/pages/service/fit.service';
 import { PatternService } from '@/pages/service/pattern.service';
 import { SeasonService } from '@/pages/service/season.service';
 import { OccasionService } from '@/pages/service/occation.service';
-
+import { OrderListModule } from "primeng/orderlist";
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 @Component({
   selector: 'app-addvariant',
   imports: [CommonModule,
@@ -75,7 +76,7 @@ import { OccasionService } from '@/pages/service/occation.service';
     ListboxModule,
     InputGroupAddonModule,
     TextareaModule, FileUploadModule, GalleriaModule,
-    Tooltip, DialogModule],
+    Tooltip, DialogModule,DragDropModule,OrderListModule],
   templateUrl: './addvariant.html',
   styleUrl: './addvariant.scss'
 })
@@ -84,7 +85,7 @@ export class Addvariant implements OnInit {
   showeErrorSuggestion: boolean = false;
   showeErrorSuggestionSize: boolean = false;
   showeErrorSuggestionFile: boolean = false;
-  uploadedFiles: File[] = [];
+ 
   displayConfirmation: boolean = false;
   autoValue: any[] | undefined;
   styleCategory:any[] | undefined;
@@ -101,7 +102,11 @@ export class Addvariant implements OnInit {
   autoFilteredFitValue: any[] = [];
   autoFilteredPatternValue: any[] = [];
   autoFilteredSeasonValue: any[] = [];
-
+// uploadedFiles: File[] = [];
+  uploadedFiles: {
+  file: File;
+  preview: string;
+}[] = [];
   autoFitValue: any[] | undefined;
   autoPatternValue: any[] | undefined;
   autoSeasonValue: any[] | undefined;
@@ -260,7 +265,9 @@ checkParentProduct() {
 
     this.openConfirmation();
   }
-
+drop(event: CdkDragDrop<{ file: File; preview: string }[]>) {
+  moveItemInArray(this.uploadedFiles, event.previousIndex, event.currentIndex);
+}
 
   fitService = inject(FitService);
   patternService = inject(PatternService);
@@ -492,27 +499,54 @@ onGenderCategorySelect(event: any) {
 
     this.messageService.add({ key: 'global', severity: 'info', summary: 'Success', detail: 'File Uploaded' });
   }
-  onFileSelect(event: any) {
+  // onFileSelect(event: any) {
     
-    for (const file of event.files) {
+  //   for (const file of event.files) {
       
-      if(! (file.size > this.maxFilesize)){
+  //     if(! (file.size > this.maxFilesize)){
        
-      this.uploadedFiles.push(file);
-       this.messageService.add({ key: 'global', severity: 'info', summary: 'Success!', detail: file.name+' selected',sticky:true });
-      }else{
-        this.messageService.add({ key: 'global', severity: 'warn', summary: 'Too Large!', detail: file.name+' not selected',sticky:true });
-      }
-    }
-    console.log("==", this.uploadedFiles)
+  //     this.uploadedFiles.push(file);
+  //      this.messageService.add({ key: 'global', severity: 'info', summary: 'Success!', detail: file.name+' selected',sticky:true });
+  //     }else{
+  //       this.messageService.add({ key: 'global', severity: 'warn', summary: 'Too Large!', detail: file.name+' not selected',sticky:true });
+  //     }
+  //   }
+  //   console.log("==", this.uploadedFiles)
    
+  // }
+  // onFileRemove(event: any) {
+  //   const fileToRemove = event.file;
+  //   this.uploadedFiles = this.uploadedFiles.filter(f => f !== fileToRemove);
+  //   console.log("==", this.uploadedFiles)
+  //   this.messageService.add({ key: 'global', severity: 'info', summary: 'Success', detail: 'File removed' });
+  // }
+  onFileSelect(event: any) {
+  for (const file of event.files) {
+    if (file.size <= this.maxFilesize) {
+      this.uploadedFiles = [
+        ...this.uploadedFiles,
+        {
+          file: file,
+          preview: URL.createObjectURL(file)
+        }
+      ];
+
+      this.messageService.add({
+        key: 'global',
+        severity: 'info',
+        summary: 'Selected',
+        detail: file.name
+      });
+    }
   }
-  onFileRemove(event: any) {
-    const fileToRemove = event.file;
-    this.uploadedFiles = this.uploadedFiles.filter(f => f !== fileToRemove);
-    console.log("==", this.uploadedFiles)
-    this.messageService.add({ key: 'global', severity: 'info', summary: 'Success', detail: 'File removed' });
-  }
+}
+
+onFileRemove(event: any) {
+  const removedFile = event.file;
+  this.uploadedFiles = this.uploadedFiles.filter(
+    f => f.file !== removedFile
+  );
+}
   onClearFiles() {
     this.uploadedFiles = [];
     this.messageService.add({ key: 'global', severity: 'info', summary: 'Success', detail: 'Removed all files' });
@@ -586,7 +620,10 @@ filterStyleCategory(event: AutoCompleteCompleteEvent) {
     this.autoFilteredOccasionValue = filtered;
   }
 
-
+removeFromOrderList(item: { file: File; preview: string }) {
+  URL.revokeObjectURL(item.preview);
+  this.uploadedFiles = this.uploadedFiles.filter(f => f !== item);
+}
   saveProduct() {
     this.displayConfirmation = false;
 
@@ -619,7 +656,24 @@ filterStyleCategory(event: AutoCompleteCompleteEvent) {
 
     const formData = new FormData();
     formData.append('metadata', JSON.stringify(metadata));
-    this.uploadedFiles.forEach(file => formData.append('file', file, file.name));
+  // this.uploadedFiles.forEach(file => formData.append('file', file, file.name));
+this.uploadedFiles.forEach((item, index) => {
+  const originalFile = item.file;
+
+  const extension = originalFile.name.split('.').pop();
+  const newFileName =
+    index === 0
+      ? `front.${extension}`
+      : `${originalFile}.${extension}`;
+
+  const renamedFile = new File(
+    [originalFile],
+    newFileName,
+    { type: originalFile.type }
+  );
+
+  formData.append('file', renamedFile, renamedFile.name);
+});
 
     console.log('FormData Metadata:', metadata);
     console.log('Files:', this.uploadedFiles);

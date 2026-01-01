@@ -82,6 +82,12 @@ export class Manageproducts {
   exportColumns!: ExportColumn[];
 
   cols!: Column[];
+  loading = false;
+totalRecords = 0;
+
+page = 0;
+size = 10;
+hasMore=true;
 
   constructor(
     private productService: ProductService,
@@ -96,55 +102,110 @@ export class Manageproducts {
     this.loadDemoData();
     
   }
-
-  loadDemoData() {
-    // this.productService.getAllProducts().then((data) => {
-    //     this.products.set(data);
-    // });
-
-    this.productService.getAllProducts(0, 10).subscribe({
-      next: (res) => {
-        this.productResponse = res;
-        this.products.set(this.productResponse.content);
-        console.log("res.content", res.content)
-        console.log("this.product", this.productResponse.content)
-        // this.messageService.add({
-        //   key: 'global',
-        //   severity: 'success',
-        //   summary: 'TADA!',
-        //   detail: 'Enjoy shopping with ZFC!'
-        // });
-
-        this.statuses = [
-          { label: 'INSTOCK', value: 'instock' },
-          { label: 'LOWSTOCK', value: 'lowstock' },
-          { label: 'OUTOFSTOCK', value: 'outofstock' }
-        ];
-
-        this.cols = [
-          { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
-          { field: 'name', header: 'Name' },
-          { field: 'image', header: 'Image' },
-          { field: 'price', header: 'Price' },
-          { field: 'category', header: 'Category' },
-          { field: 'subcategory', header: 'Sub Category' }
-        ];
-this.flattenProducts();
-        this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
-      },
-      error: (err) => {
-        console.error('Failed to fetch products:', err);
-        this.messageService.add({
-          key: 'global',
-          severity: 'error',
-          summary: 'Oops!',
-          detail: 'Failed to fetch the products'
-        });
-      }
-    });
-
-
+loadDemoData() {
+  if (this.loading || !this.hasMore) {
+    return;
   }
+
+  this.loading = true;
+
+  this.productService.getAllProducts(this.page, this.size).subscribe({
+    next: (res) => {
+      this.productResponse = res;
+
+      // 🔥 APPEND instead of replace
+      const existingProducts = this.products();
+      const newProducts = res.content || [];
+
+      this.products.set([
+        ...existingProducts,
+        ...newProducts
+      ]);
+
+      // pagination flags
+      this.hasMore = !res.last;   // backend pageable flag
+      this.page++;               // move to next page
+
+      // static configs (set once is also fine)
+      this.statuses = [
+        { label: 'INSTOCK', value: 'instock' },
+        { label: 'LOWSTOCK', value: 'lowstock' },
+        { label: 'OUTOFSTOCK', value: 'outofstock' }
+      ];
+
+      this.cols = [
+        { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
+        { field: 'name', header: 'Name' },
+        { field: 'image', header: 'Image' },
+        { field: 'price', header: 'Price' },
+        { field: 'category', header: 'Category' },
+        { field: 'subcategory', header: 'Sub Category' }
+      ];
+
+      // re-flatten after appending
+      this.flattenProducts();
+
+      this.exportColumns = this.cols.map((col) => ({
+        title: col.header,
+        dataKey: col.field
+      }));
+
+      this.loading = false;
+    },
+    error: (err) => {
+      this.loading = false;
+      console.error('Failed to fetch products:', err);
+      this.messageService.add({
+        key: 'global',
+        severity: 'error',
+        summary: 'Oops!',
+        detail: 'Failed to fetch the products'
+      });
+    }
+  });
+}
+
+
+//   loadDemoData() {
+//     // this.productService.getAllProducts().then((data) => {
+//     //     this.products.set(data);
+//     // });
+
+//     this.productService.getAllProducts(this.page, this.size).subscribe({
+//       next: (res) => {
+//         this.productResponse = res;
+//         this.products.set(this.productResponse.content);
+
+//         this.statuses = [
+//           { label: 'INSTOCK', value: 'instock' },
+//           { label: 'LOWSTOCK', value: 'lowstock' },
+//           { label: 'OUTOFSTOCK', value: 'outofstock' }
+//         ];
+
+//         this.cols = [
+//           { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
+//           { field: 'name', header: 'Name' },
+//           { field: 'image', header: 'Image' },
+//           { field: 'price', header: 'Price' },
+//           { field: 'category', header: 'Category' },
+//           { field: 'subcategory', header: 'Sub Category' }
+//         ];
+// this.flattenProducts();
+//         this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
+//       },
+//       error: (err) => {
+//         console.error('Failed to fetch products:', err);
+//         this.messageService.add({
+//           key: 'global',
+//           severity: 'error',
+//           summary: 'Oops!',
+//           detail: 'Failed to fetch the products'
+//         });
+//       }
+//     });
+
+
+//   }
 
   onGlobalFilter(table: Table, event: Event) {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
