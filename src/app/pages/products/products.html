@@ -35,50 +35,11 @@
       </div>
     </ng-template>
   </p-carousel>
+  
 </div>
+<app-review-banner-component></app-review-banner-component>
 
 
-<!-- <div class=" mx-auto px-4 pt-6 pb-6 sm:px-6 sm:pt-8 flex-col ">
-
-
-  <div class="w-full overflow-x-auto scrollbar-hide">
-  <div class="flex space-x-4 px-4 py-3 min-w-max w-full overflow-x-auto scrollbar-hide">
-    @for (chip of chips; track chip.label) {
-      <div
-        class="flex flex-col items-center justify-center space-y-1 cursor-pointer transition-all duration-200 shrink-0"
-        [ngClass]="{
-          'scale-105': selectedChip?.label === chip.label
-        }"
-        (click)="selectChip(chip)"
-      >
-        <div
-          class="w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all duration-200"
-          [ngClass]="{
-            'border-yellow-400 shadow-lg': selectedChip?.label === chip.label,
-            'border-gray-300': selectedChip?.label !== chip.label
-          }"
-        >
-          <img
-            [src]="chip.image"
-            alt="{{ chip.label }}"
-            class="w-12 h-12 rounded-full object-cover"
-          />
-        </div>
-        <span
-          class="text-sm font-medium text-center"
-          [ngClass]="{
-            'text-gray-900': selectedChip?.label === chip.label,
-            'text-gray-600': selectedChip?.label !== chip.label
-          }"
-        >
-          {{ chip.label }}
-        </span>
-      </div>
-    }
-  </div>
-</div>
-
-</div> -->
 
 <!-- Ethnic Wear Section -->
 @if(showWearSections){<h2 class="px-4 text-center mb-2 text-red-800 dune-font">ETHNIC WEAR</h2>
@@ -117,7 +78,7 @@
         </p>
 
         <!-- Boutique Add Button with PrimeNG -->
-        <p-button class="dune-font" label="ADD" icon="pi pi-shopping-bag" outlined severity="warn">
+        <p-button class="dune-font" label="ADD" icon="pi pi-shopping-bag" outlined  >
         </p-button>
       </div>
     </div>
@@ -166,7 +127,7 @@
         </p>
 
         <!-- Boutique Add Button with PrimeNG -->
-        <p-button class="dune-font" label="ADD" icon="pi pi-shopping-bag" outlined severity="warn">
+        <p-button class="dune-font" label="ADD" icon="pi pi-shopping-bag" outlined  >
         </p-button>
       </div>
     </div>
@@ -214,7 +175,7 @@
         </p>
 
         <!-- Boutique Add Button with PrimeNG -->
-        <p-button label="ADD" icon="pi pi-shopping-bag" outlined severity="warn">
+        <p-button label="ADD" icon="pi pi-shopping-bag" outlined  >
         </p-button>
       </div>
     </div>
@@ -418,7 +379,7 @@
 }
 </div>
 @if(!lastPage){<div class="text-center mt-4" >
-  <p-button label="Load More" (onClick)="fetchProducts()" [disabled]="loading" severity="warn"
+  <p-button label="Load More" (onClick)="fetchProducts()" [disabled]="loading"  
             class="dune-font" outlined >
     @if(loading){<i class="pi pi-spin pi-spinner"></i>}
   </p-button>

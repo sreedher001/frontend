@@ -16,6 +16,8 @@ import { DialogModule } from 'primeng/dialog';
 import { Step, StepperModule } from 'primeng/stepper';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { DialogService } from 'primeng/dynamicdialog';
+import { ReviewModalComponent } from '../productreview/review-modal-component/review-modal-component';
 
 export interface OrderSummaryDto {
   orderNumber: string;
@@ -37,9 +39,11 @@ interface StepData {
   selector: 'app-orderhistory',
   imports: [DatePipe,DialogModule,StepperModule,ButtonModule,CommonModule,ImageModule,CardModule,TableModule,ProgressSpinnerModule,AvatarGroupModule,AvatarModule,OverlayBadgeModule,TagModule],
   templateUrl: './orderhistory.html',
+  providers: [DialogService],
   styleUrl: './orderhistory.scss'
 })
 export class Orderhistory implements OnInit{
+
 
  orders: OrderSummaryDto[] = [];
 loading = false;
@@ -77,11 +81,21 @@ stepLabels:{ [key: number]: string } = {
 
 
 maxAllowedStep: number = 1;
-  constructor(private orderService: OrderService,private router: Router) {}
+  constructor(private orderService: OrderService,private router: Router,private dialog: DialogService) {}
    ngOnInit(): void {
     this.loadOrderHistory();
   }
- 
+ openReview(orderId: number, variantId: number) {
+    this.dialog.open(ReviewModalComponent, {
+      header: 'Rate Now',
+      width: '420px',
+      closable: true,
+      data: {
+        orderId,
+        variantId
+      }
+    });
+  }
 // openTrackingModal(order: any) {
 //   this.selectedOrder = order;
 //   this.activeStepIndex = this.getStepIndex(order.status);
@@ -154,6 +168,13 @@ openTrackingModal(order: any) {
         items: order.items,
       };
     }
+    if (stepId === 5) {
+      details = {
+        orderNumber:order.orderNumber,
+        orderDate: order.orderDate,
+        items: order.items,
+      };
+    }
     // Add more details for other steps as you want
 
     return {
@@ -181,4 +202,9 @@ onStepSelect(event: any) {
       this.activeStep = this.activeStep;
     }
   }
+
+  openReviewFromOrder(order: OrderSummaryDto) {
+
+    this.selectedOrder = order;
+}
 }

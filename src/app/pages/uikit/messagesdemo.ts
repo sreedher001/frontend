@@ -19,7 +19,7 @@ import { ToastModule } from 'primeng/toast';
                     <div class="flex flex-wrap gap-2">
                         <p-button (click)="showSuccessViaToast()" label="Success" severity="success" />
                         <p-button (click)="showInfoViaToast()" label="Info" severity="info" />
-                        <p-button (click)="showWarnViaToast()" label="Warn" severity="warn" />
+                        <p-button (click)="showWarnViaToast()" label="Warn"   />
                         <p-button (click)="showErrorViaToast()" label="Error" severity="danger" />
                         <p-toast />
                     </div>
@@ -41,7 +41,7 @@ import { ToastModule } from 'primeng/toast';
                     <div class="flex flex-col gap-4 mb-4">
                         <p-message severity="success">Success Message</p-message>
                         <p-message severity="info">Info Message</p-message>
-                        <p-message severity="warn">Warn Message</p-message>
+                        <p-message  >Warn Message</p-message>
                         <p-message severity="error">Error Message</p-message>
                         <p-message severity="secondary">Secondary Message</p-message>
                         <p-message severity="contrast">Contrast Message</p-message>

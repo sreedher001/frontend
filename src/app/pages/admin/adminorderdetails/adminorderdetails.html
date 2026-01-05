@@ -144,7 +144,7 @@
   <p-button 
     label="Apply" 
     icon="pi pi-check" 
-    severity="warn"
+    
     (click)="updateOrderStatus(orderDetails.id, selectedStatus)" 
     [disabled]="!selectedStatus || selectedStatus.value === orderDetails.status"
   ></p-button>

@@ -36,8 +36,8 @@
     
 
     <div class="flex items-center gap-4">
-      <p-tag severity="warn" class="text-lg font-semibold  font-semibold">{{ product.variant.variantName }}</p-tag>
-      <!-- <p-tag severity="warn" class="whitespace-nowrap">{{ product.category }}</p-tag> -->
+      <p-tag   class="text-lg font-semibold  font-semibold">{{ product.variant.variantName }}</p-tag>
+      <!-- <p-tag   class="whitespace-nowrap">{{ product.category }}</p-tag> -->
      <div class="p-2 rounded-full flex items-center gap-2" [ngClass]="getRatingSeverity(product.variant.rating)">
         <span class="font-medium text-lg dune-font">{{ product.variant.rating }}</span>
         <i class="pi pi-star-fill text-xs" [ngClass]="{
@@ -357,7 +357,7 @@
       <p-button label="ADD TO BAG" icon="pi pi-shopping-bag" styleClass="w-full sm:w-auto " severity="contrast" outlined
         class="font-bold font-semibold " raised size="large"
         (onClick)="addToCart(product.variant, $event)"></p-button>
-      <p-button label="Buy Now" icon="pi pi-credit-card" styleClass="w-full sm:w-auto" severity="warn"
+      <p-button label="Buy Now" icon="pi pi-credit-card" styleClass="w-full sm:w-auto"  
         class=" font-bold text-black" raised size="large"
         (onClick)="buyNow(product.variant, $event)"></p-button>
     </div>
@@ -460,7 +460,7 @@
 
     <!-- Add to Cart Final Button -->
     <div class="mt-6">
-      <p-button label="Confirm & Add to bag" icon="pi pi-check" class="w-full dune-font font-bold" severity="warn"
+      <p-button label="Confirm & Add to bag" icon="pi pi-check" class="w-full dune-font font-bold"  
         size="large" (onClick)="addToCart(product.variant, $event); closeSizeSelector()"></p-button>
     </div>
     }

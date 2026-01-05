@@ -72,7 +72,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 
     </div>
 
-    <p-button severity="warn"
+    <p-button 
       label="Sign In"
       styleClass="w-full"
       (click)="onLogin()"
@@ -101,7 +101,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
   <label for="forgot_email">Email</label>
 </p-floatlabel>
 
-<p-button severity="warn" label="Send OTP" class="flex w-full mt-3" (click)="sendOtp()"></p-button>
+<p-button   label="Send OTP" class="flex w-full mt-3" (click)="sendOtp()"></p-button>
 
   </div>}
 
@@ -119,7 +119,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 </p-floatlabel>
 
 <p-button
-  severity="warn"
+   
   label="Verify OTP"
   class="w-full mt-3 flex"
   (click)="verifyOtp()"
@@ -139,7 +139,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
   <label for="confirm_password">Confirm Password</label>
 </p-floatlabel>
 
-<p-button severity="warn" label="Reset Password" class="flex w-full mt-3" (click)="resetPassword()"></p-button>
+<p-button  label="Reset Password" class="flex w-full mt-3" (click)="resetPassword()"></p-button>
 
   </div>}
 

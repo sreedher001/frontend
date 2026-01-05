@@ -20,11 +20,12 @@ import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
 import { ChipModule } from 'primeng/chip';
 import { Signup } from "../auth/signup/signup";
 import {  LoginComponent } from "../auth/login";
+import { ReviewBannerComponent } from "../productreview/review-banner-component/review-banner-component";
 
 @Component({
   selector: 'app-products',
   imports: [CardModule, CommonModule, ButtonModule, FluidModule, TagModule, FormsModule, BadgeModule, Tooltip, CarouselModule,
-    ChipModule, Signup, LoginComponent],
+    ChipModule, Signup, LoginComponent, ReviewBannerComponent],
   templateUrl: './products.html',
   styleUrl: './products.scss'
 })

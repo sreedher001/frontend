@@ -1,0 +1,45 @@
+@if(pending.length){<div
+  
+  @slideDown
+  class="relative mx-4 my-2 px-4 py-3
+         flex items-center justify-between gap-2
+           background
+         bg-gray-100 backdrop-blur
+         shadow-sm">
+
+  <!-- Close -->
+  <i
+    class="pi pi-times absolute top-2 right-2 text-xs
+           cursor-pointer text-gray-400 hover:text-gray-700"
+    (click)="pending = []">
+  </i>
+
+  <!-- Left -->
+  <div class="flex items-center gap-2 min-w-0">
+    <img
+      [src]="pending[0].imageUrl"
+      class="w-12 h-12 rounded-md object-cover "
+    />
+
+    <div class="leading-tight min-w-0">
+      <p class="text-lg font-semibold text-gray-800 truncate">
+        Rate your purchase
+      </p>
+      <p class="text-[15px] text-gray-600 truncate">
+        {{ pending[0].productName }}
+      </p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <p-button
+    label="Rate Now" class="mt-5"
+    size="small" outlined
+    icon="pi pi-star" size="large"
+    severity="contrast" 
+    (onClick)="openReview(pending[0])">
+  </p-button>
+
+</div>
+<p-toast></p-toast>
+}

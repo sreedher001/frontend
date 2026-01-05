@@ -25,7 +25,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
                     <p-button label="Secondary" severity="secondary" />
                     <p-button label="Success" severity="success" />
                     <p-button label="Info" severity="info" />
-                    <p-button label="Warn" severity="warn" />
+                    <p-button label="Warn"   />
                     <p-button label="Help" severity="help" />
                     <p-button label="Danger" severity="danger" />
                     <p-button label="Contrast" severity="contrast" />
@@ -38,7 +38,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
                     <p-button label="Secondary" severity="secondary" text />
                     <p-button label="Success" severity="success" text />
                     <p-button label="Info" severity="info" text />
-                    <p-button label="Warn" severity="warn" text />
+                    <p-button label="Warn"   text />
                     <p-button label="Help" severity="help" text />
                     <p-button label="Danger" severity="danger" text />
                     <p-button label="Plain" text />
@@ -51,7 +51,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
                     <p-button label="Secondary" severity="secondary" outlined />
                     <p-button label="Success" severity="success" outlined />
                     <p-button label="Info" severity="info" outlined />
-                    <p-button label="warn" severity="warn" outlined />
+                    <p-button label="warn"   outlined />
                     <p-button label="Help" severity="help" outlined />
                     <p-button label="Danger" severity="danger" outlined />
                     <p-button label="Contrast" severity="contrast" outlined />
@@ -74,7 +74,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
                     <p-splitbutton label="Save" [model]="items" severity="secondary"></p-splitbutton>
                     <p-splitbutton label="Save" [model]="items" severity="success"></p-splitbutton>
                     <p-splitbutton label="Save" [model]="items" severity="info"></p-splitbutton>
-                    <p-splitbutton label="Save" [model]="items" severity="warn"></p-splitbutton>
+                    <p-splitbutton label="Save" [model]="items"  ></p-splitbutton>
                     <p-splitbutton label="Save" [model]="items" severity="help"></p-splitbutton>
                     <p-splitbutton label="Save" [model]="items" severity="danger"></p-splitbutton>
                     <p-splitbutton label="Save" [model]="items" severity="contrast"></p-splitbutton>
@@ -109,7 +109,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
                     <p-button label="Secondary" severity="secondary" raised />
                     <p-button label="Success" severity="success" raised />
                     <p-button label="Info" severity="info" raised />
-                    <p-button label="Warn" severity="warn" raised />
+                    <p-button label="Warn"   raised />
                     <p-button label="Help" severity="help" raised />
                     <p-button label="Danger" severity="danger" raised />
                     <p-button label="Contrast" severity="contrast" raised />
@@ -122,7 +122,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
                     <p-button label="Secondary" severity="secondary" rounded />
                     <p-button label="Success" severity="success" rounded />
                     <p-button label="Info" severity="info" rounded />
-                    <p-button label="Warn" severity="warn" rounded />
+                    <p-button label="Warn"   rounded />
                     <p-button label="Help" severity="help" rounded />
                     <p-button label="Danger" severity="danger" rounded />
                     <p-button label="Contrast" severity="contrast" rounded />
@@ -135,7 +135,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
                     <p-button icon="pi pi-bookmark" severity="secondary" rounded />
                     <p-button icon="pi pi-search" severity="success" rounded />
                     <p-button icon="pi pi-user" severity="info" rounded />
-                    <p-button icon="pi pi-bell" severity="warn" rounded />
+                    <p-button icon="pi pi-bell"   rounded />
                     <p-button icon="pi pi-heart" severity="help" rounded />
                     <p-button icon="pi pi-times" severity="danger" rounded />
                 </div>
@@ -147,7 +147,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
                     <p-button icon="pi pi-bookmark" severity="secondary" text raised rounded />
                     <p-button icon="pi pi-search" severity="success" text raised rounded />
                     <p-button icon="pi pi-user" severity="info" text raised rounded />
-                    <p-button icon="pi pi-bell" severity="warn" text raised rounded />
+                    <p-button icon="pi pi-bell"   text raised rounded />
                     <p-button icon="pi pi-heart" severity="help" text raised rounded />
                     <p-button icon="pi pi-times" severity="danger" text raised rounded />
                 </div>
@@ -159,7 +159,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
                     <p-button icon="pi pi-bookmark" severity="secondary" rounded outlined />
                     <p-button icon="pi pi-search" severity="success" rounded outlined />
                     <p-button icon="pi pi-user" severity="info" rounded outlined />
-                    <p-button icon="pi pi-bell" severity="warn" rounded outlined />
+                    <p-button icon="pi pi-bell"   rounded outlined />
                     <p-button icon="pi pi-heart" severity="help" rounded outlined />
                     <p-button icon="pi pi-times" severity="danger" rounded outlined />
                 </div>

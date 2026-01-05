@@ -28,6 +28,7 @@ import { Orderstatus } from '@/pages/orderstatus/orderstatus';
 import { Shiporder } from '@/pages/admin/shiporder/shiporder';
 import { Profile } from '@/pages/profile/profile';
 import { BannerComponent } from '@/pages/banner/banner';
+import { AdminReviewsComponent } from '@/pages/admin/admin-reviews-component/admin-reviews-component';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -56,6 +57,7 @@ export const appRoutes: Routes = [
             { path: 'checkout', component: Checkout,canActivate:[LoginGuard]},
             { path: 'auth/signup', component: Signup},
             { path: 'home', component: Home},
+            { path: 'admin/reviews', component: AdminReviewsComponent},
             { path: 'order-status', component: Orderstatus},
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             // { path: 'documentation', component: Documentation },

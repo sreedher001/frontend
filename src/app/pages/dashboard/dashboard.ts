@@ -9,7 +9,7 @@ import { Salestrend } from "./salestrend/salestrend";
 
 @Component({
     selector: 'app-dashboard',
-    imports: [Adminorder, Salestrend],
+    imports: [Adminorder, Salestrend, NotificationsWidget],
     template: `
         <div class="grid grid-cols-12 gap-8">
             <!-- <app-stats-widget class="contents" /> -->
@@ -21,7 +21,7 @@ import { Salestrend } from "./salestrend/salestrend";
             </div>
             <div class="col-span-12 xl:col-span-6">
                 <app-adminorder/>
-                <!-- <app-notifications-widget /> -->
+                <app-notifications-widget />
             </div>
         </div>
     `

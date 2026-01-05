@@ -37,7 +37,7 @@ import { TagModule } from 'primeng/tag';
                         <p-badge value="2"></p-badge>
                         <p-badge value="8" severity="success"></p-badge>
                         <p-badge value="4" severity="info"></p-badge>
-                        <p-badge value="12" severity="warn"></p-badge>
+                        <p-badge value="12"  ></p-badge>
                         <p-badge value="3" severity="danger"></p-badge>
                     </div>
 
@@ -57,13 +57,13 @@ import { TagModule } from 'primeng/tag';
                     <div class="font-semibold my-4">Button</div>
                     <div class="flex gap-2">
                         <p-button label="Emails" badge="8"></p-button>
-                        <p-button label="Messages" icon="pi pi-users" severity="warn" badge="8" badgeSeverity="danger"></p-button>
+                        <p-button label="Messages" icon="pi pi-users"   badge="8" badgeSeverity="danger"></p-button>
                     </div>
 
                     <div class="font-semibold my-4">Sizes</div>
                     <div class="flex items-start gap-2">
                         <p-badge [value]="2"></p-badge>
-                        <p-badge [value]="4" badgeSize="large" severity="warn"></p-badge>
+                        <p-badge [value]="4" badgeSize="large"  ></p-badge>
                         <p-badge [value]="6" badgeSize="xlarge" severity="success"></p-badge>
                     </div>
                 </div>
@@ -118,7 +118,7 @@ import { TagModule } from 'primeng/tag';
                         <p-tag value="Primary"></p-tag>
                         <p-tag severity="success" value="Success"></p-tag>
                         <p-tag severity="info" value="Info"></p-tag>
-                        <p-tag severity="warn" value="Warning"></p-tag>
+                        <p-tag   value="Warning"></p-tag>
                         <p-tag severity="danger" value="Danger"></p-tag>
                     </div>
 
@@ -127,7 +127,7 @@ import { TagModule } from 'primeng/tag';
                         <p-tag value="Primary" [rounded]="true"></p-tag>
                         <p-tag severity="success" value="Success" [rounded]="true"></p-tag>
                         <p-tag severity="info" value="Info" [rounded]="true"></p-tag>
-                        <p-tag severity="warn" value="Warning" [rounded]="true"></p-tag>
+                        <p-tag   value="Warning" [rounded]="true"></p-tag>
                         <p-tag severity="danger" value="Danger" [rounded]="true"></p-tag>
                     </div>
 
@@ -136,7 +136,7 @@ import { TagModule } from 'primeng/tag';
                         <p-tag icon="pi pi-user" value="Primary"></p-tag>
                         <p-tag icon="pi pi-check" severity="success" value="Success"></p-tag>
                         <p-tag icon="pi pi-info-circle" severity="info" value="Info"></p-tag>
-                        <p-tag icon="pi pi-exclamation-triangle" severity="warn" value="Warning"></p-tag>
+                        <p-tag icon="pi pi-exclamation-triangle"   value="Warning"></p-tag>
                         <p-tag icon="pi pi-times" severity="danger" value="Danger"></p-tag>
                     </div>
                 </div>

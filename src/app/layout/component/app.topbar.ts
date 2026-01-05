@@ -28,7 +28,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   imports: [RouterModule, CommonModule, StyleClassModule, //AppConfigurator, 
     BadgeModule, FormsModule, InputTextModule,
     ButtonModule, DrawerModule,
-    MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule, AutoCompleteModule, Cart],
+    MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule, AutoCompleteModule, Cart, AppConfigurator],
   template: `<div class="layout-topbar 
          
          shadow-md  text-[#8a5c1d]">
@@ -49,8 +49,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     </a>
   </div>
 
-  <div class="layout-topbar-actions flex-1">
-    <div class="layout-config-menu">
+  <div class="layout-topbar-actions flex-1 ">
+    <div class="layout-config-menu ">
         <!-- Dark Mode Toggle (Commented) -->
 <!--         
         <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
@@ -101,6 +101,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
           <span class="hidden sm:inline">Messages</span>
         </button> 
         -->
+
+        
   <div class="sm:hidden">
   <button 
     class="layout-topbar-action relative flex items-center justify-center  rounded-full shrink-0 " 
@@ -139,6 +141,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
             </ng-template>
           </p-autoComplete>
         </div> -->
+        
         <div class="hidden sm:block w-80">
   <p-autoComplete
     [(ngModel)]="searchQuery"
@@ -213,7 +216,22 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
         >
           <i class="pi pi-user text-black text-xl"></i>
         </button>
-
+<!-- Color Picker (Commented) -->
+        
+       <div class="">
+            <button
+                class="layout-topbar-action layout-topbar-action-highlight"
+                pStyleClass="@next"
+                enterFromClass="hidden"
+                enterActiveClass="animate-scalein"
+                leaveToClass="hidden"
+                leaveActiveClass="animate-fadeout"
+                [hideOnOutsideClick]="true"
+            >
+                <i class="pi pi-palette"></i>
+            </button>
+            <app-configurator />
+        </div> 
         <!-- User Menu -->
        <p-drawer 
   [header]="'Hello ' + userName"
@@ -221,6 +239,20 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   position="right"
   [baseZIndex]="1000"
 >
+ <div class="relative">
+            <button
+                class="layout-topbar-action layout-topbar-action-highlight"
+                pStyleClass="@next"
+                enterFromClass="hidden"
+                enterActiveClass="animate-scalein"
+                leaveToClass="hidden"
+                leaveActiveClass="animate-fadeout"
+                [hideOnOutsideClick]="true"
+            >
+                <i class="pi pi-palette"></i>
+            </button>
+            <app-configurator />
+        </div> 
 
   <ul class="p-0 m-0 list-none space-y-4">
     <ng-container *ngFor="let item of overlayMenuItems">
@@ -244,6 +276,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     
   </div>
 </div>
+
+
 <p-drawer
   [(visible)]="visibleCartDrawer"
   position="right"

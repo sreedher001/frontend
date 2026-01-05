@@ -1,0 +1,198 @@
+<p-card header="Customer Reviews" class="shadow-md">
+
+  <p-table
+    #dt
+    stripedRows
+    [value]="reviews"
+    dataKey="orderId"
+    [expandedRowKeys]="expandedRows"
+    (onRowExpand)="onRowExpand($event)"
+    (onRowCollapse)="onRowCollapse($event)"
+    responsiveLayout="scroll"
+    [loading]="loading"
+    [globalFilterFields]="[
+      'username',
+      'userEmail',
+      'productName',
+      'variantName',
+      'orderNumber'
+    ]"
+  >
+
+    <!-- CAPTION (GLOBAL SEARCH + ACTIONS) -->
+    <ng-template pTemplate="caption">
+      <div class="flex justify-between align-items-center gap-3 flex-wrap">
+
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+  pInputText
+  type="text"
+  placeholder="Search reviews..."
+  (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+  class="w-20rem"
+/>
+        </span>
+
+        <div class="flex gap-2">
+          <button
+            pButton
+            label="Expand All"
+            icon="pi pi-plus"
+            class="p-button-text"
+            (click)="expandAll()">
+          </button>
+
+          <button
+            pButton
+            label="Collapse All"
+            icon="pi pi-minus"
+            class="p-button-text"
+            (click)="collapseAll()">
+          </button>
+        </div>
+
+      </div>
+    </ng-template>
+
+    <!-- HEADER -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:5rem"></th>
+
+        <th>
+          Date
+          <p-columnFilter field="createdAt" type="date" display="menu"></p-columnFilter>
+        </th>
+
+        <th>
+          User
+          <p-columnFilter field="username" matchMode="contains" display="menu"></p-columnFilter>
+        </th>
+
+        <th>
+          Product
+          <p-columnFilter field="productName" matchMode="contains" display="menu"></p-columnFilter>
+        </th>
+
+        <th>
+          Variant
+          <p-columnFilter field="variantName" matchMode="contains" display="menu"></p-columnFilter>
+        </th>
+
+        <th>
+          Rating
+          <p-columnFilter field="rating" type="numeric" display="menu"></p-columnFilter>
+        </th>
+
+        <th>
+          Status
+          <p-columnFilter field="approved" type="boolean" display="menu"></p-columnFilter>
+        </th>
+
+        <th>
+          Order
+          <p-columnFilter field="orderNumber" matchMode="contains" display="menu"></p-columnFilter>
+        </th>
+      </tr>
+    </ng-template>
+
+    <!-- BODY -->
+    <ng-template pTemplate="body" let-review let-expanded="expanded">
+      <tr>
+
+        <td>
+          <button
+            pButton
+            pRipple
+            type="button"
+            [pRowToggler]="review"
+            class="p-button-text p-button-secondary p-button-sm"
+            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'">
+          </button>
+        </td>
+
+        <td>{{ review.createdAt | date:'dd MMM yyyy' }}</td>
+
+        <td>
+          <div class="font-semibold">{{ review.username }}</div>
+          <small class="text-gray-500">{{ review.userEmail }}</small>
+        </td>
+
+        <td>{{ review.productName }}</td>
+
+        <td>
+          <p-tag
+            [value]="review.variantName"
+            severity="info"
+            class="cursor-pointer"
+            (click)="goToVariant(review.variantId)">
+          </p-tag>
+        </td>
+
+        <td>
+          <p-rating
+            [ngModel]="review.rating"
+            [readonly]="true">
+          </p-rating>
+        </td>
+
+        <td>
+          <p-tag
+            [value]="review.approved ? 'Approved' : 'Pending'"
+            [severity]="review.approved ? 'success' : 'warning'">
+          </p-tag>
+        </td>
+
+        <td>
+          <p-tag
+            [value]="review.orderNumber"
+            severity="info"
+            class="cursor-pointer"
+            (click)="goToOrder(review.orderId)">
+          </p-tag>
+        </td>
+
+      </tr>
+    </ng-template>
+
+    <!-- EXPANDED ROW -->
+    <ng-template pTemplate="expandedrow" let-review>
+      <tr>
+        <td colspan="8">
+          <div class="p-4 surface-100 border-round">
+
+            <h5 class="mb-3">Customer Review</h5>
+
+            <div class="flex align-items-center gap-3 mb-2">
+              <p-rating
+                [ngModel]="review.rating"
+                [readonly]="true">
+              </p-rating>
+
+              <span class="text-sm text-gray-500">
+                {{ review.createdAt | date:'fullDate' }}
+              </span>
+            </div>
+
+            <p class="line-height-3 m-0 text-900">
+              {{ review.reviewText || 'No review text provided.' }}
+            </p>
+
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+  <div class="flex justify-center mt-4">
+    <button
+      pButton
+      label="Load More"
+      icon="pi pi-chevron-down"
+      (click)="loadMore()"
+      [disabled]="loading || allLoaded"
+    ></button>
+  </div>
+
+</p-card>

@@ -6,7 +6,7 @@
 
     <div class="flex justify-end">
       <p-button pTooltip="save" tooltipPosition="left" label="Save Product" icon="pi pi-save" raised type="button"
-        (click)="onSubmit(formRef)" severity="warn" size="large">
+        (click)="onSubmit(formRef)"  size="large">
       </p-button>
 
       <!-- Confirmation Dialog -->
@@ -17,7 +17,7 @@
         </div>
         <ng-template #footer>
           <p-button label="No" icon="pi pi-times" (click)="closeConfirmation()" text severity="secondary" raised />
-          <p-button label="Yes" icon="pi pi-check" (click)="saveProduct()" severity="warn" raised autofocus />
+          <p-button label="Yes" icon="pi pi-check" (click)="saveProduct()"  raised autofocus />
         </ng-template>
       </p-dialog>
     </div>
@@ -355,7 +355,7 @@
         @if(showeErrorSuggestionSize){<span class="p-error text-red-800 ">(NOTE : All fields are mandatory to be
           filled)</span>}
         <div>
-          <p-button label="Add Size" icon="pi pi-plus" severity="warn" raised (click)="addSize()"
+          <p-button label="Add Size" icon="pi pi-plus"  raised (click)="addSize()"
             pTooltip="Add new size" tooltipPosition="left"></p-button>
         </div>
       </div>
@@ -601,7 +601,7 @@
   <div class="w-full md:w-1/2 flex ">
     <div class="card flex flex-col gap-4 p-4 justify-end">
       <p-button pTooltip="save" tooltipPosition="left" label="Save Product" icon="pi pi-save" raised type="button"
-        (click)="onSubmit(formRef)" severity="warn" size="large">
+        (click)="onSubmit(formRef)"  size="large">
       </p-button>
     </div>
   </div>
