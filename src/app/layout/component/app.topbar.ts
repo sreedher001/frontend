@@ -360,14 +360,22 @@ export class AppTopbar implements OnInit {
   overlayMenuItems: MenuItem[] = [];
   visibleCartDrawer=false;
   drawerWidth = '520px';
+  cartItems: any[] = [];
   ngOnInit(): void {
+    
      this.cartService.drawerVisible$.subscribe(
     visible => this.visibleCartDrawer = visible
   );
+
+  this.cartService.cart$.subscribe(cart => {
+    this.cartItems = cart?.items || [];
+    this.cd.detectChanges();
+  });
+  
     this.setUserMenuItem();
 this.setDrawerWidth();
     if (localStorage.getItem("isLoggedIn") === "true") {
-     // this.cartService.getCart().subscribe(); // loads and updates BehaviorSubject
+      this.cartService.getCart().subscribe(); // loads and updates BehaviorSubject
       // this.getWishList();
 
       // Keep the topbar badge live-updating

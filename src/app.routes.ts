@@ -29,6 +29,8 @@ import { Shiporder } from '@/pages/admin/shiporder/shiporder';
 import { Profile } from '@/pages/profile/profile';
 import { BannerComponent } from '@/pages/banner/banner';
 import { AdminReviewsComponent } from '@/pages/admin/admin-reviews-component/admin-reviews-component';
+import { AdminReturns } from '@/pages/admin/admin-returns/admin-returns';
+import { AdminReturnDetailComponent } from '@/pages/admin/admin-returns/admin-return-detail-component/admin-return-detail-component';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -58,7 +60,9 @@ export const appRoutes: Routes = [
             { path: 'auth/signup', component: Signup},
             { path: 'home', component: Home},
             { path: 'admin/reviews', component: AdminReviewsComponent},
+            { path: 'admin/returns-view', component: AdminReturns},
             { path: 'order-status', component: Orderstatus},
+            { path: 'admin/returns/:returnId', component: AdminReturnDetailComponent},
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             // { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

@@ -234,6 +234,8 @@
           @if(step.stepId === 5 && step.details?.items?.length){<div class="py-6 flex justify-start" >
             <div class="mt-4 space-y-3 w-full">
 
+
+
     <div class="text-sm font-semibold text-gray-700">
       How was your purchase?
     </div>
@@ -262,7 +264,11 @@
             rounded
             (onClick)="openReview(step.details.orderId,item.variantId)"
           ></p-button>
-
+<p-button
+      label="Request Return" styleClass="w-full"
+      icon="pi pi-refresh" 
+      (onClick)="openReturnModal(step.details.orderId,item)">
+    </p-button>
         </div>
       }
     }
@@ -277,4 +283,51 @@
       </p-step-panel>
     </p-step-item>
   </p-stepper>
+</p-dialog>
+<p-dialog
+  header="Request Return"
+  [(visible)]="showReturnModal"
+  [modal]="true"
+  [style]="{ width: '400px',height: '450px'}">
+
+  <label class="font-semibold mb-2 block">Reason</label>
+
+  <p-autoComplete
+  [(ngModel)]="returnRequest.reason"
+  [suggestions]="filteredReasons"
+  (completeMethod)="filterReasons($event)"
+  [dropdown]="true"
+  placeholder="Select reason" appendTo="body">
+</p-autoComplete>
+
+
+  <label class="font-semibold mt-3 mb-2 block">Comment</label>
+
+ <span class="p-float-label">
+  <textarea
+    pInputTextarea
+    rows="3"
+    [(ngModel)]="returnRequest.comment"
+    class="w-full p-inputtext">
+  </textarea>
+  <label>Comment</label>
+</span>
+
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      (onClick)="showReturnModal=false">
+    </p-button>
+
+    <p-button
+      label="Submit"
+      severity="danger"
+      [loading]="returnSubmitting"
+      [disabled]="!returnRequest.reason"
+      (onClick)="submitReturnRequest()">
+    </p-button>
+  </ng-template>
+
 </p-dialog>

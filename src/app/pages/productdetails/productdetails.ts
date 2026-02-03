@@ -279,6 +279,7 @@ if (isLoggedIn) {
           summary: 'Added to your bag',
           detail: `${variant.variantName} was added successfully.`
         });
+        
         //this.showStylePanel=true;
         if (navigateToCart) {
           this.router.navigate(['/cart']);
@@ -330,7 +331,7 @@ console.log("guestCart",guestCart);
       detail: `${variant.variantName} added. Login to checkout.`
     });
 
-    this.showStylePanel = true;
+    //this.showStylePanel = true;
     if (navigateToCart) {
       this.router.navigate(['/cart']);
     }

@@ -18,8 +18,12 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogService } from 'primeng/dynamicdialog';
 import { ReviewModalComponent } from '../productreview/review-modal-component/review-modal-component';
+import { Return } from '../admin/admin-returns/return';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { InputTextModule } from 'primeng/inputtext';
 
 export interface OrderSummaryDto {
+  id:number;
   orderNumber: string;
   orderDate: string; // ISO string
   totalAmount: number;
@@ -37,18 +41,36 @@ interface StepData {
 }
 @Component({
   selector: 'app-orderhistory',
-  imports: [DatePipe,DialogModule,StepperModule,ButtonModule,CommonModule,ImageModule,CardModule,TableModule,ProgressSpinnerModule,AvatarGroupModule,AvatarModule,OverlayBadgeModule,TagModule],
+  imports: [DatePipe,DialogModule,StepperModule,InputTextModule,
+    AutoCompleteModule,FormsModule,ButtonModule,CommonModule,ImageModule,CardModule,TableModule,ProgressSpinnerModule,AvatarGroupModule,AvatarModule,OverlayBadgeModule,TagModule],
   templateUrl: './orderhistory.html',
   providers: [DialogService],
   styleUrl: './orderhistory.scss'
 })
 export class Orderhistory implements OnInit{
+showReturnModal = false;
+selectedOrderItem: any;
+returnReasons:string[] = [
+  'Wrong Size',
+  'Wrong Product',
+  'Damaged Item',
+  'Other'
+];
 
+returnRequest = {
+  reason: '',
+  comment: ''
+};
+filteredReasons: string[] = [];
+
+
+
+returnSubmitting = false;
 
  orders: OrderSummaryDto[] = [];
 loading = false;
   error = false;
-  
+  orderId:any;
   
   displayTrackingModal = false;
 selectedOrder: any = null;
@@ -81,7 +103,7 @@ stepLabels:{ [key: number]: string } = {
 
 
 maxAllowedStep: number = 1;
-  constructor(private orderService: OrderService,private router: Router,private dialog: DialogService) {}
+  constructor(private orderService: OrderService,private router: Router,private dialog: DialogService,private returnService:Return) {}
    ngOnInit(): void {
     this.loadOrderHistory();
   }
@@ -135,7 +157,12 @@ goToProductDetails(variantId: number) {
 
 
 
-
+filterReasons(event: any) {
+  const query = event.query.toLowerCase();
+  this.filteredReasons = this.returnReasons.filter(r =>
+    r.toLowerCase().includes(query)
+  );
+}
 
 // Call this when user wants to track an order (pass order object or number)
 openTrackingModal(order: any) {
@@ -156,6 +183,7 @@ openTrackingModal(order: any) {
     let details: any = null;
     if (stepId === 2 && stepStatus !== 'pending') {
       details = {
+
         paymentMode: order.paymentMode,
         totalAmount: order.totalAmount,
         orderNumber: order.orderNumber,
@@ -170,6 +198,7 @@ openTrackingModal(order: any) {
     }
     if (stepId === 5) {
       details = {
+        orderId:order.id,
         orderNumber:order.orderNumber,
         orderDate: order.orderDate,
         items: order.items,
@@ -206,5 +235,37 @@ onStepSelect(event: any) {
   openReviewFromOrder(order: OrderSummaryDto) {
 
     this.selectedOrder = order;
+}
+
+openReturnModal(orderId:any,item: any) {
+  this.selectedOrderItem = item;
+  this.orderId=orderId;
+  this.returnRequest = { reason: '', comment: '' };
+  this.showReturnModal = true;
+}
+
+submitReturnRequest() {
+   if (!this.selectedOrderItem) return;
+  this.returnSubmitting = true;
+
+  const payload = {
+    orderId: this.orderId,                      
+    variantId: this.selectedOrderItem.variantId,      
+    quantity: this.selectedOrderItem.quantity,        
+    reason: this.returnRequest.reason,
+    description: this.returnRequest.comment
+  };
+console.log("return payload",payload);
+  this.returnService.requestReturn(payload).subscribe({
+    next: () => {
+      this.returnSubmitting = false;
+      this.showReturnModal = false;
+      alert('Return request submitted successfully');
+    },
+    error: () => {
+      this.returnSubmitting = false;
+      alert('Failed to submit return request');
+    }
+  });
 }
 }

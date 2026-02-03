@@ -406,7 +406,7 @@
 
   <!-- Add to Bag Button -->
   <button
-    class="w-1/2 h-16 flex rounded-t-sm  items-center justify-center text-lg font-bold  text-white bg-orange-500 active:bg-gray-900"
+    class="w-1/2 h-16 flex rounded-t-sm  items-center justify-center text-lg font-bold  text-white bg-black active:bg-gray-900"
     type="button" (click)="openSizeSelector()">
     <i class="pi pi-shopping-bag mr-2 text-lg"></i>
     Add to bag
@@ -426,7 +426,7 @@
     </button>
   </div>
 <div class="p-2 flex justify-between items-center"><button
-    class="text-lg text-orange-600 underline"
+    class="text-lg text-black underline"
     type="button"
     (click)="showSizeGuide = true"
   >
@@ -481,9 +481,9 @@
   <!-- Close Button -->
   <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 z-50 
          flex items-center gap-3 px-5 py-2 rounded-full 
-         shadow-md border border-yellow-400 
-         bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee] 
-         text-[#8a5c1d] font-semibold cursor-pointer 
+         shadow-md border border-black-400 
+         
+         text-black font-semibold cursor-pointer 
          hover:scale-105 transition-transform duration-200" (click)="toggleSignupPanel()">
     <i class="pi pi-times text-xl"></i>
     <span class="font-medium whitespace-nowrap text-sm sm:text-base">Close</span>
@@ -516,13 +516,13 @@
 
 <!-- Floating CTA Button (only if modal closed and not logged in) -->
 @if (!showSignupPanel && !isLoggedIn) {
-<div class="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-40 
+<div class="fixed bottom-30 left-1/2 transform -translate-x-1/2 z-40 
          flex items-center gap-3 px-5 py-3 rounded-full 
-         shadow-md border border-yellow-400 
-         bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee] 
-         text-[#8a5c1d] font-semibold cursor-pointer 
+         shadow-md border border-black-400 
+         bg-white
+         text-black font-semibold cursor-pointer 
          hover:scale-105 transition-transform duration-200" (click)="toggleSignupPanel()">
   <i class="pi pi-user-plus text-xl"></i>
-  <span class="font-medium whitespace-nowrap text-sm sm:text-base dune-font">SIGN UP / SIGN IN</span>
+  <span class="font-medium whitespace-nowrap text-sm sm:text-base ">SIGN UP / SIGN IN</span>
 </div>
 }

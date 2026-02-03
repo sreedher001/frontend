@@ -142,12 +142,36 @@ return item?.availableSizes?.length;
 }
 
 
+// loadCart(): void {
+//   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+//   if (isLoggedIn) {
+//     this.cartService.getCart().subscribe({
+//       next: (res) => {
+//         this.cart = res;
+//         this.cart.items.forEach((item) => {
+//           item.sizeOptions = item.availableSizes;
+//           item.selectedSizeObj = item.sizeOptions.find((opt: any) => opt.size === item.size);
+//         });
+//       },
+//       error: (err) => {
+//         console.error('Failed to load cart', err);
+//       }
+//     });
+//   } else {
+//     // Guest: rebuild with normalized shape
+//     this.buildCartFromGuest();
+//   }
+// }
+
+
 loadCart(): void {
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   if (isLoggedIn) {
-    this.cartService.getCart().subscribe({
+    this.cartService.cart$.subscribe({
       next: (res) => {
+        if(!res) return
         this.cart = res;
         this.cart.items.forEach((item) => {
           item.sizeOptions = item.availableSizes;
@@ -163,7 +187,6 @@ loadCart(): void {
     this.buildCartFromGuest();
   }
 }
-
 //for guest cart
 calculateItemTotal(item: any): number {
   const price = item.price;
@@ -246,15 +269,50 @@ goToShop() {
   updateCartCount(count: number) {
     this.cartCountSubject.next(count);
   }
+// increaseQuantity(item: any) {
+//   if (!this.isLoggedIn) {
+//     this.showSignupPanel=true;
+//     return;
+//   }
+
+//   const selectedSize = item.size;
+//   const sizeInfo = item.sizeOptions.find(
+//     (size: any) => size.size === selectedSize
+//   );
+
+//   if (!sizeInfo) {
+//     this.messageService.add({
+//       key: 'global',
+//       severity: 'error',
+//       summary: 'Size Info Missing',
+//       detail: 'Cannot find stock info for selected size.',
+//       life: 3000
+//     });
+//     return;
+//   }
+
+//   if (item.quantity < sizeInfo.availableQuantity) {
+//     item.quantity++;
+//     this.updateCartItem(item);
+//   } else {
+//     this.messageService.add({
+//       key: 'global',
+//       severity: 'warn',
+//       summary: 'Stock Limit Reached',
+//       detail: `Only ${sizeInfo.availableQuantity} items available in stock.`,
+//       life: 3000
+//     });
+//   }
+// }
+
 increaseQuantity(item: any) {
   if (!this.isLoggedIn) {
-    this.showSignupPanel=true;
+    this.showSignupPanel = true;
     return;
   }
 
-  const selectedSize = item.size;
-  const sizeInfo = item.sizeOptions.find(
-    (size: any) => size.size === selectedSize
+  const sizeInfo = item.sizeOptions?.find(
+    (s: any) => s.size === item.size
   );
 
   if (!sizeInfo) {
@@ -268,61 +326,63 @@ increaseQuantity(item: any) {
     return;
   }
 
-  if (item.quantity < sizeInfo.availableQuantity) {
-    item.quantity++;
-    this.updateCartItem(item);
-  } else {
+  if (item.quantity >= sizeInfo.availableQuantity) {
     this.messageService.add({
       key: 'global',
       severity: 'warn',
       summary: 'Stock Limit Reached',
-      detail: `Only ${sizeInfo.availableQuantity} items available in stock.`,
+      detail: `Only ${sizeInfo.availableQuantity} items available.`,
       life: 3000
     });
-  }
-}
-
-decreaseQuantity(item: any) {
-  if (!this.isLoggedIn) {
-    this.showSignupPanel=true;
     return;
   }
 
-  if (item.quantity > 1) {
-    item.quantity--;
-    this.updateCartItem(item);
-  }
+  const nextQty = item.quantity + 1;
+  this.updateCartItem(item, nextQty);
 }
 
 
-// updateCartItem(item: any) {
-//   this.cartService.updateCartItem(item.id, item.quantity, item.size)
-//       .subscribe({
-//         next: (res: any) => {
-//           console.log('Cart updated:', res);
-          
-//     window.location.reload();
-//         },
-//         error: (err:any) => {
-//           console.error('Update failed:', err);
-//         }
-//       });
+// decreaseQuantity(item: any) {
+//   if (!this.isLoggedIn) {
+//     this.showSignupPanel=true;
+//     return;
+//   }
+
+//   if (item.quantity > 1) {
+//     item.quantity--;
+//     this.updateCartItem(item);
+//   }
 // }
 
-updateCartItem(item: any) {
+decreaseQuantity(item: any) {
+  if (!this.isLoggedIn) {
+    this.showSignupPanel = true;
+    return;
+  }
+
+  if (item.quantity <= 1) return;
+
+  const nextQty = item.quantity - 1;
+  this.updateCartItem(item, nextQty);
+}
+
+
+
+updateCartItem(item: any,newQuantity:number) {
   if (localStorage.getItem("isLoggedIn") === "true") {
     // Logged-in: call backend
-    this.cartService.updateCartItem(item.id, item.quantity, item.size,item.sizeId)
+    this.cartService.updateCartItem(item.id, newQuantity, item.size,item.sizeId)
       .subscribe({
         next: (res: any) => {
           console.log('Cart updated:', res);
           // prefer to update UI without full reload - but for now refresh:
           //window.location.reload();
-          const index = this.cart.items.findIndex((i: any) => i.id === item.id);
-          if (index > -1) {
-            this.cart.items[index].quantity = item.quantity;
-            this.cart.items[index].total = item.price * item.quantity;
-          }
+          // const index = this.cart.items.findIndex((i: any) => i.id === item.id);
+          // if (index > -1) {
+          //   this.cart.items[index].quantity = item.quantity;
+          //   this.cart.items[index].total = item.price * item.quantity;
+          // }
+          this.cartService.getCart().subscribe();
           
         },
         error: (err:any) => {
@@ -360,20 +420,53 @@ updateCartItem(item: any) {
   }
 }
 
- onSizeChange(item: any) {
-  if (item.selectedSizeObj) {
-    item.size = item.selectedSizeObj.size; // keep string for backend
-    item.quantity=1;
-    item.price=item.selectedSizeObj.priceAfterDiscount;
-    item.sizeId=item.selectedSizeObj.id;
-    item.originalPrice=item.selectedSizeObj.price;
-    item.discount=item.selectedSizeObj.discountPercentage;
-    this.updateCartItem(item);
+//  onSizeChange(item: any) {
+//   if (item.selectedSizeObj) {
+//     item.size = item.selectedSizeObj.size; // keep string for backend
+//     item.quantity=1;
+//     item.price=item.selectedSizeObj.priceAfterDiscount;
+//     item.sizeId=item.selectedSizeObj.id;
+//     item.originalPrice=item.selectedSizeObj.price;
+//     item.discount=item.selectedSizeObj.discountPercentage;
+//     this.updateCartItem(item);
+//   }
+
+onSizeChange(item: any) {
+  if (!item.selectedSizeObj) return;
+
+  const newSize = item.selectedSizeObj;
+
+  const newQuantity = 1; // always reset qty on size change
+
+  if (this.isLoggedIn) {
+    this.cartService
+      .updateCartItem(
+        item.id,              // cartItemId
+        newQuantity,
+        newSize.size,         // size string
+        newSize.id            // sizeId
+      )
+      .subscribe({
+        next: () => {
+          //  DO NOT mutate item locally
+          //  Just refresh cart from backend
+          this.cartService.getCart().subscribe();
+        },
+        error: (err) => {
+          console.error('Size update failed', err);
+          this.messageService.add({
+            key:'global',
+            severity: 'error',
+            summary: 'Failed to update size',
+            detail: 'Please try again'
+          });
+        }
+      });
+  } else {
+    // Guest cart
+   // this.updateGuestCartSize(item, newSize);
   }
-
 }
-
-
 
 removeFromCart(item: any): void {
   if (this.isLoggedIn) {

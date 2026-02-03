@@ -1,0 +1,161 @@
+
+<p-confirmDialog></p-confirmDialog>
+<div class="mt-10 card">
+  <div class="flex justify-end mb-3">
+    <p-autoComplete
+  [(ngModel)]="selectedStatus"
+  [suggestions]="filteredStatuses"
+  (completeMethod)="filterStatus($event)"
+  placeholder="Filter by status"
+  [dropdown]="true"
+  (onSelect)="loadReturns()"
+  (onClear)="loadReturns()">
+</p-autoComplete>
+  </div>
+
+<p-table
+  [value]="returns"
+  [loading]="loading"
+  responsiveLayout="scroll"
+  rowHover
+  [paginator]="true"
+  [rows]="size"
+  [totalRecords]="totalRecords"
+  [lazy]="true"
+  (onLazyLoad)="loadReturns($event)">
+
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Order</th>
+      <th>Customer</th>
+      <th>Product</th>
+      <th>Status</th>
+      <th>Refund</th>
+      <th>Action</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-r>
+    <tr>
+      
+      <p-tag
+          [value]="r.orderNumber"
+          [severity]="
+            r.status === 'REQUESTED' ? 'warn' :
+            r.status === 'QC_FAILED' ? 'danger' :
+            r.status === 'REFUND_COMPLETED' ? 'success' : 'info' " (click)="goToOrderDetails(r.orderId)">
+        </p-tag>
+      <td>{{ r.customerName }}</td>
+      <td>{{ r.productName }}</td>
+
+      <td>
+        <p-tag
+          [value]="r.status"
+          [severity]="
+            r.status === 'REQUESTED' ? 'warn' :
+            r.status === 'QC_FAILED' ? 'danger' :
+            r.status === 'REFUND_COMPLETED' ? 'success' : 'info'
+          ">
+        </p-tag>
+      </td>
+
+      <td>₹{{ r.refundAmount }}</td>
+
+      <td class="flex gap-2">
+<p-button
+  label="View"
+  icon="pi pi-eye"
+  severity="contrast"
+  (onClick)="viewReturn(r.returnId)">
+</p-button>
+  <!-- REQUESTED -->
+  <p-button *ngIf="r.status === 'REQUESTED'"
+  label="Approve" icon="pi pi-check"
+  severity="success"
+  (onClick)="confirmApprove(r)">
+</p-button>
+
+  <p-button *ngIf="r.status === 'REQUESTED'"
+    label="Reject" severity="danger" icon="pi pi-times"
+    (onClick)="openCommentModal('REJECT', r)">
+  </p-button>
+
+  <!-- APPROVED -->
+  <p-button *ngIf="r.status === 'APPROVED'"
+    label="Mark Received" icon="pi pi-check"
+    (onClick)="markReceived(r)">
+  </p-button>
+
+  <!-- RECEIVED -->
+  <p-button *ngIf="r.status === 'RECEIVED_AT_WAREHOUSE'"
+    label="QC Pass" severity="success" icon="pi pi-check"
+    (onClick)="openCommentModal('QC_PASS', r)">
+  </p-button>
+
+  <p-button *ngIf="r.status === 'RECEIVED_AT_WAREHOUSE'"
+    label="QC Fail" severity="danger" icon="pi pi-times"
+    (onClick)="openCommentModal('QC_FAIL', r)">
+  </p-button>
+
+  <!-- QC_PASSED -->
+  <p-button *ngIf="r.status === 'QC_PASSED'"
+    label="Initiate Refund" icon="pi pi-check"
+    severity="warn"
+    (onClick)="initiateRefund(r)">
+  </p-button>
+
+  <!-- REFUND_INITIATED -->
+  <p-button *ngIf="r.status === 'REFUND_INITIATED'"
+    label="Refund Completed"
+    severity="success"
+   
+    (onClick)="openCommentModal('REFUND_COMPLETED', r)">
+  </p-button>
+
+  <!-- REFUND_COMPLETED -->
+  <p-button *ngIf="r.status === 'REFUND_COMPLETED'"
+  label="Close"
+  severity="secondary"
+  (onClick)="confirmClose(r)">
+</p-button>
+
+</td>
+
+    </tr>
+  </ng-template>
+
+</p-table>
+</div>
+
+<p-dialog
+  header="Add Comment"
+  [(visible)]="showCommentModal"
+  [modal]="true"
+  [style]="{ width: '400px' }">
+
+  
+  <span class="p-float-label">
+  <textarea
+    pInputTextarea
+    rows="4"
+    [(ngModel)]="commentText"
+    class="w-full p-inputtext">
+  </textarea>
+  <label>Comment</label>
+</span>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      (onClick)="showCommentModal=false">
+    </p-button>
+
+    <p-button
+      label="Submit"
+      severity="primary"
+      (onClick)="submitCommentAction()">
+    </p-button>
+  </ng-template>
+
+</p-dialog>

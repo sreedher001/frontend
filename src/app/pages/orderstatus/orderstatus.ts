@@ -9,6 +9,11 @@ import { TagModule } from 'primeng/tag';
 import { ActivatedRoute } from '@angular/router';
 import { OrderService } from '../orderhistory/order.service';
 import { ImageModule } from 'primeng/image';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { Return } from '../admin/admin-returns/return';
 
 interface OrderItemDto {
   productId: number;
@@ -53,7 +58,10 @@ interface StepData {
 
 @Component({
   selector: 'app-orderstatus',
-  imports: [StepperModule, CardModule,StepperModule,CommonModule, TableModule,ButtonModule,TagModule,ImageModule],
+  imports: [StepperModule, CardModule,StepperModule,CommonModule, TableModule,ButtonModule,TagModule,ImageModule,
+
+    DialogModule,InputTextModule,FormsModule,AutoCompleteModule
+  ],
   templateUrl: './orderstatus.html',
   styleUrl: './orderstatus.scss'
 })
@@ -65,6 +73,9 @@ export class Orderstatus {
 loading:boolean=true;
 steps: StepData[] = [];
 maxAllowedStep: number = 1;
+
+
+
 constructor(
   private route: ActivatedRoute,
   private orderService: OrderService
@@ -177,4 +188,6 @@ stepLabels:{ [key: number]: string } = {
   if (stepIndex === this.activeStep) return 'current';
   return 'pending';
 }
+
+
 }

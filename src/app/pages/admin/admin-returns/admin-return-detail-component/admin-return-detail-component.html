@@ -1,0 +1,68 @@
+@if(loading){<p-progressSpinner></p-progressSpinner>}
+@if(!loading && returnDetail){<div class="mt-12">
+<p-card>
+  <div class="flex justify-between items-center">
+    <div>
+      @if(returnDetail.returnId){<h2 class="text-xl font-semibold">
+        Return #{{ returnDetail.returnId }}
+      </h2>}
+      <p class="text-sm text-gray-500">
+        Order: {{ returnDetail.orderNumber }}
+      </p>
+    </div>
+
+    <p-tag
+      [value]="returnDetail.status"
+      [severity]="
+        returnDetail.status === 'QC_FAILED' ? 'danger' :
+        returnDetail.status === 'REFUND_COMPLETED' ? 'success' :
+        'info'
+      ">
+    </p-tag>
+  </div>
+</p-card>
+<div class="grid grid-cols-2 gap-4 mt-4">
+
+  <p-card header="Customer Details">
+    <p><strong>Name:</strong> {{ returnDetail.customerName }}</p>
+    <p><strong>Email:</strong> {{ returnDetail.email }}</p>
+    <p><strong>Phone:</strong> {{ returnDetail.phone }}</p>
+  </p-card>
+
+  <p-card header="Product Details">
+    <p><strong>Product:</strong> {{ returnDetail.productName }}</p>
+    <p><strong>Color:</strong> {{ returnDetail.color }}</p>
+    <p><strong>Size:</strong> {{ returnDetail.size }}</p>
+    <p><strong>Qty:</strong> {{ returnDetail.quantity }}</p>
+  </p-card>
+
+</div>
+<p-card header="Return Reason" class="mt-4">
+  <p>{{ returnDetail.reason }}</p>
+
+  @if(returnDetail.comment){<div class="mt-3">
+    <strong>Latest Comment:</strong>
+    <p class="text-sm">{{ returnDetail.comment }}</p>
+  </div>}
+</p-card>
+<p-card header="Return Timeline" class="mt-4">
+
+  <p-timeline
+    [value]="returnDetail.timeline"
+    layout="vertical"
+    align="left">
+
+    <ng-template pTemplate="content" let-event>
+      <div class="mb-3">
+        <strong>{{ event.status }}</strong>
+        <div class="text-sm text-gray-500">
+          {{ event.changedBy }} •
+          {{ event.changedAt | date:'medium' }}
+        </div>
+      </div>
+    </ng-template>
+
+  </p-timeline>
+
+</p-card>
+</div>}
