@@ -64,7 +64,7 @@ import { RouterModule } from '@angular/router';
     <a href="https://www.instagram.com/zyra.fashion.curves" target="_blank" aria-label="Instagram" class="hover:text-primary">
       <i class="pi pi-instagram"></i>
     </a>
-    <a href="https://linkedin.com/yourbrand" target="_blank" aria-label="LinkedIn" class="hover:text-primary">
+    <a href="https://www.linkedin.com/in/zyra-fashion-curves-ab16723aa" target="_blank" aria-label="LinkedIn" class="hover:text-primary">
       <i class="pi pi-linkedin"></i>
     </a>
     <!-- Add more as needed -->

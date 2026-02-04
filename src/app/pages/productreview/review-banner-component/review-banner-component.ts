@@ -34,8 +34,9 @@ export class ReviewBannerComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    if(localStorage.getItem("isLoggedIn")==="true"){
     this.reviewService.getPendingReviews()
-      .subscribe(res => this.pending = res.slice(0, 1));
+      .subscribe(res => this.pending = res.slice(0, 1));}
   }
 
   openReview(review: PendingReview) {

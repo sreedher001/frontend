@@ -110,7 +110,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     pTooltip="Search"
     tooltipPosition="bottom"
   >
-    <i class="pi pi-search text-xl"></i>
+    <i class="pi pi-search "></i>
   </button>
 </div>
         <!-- Search (hidden on mobile, full width below) -->
@@ -218,7 +218,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
         </button>
 <!-- Color Picker (Commented) -->
         
-       <div class="">
+       @if(isAdmin){<div class="">
             <button
                 class="layout-topbar-action layout-topbar-action-highlight"
                 pStyleClass="@next"
@@ -231,7 +231,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
                 <i class="pi pi-palette"></i>
             </button>
             <app-configurator />
-        </div> 
+        </div> }
         <!-- User Menu -->
        <p-drawer 
   [header]="'Hello ' + userName"
@@ -239,7 +239,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   position="right"
   [baseZIndex]="1000"
 >
- <div class="relative">
+ <!-- @if(isAdmin){<div class="relative">
             <button
                 class="layout-topbar-action layout-topbar-action-highlight"
                 pStyleClass="@next"
@@ -252,7 +252,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
                 <i class="pi pi-palette"></i>
             </button>
             <app-configurator />
-        </div> 
+        </div> } -->
 
   <ul class="p-0 m-0 list-none space-y-4">
     <ng-container *ngFor="let item of overlayMenuItems">
@@ -375,6 +375,7 @@ export class AppTopbar implements OnInit {
     this.setUserMenuItem();
 this.setDrawerWidth();
     if (localStorage.getItem("isLoggedIn") === "true") {
+      this.isLoggedIn=true;
       this.cartService.getCart().subscribe(); // loads and updates BehaviorSubject
       // this.getWishList();
 

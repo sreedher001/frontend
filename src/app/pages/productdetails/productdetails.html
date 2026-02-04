@@ -84,13 +84,13 @@
       <div class="flex items-center justify-between mt-4">
   <h3 class="text-sm font-semibold mb-2  ">Select Size</h3>
 
-  <button
+  <!-- <button
     class="text-sm text-orange-600 underline "
     type="button"
     (click)="showSizeGuide = true"
   >
     Size Guide
-  </button>
+  </button> -->
 </div>
       <div class="flex flex-wrap gap-3">
         @for (s of product.variant.sizes; track s.id) {
@@ -460,7 +460,7 @@
 
     <!-- Add to Cart Final Button -->
     <div class="mt-6">
-      <p-button label="Confirm & Add to bag" icon="pi pi-check" class="w-full dune-font font-bold"  
+      <p-button label="Confirm & Add to bag" icon="pi pi-check" styleClass="w-full  font-bold" size="large" 
         size="large" (onClick)="addToCart(product.variant, $event); closeSizeSelector()"></p-button>
     </div>
     }

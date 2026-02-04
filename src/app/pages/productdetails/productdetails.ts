@@ -257,6 +257,7 @@ handleLoginSuccess($event:any) {
       summary: 'Select a Size',
       detail: 'Please select a size before adding to bag.'
     });
+    this.openSizeSelector();
     return;
   }
   const payload: any = {
