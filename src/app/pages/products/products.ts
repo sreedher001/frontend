@@ -467,7 +467,7 @@ hasDiscount(product: any): boolean {
 
 getVariantFrontImage(variant: any): string {
   const frontImage = variant.productImage?.find((img: any) => img.viewType === 'front');
-  return frontImage?.imageUrl || 'assets/placeholder.jpg';
+  return frontImage?.imageUrl;
 }
 
 getVariantFinalPrice(variant: any): number {

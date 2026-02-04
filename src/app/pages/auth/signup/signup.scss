@@ -1,0 +1,25 @@
+.otp-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.otp-container h2 {
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--text-color-secondary);
+  margin-bottom: 1.5rem;
+}
+
+p-inputotp {
+  margin-bottom: 1.5rem;
+}
+
+.otp-actions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}

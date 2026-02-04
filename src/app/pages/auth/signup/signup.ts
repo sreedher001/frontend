@@ -38,9 +38,10 @@ import { Tooltip, TooltipModule } from "primeng/tooltip";
 import { DialogModule } from 'primeng/dialog';
 import { Divider, DividerModule } from 'primeng/divider';
 import { JwtHelper } from '@/jwt/jwt-helper';
+import { InputOtpModule } from 'primeng/inputotp';
 @Component({
   selector: 'app-signup',
-  imports: [CommonModule,ReactiveFormsModule,
+  imports: [CommonModule,ReactiveFormsModule,InputOtpModule,
     FormsModule,
     InputTextModule,
     ButtonModule,
@@ -75,7 +76,8 @@ import { JwtHelper } from '@/jwt/jwt-helper';
 })
 
 export class Signup {
-
+displayOtpDialog: boolean = false;
+  otpValue: string = '';
 displayConfirmation: boolean = false;
   user = {
     username: '',
@@ -121,7 +123,7 @@ if (signupForm.invalid) {
       return;
     }
 
-     // 👇 Password mismatch check
+     //  Password mismatch check
   if (this.user.password !== this.user.confirmPassword) {
     this.messageService.add({
       key: 'global',
@@ -145,9 +147,9 @@ if (signupForm.invalid) {
         key: 'global',
         severity: 'success',
         summary: 'Verify your mail!',
-        detail: `Click on the link sent to your email -${this.user.email} and verify`,
+        detail: `Enter the OTP sent to your email -${this.user.email} and verify`,
         sticky:true
-      });
+      }); this.displayOtpDialog = true;
         },
         error: (err) => {
           this.loading = false;
@@ -169,6 +171,53 @@ if (signupForm.invalid) {
   openConfirmation() {
     this.displayConfirmation = true;
   }
+
+  submitOtp() {
+  if (!this.otpValue || this.otpValue.length !== 6) {
+    this.messageService.add({
+      key: 'global',
+      severity: 'error',
+      summary: 'Invalid OTP',
+      detail: 'Please enter a valid 6-digit OTP'
+    });
+    return;
+  }
+
+  this.loginService.verifyOtp(this.user.email,this.otpValue).subscribe({
+    next: () => {
+      this.messageService.add({
+        key: 'global',
+        severity: 'success',
+        summary: 'Verified',
+        detail: 'Account verified successfully'
+      });
+
+      this.displayOtpDialog = false;
+      this.router.navigate(['/auth/login'], {
+    queryParams: { email: this.user.email }
+  });
+    },
+    error: (err) => {
+      this.messageService.add({
+        key: 'global',
+        severity: 'error',
+        summary: 'OTP Failed',
+        detail: err.error.message
+      });
+    }
+  });
+}
+
+resendOtp() {
+  this.loginService.sendForgotOtp(this.user.email).subscribe(() => {
+    this.messageService.add({
+      key: 'global',
+      severity: 'info',
+      summary: 'OTP Sent',
+      detail: 'A new OTP has been sent to your email'
+    });
+  });
+}
 }
 
 

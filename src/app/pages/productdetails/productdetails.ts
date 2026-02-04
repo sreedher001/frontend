@@ -344,7 +344,7 @@ console.log("guestCart",guestCart);
 
   buyNow(variant: any,event: Event): void {
    
-  this.addToCart(variant,event,true);
+  this.addToCart(variant,event,false);
   
   }
 

@@ -161,3 +161,46 @@
 
   
 </form>
+
+<p-dialog
+[dismissableMask]="false"
+  [closeOnEscape]="false"
+  [focusOnShow]="false"
+  [blockScroll]="true"
+  [(visible)]="displayOtpDialog"
+  modal="true"
+  [closable]="false"
+  [style]="{ width: '400px' }"
+  header="Account Verification">
+
+  <div class="otp-container">
+
+    <h2>Authenticate Your Account</h2>
+
+    <p class="subtitle">
+      Please enter the 6-digit code sent to your email
+    </p>
+
+    <p-inputotp
+      [(ngModel)]="otpValue"
+      [length]="6"
+      [integerOnly]="true"
+      [ngModelOptions]="{ standalone: true }">
+    </p-inputotp>
+
+    <div class="otp-actions">
+      <p-button
+        label="Resend Code"
+        link="true"
+        (onClick)="resendOtp()">
+      </p-button>
+
+      <p-button
+        label="Submit Code"
+        (onClick)="submitOtp()">
+      </p-button>
+    </div>
+
+  </div>
+</p-dialog>
+

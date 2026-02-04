@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -50,7 +50,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
       <p-password
   [(ngModel)]="password"
   id="password1"
-  placeholder="Password"
+  placeholder="Password" #passwordInput name="password"
   [toggleMask]="true"
   [feedback]="false"
   [inputStyle]="{ width: '100%' }"
@@ -170,32 +170,19 @@ forgotOtp = '';
 newPassword = '';
 confirmPassword = '';
 
-
+ @ViewChild('passwordInput') passwordInput!: ElementRef<HTMLInputElement>;
     constructor(private loginService: LoginService, private router: Router, private jwtHelper: JwtHelper, 
       private messageService: MessageService,private route: ActivatedRoute) { }
 
     ngOnInit() {
   this.route.queryParams.subscribe(params => {
-    const verifiedStatus = params['verified'];
+    if (params['email']) {
+      this.email = params['email'];
 
-    if (verifiedStatus === 'success') {
-      this.messageService.add({
-        key:'global',
-        severity: 'success',
-        summary: 'Email Verified',
-        detail: 'Your email has been successfully verified. Please log in.',
-        sticky:true
-      });
-    }
-
-    if (verifiedStatus === 'failed') {
-      this.messageService.add({
-        key:'global',
-        severity: 'error',
-        summary: 'Verification Failed',
-        detail: 'Invalid or expired verification link.',
-        sticky:true
-      });
+      // Optional: focus password
+      setTimeout(() => {
+        this.passwordInput?.nativeElement.focus();
+      }, 200);
     }
   });
 }

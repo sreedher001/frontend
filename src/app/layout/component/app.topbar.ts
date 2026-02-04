@@ -218,8 +218,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
         </button>
 <!-- Color Picker (Commented) -->
         
-       @if(isAdmin){<div class="">
-            <button
+       <div class="">
+            @if(isAdmin){<button
                 class="layout-topbar-action layout-topbar-action-highlight"
                 pStyleClass="@next"
                 enterFromClass="hidden"
@@ -229,9 +229,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
                 [hideOnOutsideClick]="true"
             >
                 <i class="pi pi-palette"></i>
-            </button>
+            </button>}
             <app-configurator />
-        </div> }
+        </div> 
         <!-- User Menu -->
        <p-drawer 
   [header]="'Hello ' + userName"
