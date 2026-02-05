@@ -33,6 +33,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   localStorage.removeItem('authToken');
   localStorage.removeItem('userName');
   localStorage.removeItem('isLoggedIn');
+  window.location.reload();
   messageService.add({key:'global', severity: 'warn', summary: 'Session Expired', detail: 'Please log in again.' });
   
 }
