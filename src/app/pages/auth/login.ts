@@ -214,8 +214,8 @@ confirmPassword = '';
                     const userInfo = this.jwtHelper.getUserInfo();
                     localStorage.setItem('userName', userInfo?.name);
                 }
-
-                this.router.navigate(['/']);
+window.location.reload();
+                //this.router.navigate(['/']);
                 this.email = "";
                 this.password = "";
                 this.loginSuccess.emit(res);
