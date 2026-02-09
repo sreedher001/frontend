@@ -34,7 +34,7 @@ export class CommonService {
         this.domain = 'https://stage-api.example.com/stage';
         break;
       case 'prod':
-        this.domain = 'https://prod-api.example.com/prod';
+        this.domain = 'https://uld3hh3zn9.execute-api.ap-south-1.amazonaws.com/prod';
         break;
       default:
         this.domain = 'https://o0y0tzrazj.execute-api.eu-north-1.amazonaws.com/dev';
