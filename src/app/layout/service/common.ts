@@ -16,7 +16,7 @@ export class CommonService {
       stage = 'dev';
     } else if (hostname.includes('d2abc123xyz.cloudfront.net')) {
       stage = 'qa';
-    } else if (hostname.includes('myapp.com')) {
+    } else if (hostname.includes('zfc-store.com')) {
       stage = 'prod';
     }
 
