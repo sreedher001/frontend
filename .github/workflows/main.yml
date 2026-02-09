@@ -3,7 +3,7 @@ name: Deploy Angular App to S3 + CloudFront
 on:
   push:
     branches:
-      - master   # only deploy when code is merged to master
+      - develop   # only deploy when code is merged to develop
 
 jobs:
   deploy:
