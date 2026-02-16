@@ -20,4 +20,20 @@ export class ReviewService {
   submitReview(payload: ReviewRequest) {
     return this.http.post(`${this.baseUrl}/reviews/submit`, payload);
   }
+
+
+  getReviews(variantId: number, page: number, size: number) {
+  return this.http.get(
+    `${this.baseUrl}/reviews/${variantId}/reviews`,
+    {
+      params: {
+        page,
+        size,
+        sortBy: 'createdAt',
+        direction: 'desc'
+      }
+    }
+  );
+}
+
 }

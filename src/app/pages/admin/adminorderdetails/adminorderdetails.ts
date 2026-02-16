@@ -95,4 +95,8 @@ shipOrder(id: any) {
   this.router.navigate(['/admin/order/ship', id]);
 }
 
+goToDetails(variantId: number) {
+  this.router.navigate(['/product-details', variantId]);
+}
+
 }

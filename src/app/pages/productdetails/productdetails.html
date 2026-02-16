@@ -300,7 +300,7 @@
     </p-accordion-content>
   </p-accordion-panel>
 
-  <!-- 🌸 Season & Occasion -->
+  <!--  Season & Occasion -->
   <p-accordion-panel [value]="3" class="rounded-xl  overflow-hidden">
     <p-accordion-header>
       🌸 Season & Occasion
@@ -360,6 +360,8 @@
       <p-button label="Buy Now" icon="pi pi-credit-card" styleClass="w-full sm:w-auto"  
         class=" font-bold text-black" raised size="large"
         (onClick)="buyNow(product.variant, $event)"></p-button>
+        <p-button label="Show reviews" icon="pi pi-star" styleClass="w-full  font-bold" size="large" severity="danger" outlined
+        size="large" (onClick)="loadReviews(product.variant.id); closeSizeSelector()"></p-button>
     </div>
   </div>
 </div>
@@ -468,6 +470,8 @@
 </div>
 
 
+
+
 <!-- BACKDROP (only if modal open and not logged in) -->
 @if (showSignupPanel && !isLoggedIn) {
 <div class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300"></div>
@@ -525,4 +529,147 @@
   <i class="pi pi-user-plus text-xl"></i>
   <span class="font-medium whitespace-nowrap text-sm sm:text-base ">SIGN UP / SIGN IN</span>
 </div>
+}
+
+
+@if(showReviews){
+
+  <!-- Reviews Section -->
+<div >
+
+  <!-- SUMMARY BLOCK -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-2xl shadow-sm">
+
+    <!-- LEFT SIDE (Average Rating) -->
+    <div class="flex flex-col items-center justify-center border rounded p-6">
+
+      <div class="text-7xl font-bold">
+        {{ reviewSummary?.averageRating || 0 }}
+      </div>
+
+      <!-- Stars -->
+      <div class="flex gap-1 mt-3">
+        <ng-container *ngFor="let star of [1,2,3,4,5]">
+          <i
+            class="pi"
+            [ngClass]="star <= reviewSummary?.averageRating
+              ? 'pi-star-fill text-black'
+              : 'pi-star text-black'">
+          </i>
+        </ng-container>
+      </div>
+
+      <div class="text-gray-500 mt-2">
+        {{ reviewSummary?.totalReviews }} review(s)
+      </div>
+
+      <p-button 
+    label="Leave a Review" size="large"
+    icon="pi pi-pencil"
+    >
+</p-button>
+
+
+    </div>
+
+
+    <!-- RIGHT SIDE (Breakdown Bars) -->
+    <div>
+
+      <div *ngFor="let row of ratingRows" class="flex items-center gap-3 mb-3">
+
+        <!-- Star Label -->
+        <div class="flex items-center gap-1 w-16">
+          <span>{{ row.label }}</span>
+          <i class="pi pi-star-fill text-black text-sm"></i>
+        </div>
+
+        <!-- Progress -->
+        <div class="flex-1 bg-gray-200 rounded  h-3 overflow-hidden">
+          <div
+            class="bg-black h-3 rounded transition-all duration-500"
+            [style.width.%]="row.percentage">
+          </div>
+        </div>
+
+        <!-- Count -->
+        <div class="w-8 text-right font-medium">
+          {{ row.count }}
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- REVIEW LIST -->
+  <div class="mt-10 bg-white p-6 rounded-2xl shadow-sm">
+
+    <h3 class="text-xl font-semibold mb-6">
+      Customer Reviews
+    </h3>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="text-center py-6">
+      <i class="pi pi-spin pi-spinner text-3xl"></i>
+    </div>
+
+    <!-- No Reviews -->
+    <div *ngIf="!loading && reviews.length === 0" class="text-gray-500">
+      No reviews yet.
+    </div>
+
+    <!-- Review Cards -->
+    <div *ngFor="let review of reviews" class="border-b pb-6 mb-6">
+
+      <div class="flex justify-between items-center">
+
+        <div class="font-semibold text-lg">
+          {{ review.username }}<i class="pi pi-verified text-green-600"></i>
+        </div>
+<span 
+        class="flex items-center gap-1 text-xs font-medium bg-green-100 text-green-700 px-2 py-1 rounded-full">
+
+    <i class="pi pi-check-circle text-green-600"></i>
+    Verified Purchase
+
+  </span>
+        <div class="flex gap-1">
+          <ng-container *ngFor="let star of [1,2,3,4,5]">
+            <i
+              class="pi"
+              [ngClass]="star <= review.rating
+                ? 'pi-star-fill text-black'
+                : 'pi-star text-black'">
+            </i>
+          </ng-container>
+        </div>
+
+      </div>
+
+      <div class="text-gray-700 mt-3">
+        {{ review.reviewText }}
+      </div>
+
+      <div class="text-sm text-gray-400 mt-2">
+        {{ review.createdAt | date:'mediumDate' }}
+      </div>
+
+    </div>
+
+
+    <!-- Load More -->
+    <div class="text-center" *ngIf="!last && !loading">
+      <button
+        class="px-5 py-2 border rounded-full font-semibold hover:bg-gray-100 transition"
+        (click)="loadMore()">
+        Load More Reviews
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
 }

@@ -19,6 +19,7 @@ import { LoginComponent } from "../auth/login";
 import { Signup } from "../auth/signup/signup";
 import { DialogModule } from 'primeng/dialog';
 import { AccordionModule, AccordionPanel } from 'primeng/accordion';
+import { ReviewService } from '../productreview/review-service';
 
 interface RelatedItem {
   variantId:number;
@@ -118,13 +119,22 @@ showLogin = false;
 isLoggedIn:boolean =false;
 wishlistVariantIds: Set<number> = new Set(); // Store variant IDs in wishlist
 wishlistItems: any[] = [];
+reviews: any[] = [];
+reviewSummary: any;
+showReviews = false;
+ratingRows: any[] = [];
 
+page = 0;
+size = 5;
+last = false;
+variantId!: number;
 
   constructor(private route: ActivatedRoute,private productService: ProductService, private cartService: CartService,
-    private messageService: MessageService,private router: Router) {}
+    private messageService: MessageService,private router: Router,private reviewService:ReviewService) {}
   
   ngOnInit(): void {
     this.loading=true;
+    this.prepareRatingBreakdown();
     this.route.paramMap.subscribe(params => {
     this.productId = Number(params.get('id'));
     this.getProductByVariantId(this.productId);
@@ -414,5 +424,63 @@ toggleLogin() {
 }
 getSizeGuide(unit: 'cm' | 'inch') {
   return this.sizeGuideData[unit];
+}
+
+loadReviews(variantId: number) {
+  this.variantId = variantId;
+  this.page = 0;
+  this.reviews = [];
+  this.showReviews = true;
+
+  this.fetchReviews();
+}
+
+fetchReviews() {
+  this.loading = true;
+
+  this.reviewService.getReviews(
+    this.variantId,
+    this.page,
+    this.size
+  ).subscribe({
+    next: (response: any) => {
+
+      this.reviewSummary = response.summary;
+      this.prepareRatingBreakdown();
+
+      this.reviews = [...this.reviews, ...response.reviews];
+      this.last = response.last;
+
+      this.loading = false;
+    },
+    error: (err:any) => {
+      console.error(err);
+      this.loading = false;
+    }
+  });
+}
+
+
+loadMore() {
+  if (!this.last) {
+    this.page++;
+    this.fetchReviews();
+  }
+}
+
+prepareRatingBreakdown() {
+  const s = this.reviewSummary;
+  const total = s?.totalReviews || 1;
+
+  this.ratingRows = [
+    { label: 5, count: s?.fiveStar || 0 },
+    { label: 4, count: s?.fourStar || 0 },
+    { label: 3, count: s?.threeStar || 0 },
+    { label: 2, count: s?.twoStar || 0 },
+    { label: 1, count: s?.oneStar || 0 },
+  ].map(r => ({
+    ...r,
+    percentage: (r.count / total) * 100
+  }));
 }
 }
