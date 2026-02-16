@@ -15,13 +15,13 @@
           <i class="pi pi-clone text-xl"></i>
         </p-button>
 
-        @if (product.variant.rating != null) {
+        <!-- @if (product.variant.rating != null) {
         <div
           class="absolute bottom-2 right-2 bg-grey-500 text-green-600 font-semibold px-2 py-1 rounded flex items-center space-x-1 shadow">
           <i class="pi pi-star-fill "></i>
           <span class="dune-font">{{ product.variant.rating }}</span>
         </div>
-        }
+        } -->
       </div>
     </ng-template>
 
@@ -559,15 +559,42 @@
         </ng-container>
       </div>
 
-      <div class="text-gray-500 mt-2">
-        {{ reviewSummary?.totalReviews }} review(s)
-      </div>
+      <div class="mt-6 flex flex-col items-center">
 
-      <p-button 
-    label="Leave a Review" size="large"
-    icon="pi pi-pencil"
-    >
-</p-button>
+  <!-- Shield Container -->
+  <div class="relative flex items-center justify-center">
+
+    <!-- Gradient Background Circle -->
+    <div class="absolute w-32 h-32 bg-emerald-600 rounded-full blur-md opacity-20"></div>
+
+    <!-- Shield Icon -->
+    <i class="pi pi-shield text-emerald-600 drop-shadow-xl"
+       style="font-size: 110px;"></i>
+
+    <!-- Number Inside -->
+    <span
+      class="absolute text-white font-extrabold tracking-tight"
+      [ngClass]="reviewSummary?.totalReviews > 99 ? 'text-3xl' : 'text-5xl'">
+      {{ reviewSummary?.totalReviews }}
+    </span>
+
+  </div>
+
+  <!-- Verified Text -->
+  <div class="mt-5 text-center">
+    <div class="text-emerald-700 font-bold text-xl tracking-wide">
+      Verified Review(s)
+    </div>
+
+    <div class="text-gray-500 text-sm mt-1">
+      Authentic customer feedback
+    </div>
+  </div>
+
+</div>
+
+
+
 
 
     </div>
