@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ProductResponse } from '@/models/product-response.model';
 import { Product } from '@/models/product.model';
@@ -38,6 +38,7 @@ export interface AiSuggestionResponse {
   providedIn: 'root'
 })
 export class ProductService {
+  
   
 
   commonService:CommonService = new CommonService;
@@ -99,6 +100,33 @@ addVariant(productParentId:any,formData: FormData) {
     formData
   );
 }
+
+notifyStock(
+  variantId: number,
+  isLoggedIn: boolean,
+  sizeId: number,
+  email: string | null
+) {
+
+  let options = {};
+
+  if (isLoggedIn) {
+    const token = localStorage.getItem('token');
+
+    options = {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      })
+    };
+  }
+
+  return this.http.post<any>(
+    `${this.apiUrl}/interest/variants/${variantId}/sizes/${sizeId}/stock-interest`,
+    { email },
+    options
+  );
+}
+
 
 checkParentProduct(params: {
   name: string,
@@ -180,6 +208,7 @@ refreshWishlistCount() {
     .set('size', size);
   return this.http.get<any>(`${this.apiUrl}/products/search/weartype`,{params });
 }
+
 
 
 //==================AI API===============

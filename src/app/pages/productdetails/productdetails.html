@@ -92,7 +92,7 @@
     Size Guide
   </button> -->
 </div>
-      <div class="flex flex-wrap gap-3">
+      <!-- <div class="flex flex-wrap gap-3">
         @for (s of product.variant.sizes; track s.id) {
         <div class="flex flex-col items-center">
           <button type="button" (click)="selectSize(s)" [disabled]="s.availableQuantity === 0" [ngClass]="{
@@ -108,7 +108,47 @@
             }
         </div>
         }
-      </div>
+      </div> -->
+      <div class="flex flex-wrap gap-3">
+  @for (s of product.variant.sizes; track s.id) {
+  <div class="flex flex-col items-center">
+
+    <button type="button"
+      (click)="handleSizeClick(s)"
+      [ngClass]="{
+        'border border-grey-800 bg-black text-white': selectedSize?.id === s.id && s.availableQuantity > 0,
+        'border border-gray-300': selectedSize?.id !== s.id && s.availableQuantity > 0,
+        ' border border-gray-200': s.availableQuantity === 0
+      }"
+      class="dune-font w-15 h-12 rounded text-sm font-semibold flex items-center justify-center transition">
+
+      {{ s.size }}
+
+    </button>
+
+    @if (s.availableQuantity > 0 && s.availableQuantity <= s.lowStockThreshold) {
+      <span class="text-xs text-red-600 mt-1">
+        {{ s.availableQuantity }} left
+      </span>
+    }
+
+    @if (s.availableQuantity === 0) {
+      <span class="text-xs text-red-600 mt-1">
+        Out of stock
+        
+      </span>
+      <p-button
+     size="small" outlined severity="contrast"
+    (click)="handleSizeClick(s)"
+    >
+    Notify me
+  </p-button> 
+    }
+
+  </div>
+  }
+</div>
+
     </div>
     }
 
@@ -699,4 +739,58 @@
 
 </div>
 
+
+
+
 }
+<p-dialog 
+  [(visible)]="showNotifyModal"
+  [modal]="true"
+  [closable]="true"
+  [style]="{width: '400px'}"
+  header="Out of Stock">
+
+  <div class="flex flex-col gap-4">
+
+    <p>
+      Size <b>{{ selectedOutOfStockSize?.size }}</b> is currently unavailable.
+    </p>
+
+    @if (!isLoggedIn) {
+      <div>
+        <label class="block mb-2 text-sm font-medium">Email</label>
+        <input 
+  type="email"
+  pInputText
+  [(ngModel)]="guestEmail"
+  #emailModel="ngModel"
+  required
+  email
+  class="w-full" />
+
+
+      </div>
+    
+
+    <button 
+  pButton
+  icon="pi pi-bell"
+  label="Notify Me"
+  class="w-full"
+  (click)="submitStockInterest()"
+  [disabled]="!isGuestEmailValid">
+</button>
+    }@else {
+      <button 
+  pButton
+  icon="pi pi-bell"
+  label="Notify Me"
+  class="w-full"
+  (click)="submitStockInterest()"
+  ></button>
+  }
+
+<span class="text-green-800">Love it? Wishlist it. We'll alert you first. </span>
+  </div>
+
+</p-dialog>

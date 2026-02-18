@@ -182,7 +182,7 @@ autoFilteredWorkTypeValue: any[] = [];
     pattern:'',
     season:'',
     occasion:'',
-    rating:3,
+    rating:0,
     variantName:'',
     variantDescription:'',
     color: '',

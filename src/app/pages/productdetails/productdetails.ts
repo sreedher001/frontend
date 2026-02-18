@@ -20,6 +20,8 @@ import { Signup } from "../auth/signup/signup";
 import { DialogModule } from 'primeng/dialog';
 import { AccordionModule, AccordionPanel } from 'primeng/accordion';
 import { ReviewService } from '../productreview/review-service';
+import { JwtHelper } from '@/jwt/jwt-helper';
+import { InputTextModule } from 'primeng/inputtext';
 
 interface RelatedItem {
   variantId:number;
@@ -28,7 +30,7 @@ interface RelatedItem {
 }
 @Component({
   selector: 'app-productdetails',
-  imports: [GalleriaModule,ButtonModule,AccordionPanel,AccordionModule,DialogModule, FormsModule, BadgeModule, TagModule, PanelMenuModule, CarouselModule, LoginComponent, Signup],
+  imports: [GalleriaModule,ButtonModule,InputTextModule,AccordionPanel,AccordionModule,DialogModule, FormsModule, BadgeModule, TagModule, PanelMenuModule, CarouselModule, LoginComponent, Signup],
   templateUrl: './productdetails.html',
   styleUrl: './productdetails.scss'
 })
@@ -128,9 +130,11 @@ page = 0;
 size = 5;
 last = false;
 variantId!: number;
-
+showNotifyModal = false;
+selectedOutOfStockSize: any;
+guestEmail: string = '';
   constructor(private route: ActivatedRoute,private productService: ProductService, private cartService: CartService,
-    private messageService: MessageService,private router: Router,private reviewService:ReviewService) {}
+    private jwtHelper: JwtHelper,private messageService: MessageService,private router: Router,private reviewService:ReviewService) {}
   
   ngOnInit(): void {
     this.loading=true;
@@ -212,11 +216,7 @@ getDiscountedPrice(size: any): number {
 
 
 
-  selectSize(size: any) {
-  if (size.availableQuantity > 0) {
-    this.selectedSize = size;
-  }
-}
+  
   getProductByVariantId(productId:number) {
     this.loading=true;
     
@@ -483,4 +483,59 @@ prepareRatingBreakdown() {
     percentage: (r.count / total) * 100
   }));
 }
+selectSize(size: any) {
+  if (size.availableQuantity > 0) {
+    this.selectedSize = size;
+  }
+}
+handleSizeClick(size: any) {
+
+  if (size.availableQuantity === 0) {
+    this.openNotifyModal(size);
+    return;
+  }
+
+  this.selectSize(size);
+}
+openNotifyModal(size: any) {
+  this.selectedOutOfStockSize = size;
+  this.showNotifyModal = true;
+}
+
+submitStockInterest() {
+
+  const variantId = this.product.variant.id;
+  const sizeId = this.selectedOutOfStockSize.id;
+  const email = this.isLoggedIn
+    ? this.jwtHelper.getUserInfo().email
+    : this.guestEmail;
+
+  this.productService
+    .notifyStock(variantId,this.isLoggedIn, sizeId, email)
+    .subscribe({
+      next: () => {
+        this.showNotifyModal = false;
+        this.guestEmail = '';
+        this.messageService.add({
+      key: 'global',
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Your interest was registered'
+    });
+      }
+    });
+}
+
+get isGuestEmailValid(): boolean {
+  if (this.isLoggedIn) return true;
+
+  if (!this.guestEmail) return false;
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(this.guestEmail);
+}
+
+
+
+
 }
