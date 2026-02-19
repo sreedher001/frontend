@@ -129,7 +129,7 @@
     </div>
 
     <!-- CART FOOTER -->
-    @if(hasCartItems){
+    <!-- @if(hasCartItems){
     <div class="sticky bottom-0 bg-white border-t px-4 py-3">
 
       <div class="flex justify-between items-center mb-3">
@@ -150,7 +150,60 @@
       </p-button>
 
     </div>
-    }
+    } -->
+    @if(hasCartItems){
+<div class="sticky bottom-0 bg-white border-t px-4 py-3">
+
+  <!-- Subtotal -->
+  <div class="flex justify-between items-center mb-2">
+    <span class="text-sm">
+      Subtotal ({{ cart.items.length }} items)
+    </span>
+    <span>
+      ₹{{ getCartSubtotal() | number:'1.2-2' }}
+    </span>
+  </div>
+
+  <!-- Shipping -->
+  <div class="flex justify-between items-center mb-2">
+    <span class="text-sm">Shipping</span>
+    <span>
+      @if(getShippingFee() === 0){
+        <span class="text-green-600 font-medium">FREE</span>
+      }@else{
+        ₹{{ getShippingFee() | number:'1.2-2' }}
+      }
+    </span>
+  </div>
+
+  <!-- Free shipping message -->
+  @if(getShippingFee() > 0){
+    <p class="text-xs text-gray-500 mb-2">
+      Add ₹{{ 999 - getCartSubtotal() | number:'1.2-2' }} more to get FREE shipping
+    </p>
+  }
+
+  <hr class="my-2">
+
+  <!-- Final Total -->
+  <div class="flex justify-between items-center mb-3">
+    <span class="font-semibold">Total</span>
+    <span class="font-semibold">
+      ₹{{ getFinalTotal() | number:'1.2-2' }}
+    </span>
+  </div>
+
+  <p-button
+    label="Proceed to Buy" icon="pi pi-credit-card"
+    severity="contrast"
+    size="large"
+    styleClass="w-full"
+    (click)="goToCheckout()">
+  </p-button>
+
+</div>
+}
+
 
   </div>
 </div>

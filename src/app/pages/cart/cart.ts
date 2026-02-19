@@ -31,7 +31,7 @@ export class Cart implements OnInit {
 
   showSignupPanel = false;
 showLogin = false;
-
+shippingFee: number = 50;
 
   product: Product | undefined ;
   // products : Products[]=[];
@@ -243,9 +243,23 @@ goToShop() {
   this.router.navigate(['/products']);
 }
 
-  getCartTotal(): number {
-    return this.cart.items.reduce((total: number, item: any) => total + item.total, 0);
-  }
+  // getCartTotal(): number {
+  //   return this.cart.items.reduce((total: number, item: any) => total + item.total, 0);
+  // }
+  getCartSubtotal(): number {
+  return this.cart.items.reduce(
+    (total: number, item: any) => total + item.total,
+    0
+  );
+}
+
+getShippingFee(): number {
+  return this.getCartSubtotal() >= 999 ? 0 : this.shippingFee;
+}
+
+getFinalTotal(): number {
+  return this.getCartSubtotal() + this.getShippingFee();
+}
 
    goToCheckout(): void {
     if(this.isLoggedIn){

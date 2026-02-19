@@ -48,9 +48,9 @@ export class Wishlist implements OnInit {
       }else{
         this.messageService.add({
           key:'global',
-          severity:'info',
+          severity:'secondary',
           summary: 'Consider adding what you love',
-          icon:'pi pi-heart-fill'
+          icon:'pi pi-heart-fill text-red-500'
         })
       }},
       error: (err) => {
@@ -97,8 +97,8 @@ removeItemFromWishlist(variantId: number, event: MouseEvent): void {
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Yes, Remove',
       rejectLabel: 'Cancel',
-      acceptButtonStyleClass: 'p-button-warn p-button-sm',
-      rejectButtonStyleClass: 'p-button-warn p-button-outlined p-button-sm',
+      acceptButtonStyleClass: 'p-button-contrast p-button-sm',
+      rejectButtonStyleClass: 'p-button-contrast p-button-outlined p-button-sm',
       accept: () => {
         this.productService.removeFromWishlist(variantId).subscribe({
           next: () => {

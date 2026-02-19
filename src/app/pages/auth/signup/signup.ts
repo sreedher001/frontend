@@ -99,7 +99,7 @@ displayConfirmation: boolean = false;
   ];
 
   isAdmin: boolean = false;
-
+acceptedTerms: boolean = false;
   constructor(
     private loginService: LoginService,
     private router: Router,
@@ -217,6 +217,10 @@ resendOtp() {
       detail: 'A new OTP has been sent to your email'
     });
   });
+}
+
+navigateToTandC(){
+   this.router.navigate(['/terms-and-conditions']);
 }
 }
 

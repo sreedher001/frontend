@@ -329,6 +329,7 @@ verifyRazorpayPayment(payload: any) {
   this.showAddAddressDialog = true;
 
   this.addressForm.patchValue({
+    name:address.name,
     address: address.address,
     phoneNumber: address.phoneNumber,
     country: address.country,
@@ -353,7 +354,7 @@ deleteAddress(addressId: number) {
       this.checkoutService.deleteShippingAddress(this.userId, addressId).subscribe({
         next: () => {
           this.addresses = this.addresses.filter(addr => addr.id !== addressId);
-          this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Address deleted successfully' });
+          this.messageService.add({ severity: 'contrast', summary: 'Deleted', detail: 'Address deleted successfully' });
         },
         error: err => {
           console.error('Error deleting address', err);

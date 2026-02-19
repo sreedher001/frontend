@@ -113,14 +113,14 @@
   @for (s of product.variant.sizes; track s.id) {
   <div class="flex flex-col items-center">
 
-    <button type="button"
+    <button type="button" style="border:1px solid #000"
       (click)="handleSizeClick(s)"
       [ngClass]="{
-        'border border-grey-800 bg-black text-white': selectedSize?.id === s.id && s.availableQuantity > 0,
+        'border border-black bg-black text-white': selectedSize?.id === s.id && s.availableQuantity > 0,
         'border border-gray-300': selectedSize?.id !== s.id && s.availableQuantity > 0,
         ' border border-gray-200': s.availableQuantity === 0
       }"
-      class="dune-font w-15 h-12 rounded text-sm font-semibold flex items-center justify-center transition">
+      class="dune-font w-15 h-12 rounded-sm text-sm font-semibold flex items-center justify-center transition">
 
       {{ s.size }}
 
@@ -139,7 +139,7 @@
       </span>
       <p-button
      size="small" outlined severity="contrast"
-    (click)="handleSizeClick(s)"
+    (click)="handleSizeClick(s)" raised
     >
     Notify me
   </p-button> 
@@ -467,17 +467,17 @@
       <i class="pi pi-times text-xl"></i>
     </button>
   </div>
-<div class="p-2 flex justify-between items-center"><button
+<!-- <div class="p-2 flex justify-between items-center"><button
     class="text-lg text-black underline"
     type="button"
     (click)="showSizeGuide = true"
   >
     Size Guide
-  </button></div>
+  </button></div> -->
   <div class="p-4">
     <!-- Size Buttons Reuse -->
     <div class="flex flex-wrap gap-3">
-      @for (s of product.variant.sizes; track s.id) {
+      <!-- @for (s of product.variant.sizes; track s.id) {
       <button type="button" (click)="selectSize(s)" [disabled]="s.availableQuantity === 0" [ngClass]="{
             'border border-black bg-black text-white': selectedSize?.id === s.id,
             'border border-gray-300': selectedSize?.id !== s.id,
@@ -485,7 +485,46 @@
           }" class="dune-font w-16 h-12 rounded text-sm font-medium">
         {{ s.size }}
       </button>
-      }
+      } -->
+      @for (s of product.variant.sizes; track s.id) {
+  <div class="flex flex-col items-center">
+
+    <button type="button" style="border:1px solid #000"
+      (click)="handleSizeClick(s)"  
+      [ngClass]="{
+        
+        'border border-black bg-black text-white': selectedSize?.id === s.id && s.availableQuantity > 0,
+        'border border-gray-300': selectedSize?.id !== s.id && s.availableQuantity > 0,
+        ' border border-gray-200': s.availableQuantity === 0
+      }"
+      class="dune-font w-16 h-12   rounded-sm 
+       text-sm font-semibold flex items-center justify-center transition">
+
+      {{ s.size }}
+
+    </button>
+
+    @if (s.availableQuantity > 0 && s.availableQuantity <= s.lowStockThreshold) {
+      <span class="text-xs text-red-600 mt-1">
+        {{ s.availableQuantity }} left
+      </span>
+    }
+
+    @if (s.availableQuantity === 0) {
+      <span class="text-xs text-red-600 mt-1">
+        Out of stock
+        
+      </span>
+      <p-button
+     size="small" outlined severity="contrast"
+    (click)="handleSizeClick(s)" raised
+    >
+    Notify me
+  </p-button> 
+    }
+
+  </div>
+  }
     </div>
 
     <!-- Price on Size Selection -->

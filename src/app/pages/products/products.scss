@@ -6,3 +6,41 @@
   transform: scale(1.02);
 }
 
+.marquee-wrapper {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee-track {
+  display: inline-flex;
+  gap: 4rem;
+  animation: premiumMarquee 25s linear infinite;
+  will-change: transform;
+}
+
+.marquee-item {
+  font-weight: 500;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  opacity: 0.95;
+  transition: transform 0.3s ease;
+}
+
+.marquee-item:hover {
+  transform: scale(1.08);
+}
+
+@keyframes premiumMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Pause animation on hover */
+.marquee-wrapper:hover .marquee-track {
+  animation-play-state: running;
+}
+@media (max-width: 768px) {
+  .marquee-track {
+    animation-duration: 15s;
+  }
+}
