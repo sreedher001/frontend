@@ -6,17 +6,18 @@ import { BestSellingWidget } from './components/bestsellingwidget';
 import { RevenueStreamWidget } from './components/revenuestreamwidget';
 import { Adminorder } from "../admin/adminorder/adminorder";
 import { Salestrend } from "./salestrend/salestrend";
+import { ExpenseAnalytics } from "../admin/expense-analytics/expense-analytics";
 
 @Component({
     selector: 'app-dashboard',
-    imports: [Adminorder, Salestrend, NotificationsWidget],
+    imports: [Adminorder, Salestrend, NotificationsWidget, ExpenseAnalytics],
     template: `
         <div class="grid grid-cols-12 gap-8">
             <!-- <app-stats-widget class="contents" /> -->
             <div class="col-span-12 xl:col-span-6">
                 <!-- <app-recent-sales-widget /> -->
                  <app-salestrend/>
-                 
+                 <app-expense-analytics/>
                 <!-- <app-best-selling-widget /> -->
             </div>
             <div class="col-span-12 xl:col-span-6">

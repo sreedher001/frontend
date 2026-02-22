@@ -1,0 +1,146 @@
+<div class="p-3 md:p-4">
+
+  <div class="card p-3 md:p-4 border-round-xl shadow-2">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:align-items-center sm:justify-between gap-4 mb-4">
+
+      <h2 class="text-xl md:text-2xl font-bold m-0">
+        Expense Analytics
+      </h2>
+
+      <div class="flex items-center gap-3 ">
+
+        <p-floatlabel variant="in" class="w-full sm:w-auto">
+          <p-datepicker
+            [(ngModel)]="startDate"
+            inputId="startDate" [iconDisplay]="'input'"
+            [showIcon]="true"
+            [maxDate]="maxDate"
+            styleClass="w-full sm:w-12rem">
+          </p-datepicker>
+          <label for="startDate">Start Date</label>
+        </p-floatlabel>
+
+        <p-floatlabel variant="in" class="w-full sm:w-auto">
+          <p-datepicker
+            [(ngModel)]="endDate"
+            inputId="endDate" [iconDisplay]="'input'"
+            [showIcon]="true"
+            [maxDate]="maxDate"
+            styleClass="w-full sm:w-12rem">
+          </p-datepicker>
+          <label for="endDate">End Date</label>
+        </p-floatlabel>
+
+        <p-button
+          icon="pi pi-chart-pie"
+          label="Analyze"
+          class="w-full sm:w-auto"
+          (click)="loadData(startDate, endDate)">
+        </p-button>
+
+      </div>
+    </div>
+
+    @if(summary){
+<div class="mb-4">
+
+  <div class="flex flex-wrap lg:flex-nowrap 
+              align-items-center 
+              justify-content-between 
+              gap-3 
+              p-3 
+              border-round-xl 
+              surface-100 shadow-1">
+
+    <!-- Total Expense -->
+    <div class="flex align-items-center gap-2 flex-1 min-w-max">
+      <i class="pi pi-wallet text-500 text-lg"></i>
+      <div>
+        <div class="text-500 text-sm">Total Expense</div>
+        <div class="text-lg font-semibold">
+          ₹ {{ summary.totalExpense }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="hidden lg:block border-left-1 surface-border h-3rem"></div>
+
+    <!-- Total Invoices -->
+    <div class="flex align-items-center gap-2 flex-1 min-w-max">
+      <i class="pi pi-file text-500 text-lg"></i>
+      <div>
+        <div class="text-500 text-sm">Total Invoices</div>
+        <div class="text-lg font-semibold">
+          {{ summary.totalInvoices }}
+        </div>
+      </div>
+    </div>
+
+    <div class="hidden lg:block border-left-1 surface-border h-3rem"></div>
+
+    <!-- Average Expense -->
+    <div class="flex align-items-center gap-2 flex-1 min-w-max">
+      <i class="pi pi-chart-line text-500 text-lg"></i>
+      <div>
+        <div class="text-500 text-sm">Average Expense</div>
+        <div class="text-lg font-semibold">
+          ₹ {{ summary.averageExpense }}
+        </div>
+      </div>
+    </div>
+
+    <div class="hidden lg:block border-left-1 surface-border h-3rem"></div>
+
+    <!-- Highest Expense -->
+    <div class="flex align-items-center gap-2 flex-1 min-w-max">
+      <i class="pi pi-arrow-up text-500 text-lg"></i>
+      <div>
+        <div class="text-500 text-sm">Highest Expense</div>
+        <div class="text-lg font-semibold">
+          ₹ {{ summary.highestExpense }}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+}
+
+    <!-- Charts -->
+    <div class="grid">
+
+      <div class="col-12 lg:col-3">
+        <div class="card p-3 border-round-xl shadow-1">
+          <div class="text-lg font-semibold mb-3">
+            Expense by Category
+          </div>
+          <p-chart type="doughnut" [data]="categoryChart"></p-chart>
+        </div>
+      </div>
+
+      <div class="col-12 lg:col-3">
+        <div class="card p-3 border-round-xl shadow-1">
+          <div class="text-lg font-semibold mb-3">
+            Expense by Payment Method
+          </div>
+          <p-chart type="doughnut" [data]="paymentChart"></p-chart>
+        </div>
+      </div>
+
+      <div class="col-12 lg:col-6 mt-3">
+        <div class="card p-3 border-round-xl shadow-1">
+          <div class="text-lg font-semibold mb-3">
+            Monthly Expense Trend
+          </div>
+          <p-chart type="line" [data]="monthlyChart"></p-chart>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

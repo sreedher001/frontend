@@ -200,13 +200,12 @@ confirmPassword = '';
               
                 this.messageService.add({
                     key: 'global',
-                    severity: 'success',
+                    severity: 'secondary',
                     summary: 'TADA! You’re in!',
                     //detail: err.error?.message || 'Username/password is incorrect'
                     detail:'Welcome to ZFC — ready to shop? Let’s go!',
                     sticky:false
                 });
-                console.log('Login success', res);
                 const token = res?.token; // Make sure `res.token` contains the JWT
                 if (token) {
                     localStorage.setItem('authToken', token);

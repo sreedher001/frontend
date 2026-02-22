@@ -38,15 +38,20 @@ export class Return {
 
   constructor(private http: HttpClient) {}
 
-  getAllReturns(status: string, page: number, size: number) {
+  getAllReturns(status: string | null, page: number, size: number) {
+
+    let params: any = {
+    page: page,
+    size: size
+  };
+
+  if (status) {
+    params.status = status;
+  }
   return this.http.get(
     `${this.baseUrl}/admin/returns/all-returns`,
     {
-      params: {
-        status,
-        page,
-        size
-      }
+      params
     }
   );
 }

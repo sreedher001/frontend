@@ -45,7 +45,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     <!-- Logo -->
     <a class="layout-topbar-logo ml-2" routerLink="/products">
       <!-- <img src="assets/images/logo.png" alt="ZFC" class="h-10" /> -->
-      <span class="my-title">ZFC</span>
+      <span class="my-title">ZYRA</span>
     </a>
   </div>
 
@@ -510,9 +510,9 @@ formatProduct(product: any): string {
     patternPart,
     base.toLowerCase(),
     genderPart,
-    stylePart,
-    occasionPart,
-    seasonPart,
+     stylePart
+    // occasionPart,
+    // seasonPart,
   ]
     .filter(Boolean)
     .join(' ')
@@ -521,7 +521,7 @@ formatProduct(product: any): string {
 
   // Capitalize first letter for clean UI
   return description.charAt(0).toUpperCase() + description.slice(1);
-}
+} 
 
 highlightSearch(product: any, query: string): SafeHtml {
   if (!product?.productName || !query) return product?.productName ?? '';

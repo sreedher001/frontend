@@ -50,7 +50,7 @@ totalRecords = 0;
     'CLOSED'
   ];
 
-  selectedStatus: string ='REQUESTED';
+  selectedStatus!: string;
   filteredStatuses: string[] = [];
   filterStatus(event: any) {
   const query = event.query.toLowerCase();
