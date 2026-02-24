@@ -42,7 +42,7 @@ ngOnInit(): void {
   const today = new Date();
   this.startDate = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    this.loadData(this.startDate, this.endDate);
+    //this.loadData(this.startDate, this.endDate);
   }
 
   loadData(startDate: Date, endDate: Date) {
@@ -88,6 +88,7 @@ ngOnInit(): void {
           }]
         };
       });
+      this.loading=false;
   }
 
   formatLocalDate(date: Date): string {

@@ -84,13 +84,13 @@
       <div class="flex items-center justify-between mt-4">
   <h3 class="text-sm font-semibold mb-2  ">Select Size</h3>
 
-  <!-- <button
+  <button
     class="text-sm text-orange-600 underline "
     type="button"
     (click)="showSizeGuide = true"
   >
     Size Guide
-  </button> -->
+  </button>
 </div>
       <!-- <div class="flex flex-wrap gap-3">
         @for (s of product.variant.sizes; track s.id) {
@@ -160,54 +160,119 @@
   header="Size Guide"
   [(visible)]="showSizeGuide"
   [modal]="true"
-  [style]="{ width: '90vw', maxWidth: '500px' }"
+  [style]="{ width: '90vw', maxWidth: '700px' }"
   [breakpoints]="{ '960px': '95vw' }"
-  [dismissableMask]="true" 
+  [dismissableMask]="true"
 >
-  <!-- Toggle Buttons -->
-  <div class="flex justify-end mb-4">
-    <button
-      type="button"
-      class="px-3 py-1 text-sm font-semibold rounded-l border border-gray-300"
-      [ngClass]="{ 'bg-orange-500 text-white': unit === 'cm', 'bg-white text-gray-700': unit !== 'cm' }"
-      (click)="unit = 'cm'"
-    >
-      CM
-    </button>
-    <button
-      type="button"
-      class="px-3 py-1 text-sm font-semibold rounded-r border border-gray-300"
-      [ngClass]="{ 'bg-orange-500 text-white': unit === 'inch', 'bg-white text-gray-700': unit !== 'inch' }"
-      (click)="unit = 'inch'"
-    >
-      INCH
-    </button>
+
+  <p-tabs value="size">
+
+    <!-- Tab Headers -->
+    <p-tablist>
+      <p-tab value="size">Size Chart</p-tab>
+      <p-tab value="measure">How to Measure</p-tab>
+    </p-tablist>
+
+    <!-- Tab Content -->
+    <p-tabpanels>
+
+      <!-- SIZE CHART TAB -->
+      <p-tabpanel value="size">
+
+        <!-- Toggle Buttons -->
+        <div class="flex justify-end mb-4">
+          <button
+            type="button"
+            class="px-3 py-1 text-sm font-semibold rounded-l border border-gray-300"
+            [ngClass]="{ 'bg-black text-white': unit === 'cm', 'bg-white text-gray-700': unit !== 'cm' }"
+            (click)="unit = 'cm'"
+          >
+            CM
+          </button>
+          <button
+            type="button"
+            class="px-3 py-1 text-sm font-semibold rounded-r border border-gray-300"
+            [ngClass]="{ 'bg-black text-white': unit === 'inch', 'bg-white text-gray-700': unit !== 'inch' }"
+            (click)="unit = 'inch'"
+          >
+            INCH
+          </button>
+        </div>
+
+        <div class="text-sm text-gray-700 space-y-2">
+          <p class="text-xs text-gray-500 italic">
+            All measurements are approximate.
+          </p>
+
+          <table class="w-full text-left border border-gray-100 text-sm">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="p-2">Sizes</th>
+                <th class="p-2">Standard Size</th>
+                <th class="p-2">To Fit Bust</th>
+                <th class="p-2">To Fit Waist</th>
+                <th class="p-2">To Fit Hip</th>
+                <th class="p-2">Front Length</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of getSizeGuide(unit); track row) {
+                <tr>
+                  <td class="p-2">{{ row.size }}</td>
+                  <td class="p-2">{{ row.standardSize }}</td>
+                  <td class="p-2">{{ row.bust }}</td>
+                  <td class="p-2">{{ row.waist }}</td>
+                  <td class="p-2">{{ row.hip }}</td>
+                  <td class="p-2">{{ row.frontLength }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+      </p-tabpanel>
+
+      <!-- HOW TO MEASURE TAB -->
+      <p-tabpanel value="measure">
+
+        <div class="text-center">
+          <img
+            src="assets/images/how-to-measure.png"
+            alt="How to Measure"
+            class="w-full max-w-md mx-auto"
+          />
+        </div>
+
+        <div class="mt-6 space-y-6 text-sm text-gray-700 leading-relaxed">
+
+  <div>
+    <p class="font-semibold tracking-wide uppercase text-xs text-gray-500">Shoulder</p>
+    <p>Measure from the tip of one shoulder straight across to the other.</p>
   </div>
 
-  <!-- Table -->
-  <div class="text-sm text-gray-700  space-y-2">
-    <p class="text-xs text-gray-500 italic">All measurements are approximate.</p>
-
-    <table class="w-full text-left border border-gray-300 text-sm">
-      <thead class="bg-gray-100">
-        <tr>
-          <th class="p-2 border uppercase">Size</th>
-          <th class="p-2 border uppercase">Chest ({{ unit }})</th>
-          <th class="p-2 border uppercase">Waist ({{ unit }})</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (row of getSizeGuide(unit); track row) {
-  <tr>
-    <td class="p-2 border">{{ row.size }}</td>
-    <td class="p-2 border">{{ row.chest }}</td>
-    <td class="p-2 border">{{ row.waist }}</td>
-  </tr>
-}
-
-      </tbody>
-    </table>
+  <div>
+    <p class="font-semibold tracking-wide uppercase text-xs text-gray-500">Bust</p>
+    <p>Wrap the tape around the fullest part of your bust, keeping it level.</p>
   </div>
+
+  <div>
+    <p class="font-semibold tracking-wide uppercase text-xs text-gray-500">Waist</p>
+    <p>Measure around your natural waistline at the narrowest point.</p>
+  </div>
+
+  <div>
+    <p class="font-semibold tracking-wide uppercase text-xs text-gray-500">Hips</p>
+    <p>Measure around the fullest part of your hips.</p>
+  </div>
+
+</div>
+
+      </p-tabpanel>
+
+    </p-tabpanels>
+
+  </p-tabs>
+
 </p-dialog>
 
 
@@ -467,13 +532,13 @@
       <i class="pi pi-times text-xl"></i>
     </button>
   </div>
-<!-- <div class="p-2 flex justify-between items-center"><button
+<div class="p-2 flex justify-between items-center"><button
     class="text-lg text-black underline"
     type="button"
     (click)="showSizeGuide = true"
   >
     Size Guide
-  </button></div> -->
+  </button></div>
   <div class="p-4">
     <!-- Size Buttons Reuse -->
     <div class="flex flex-wrap gap-3">

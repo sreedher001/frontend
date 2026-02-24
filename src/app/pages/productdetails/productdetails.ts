@@ -22,6 +22,7 @@ import { AccordionModule, AccordionPanel } from 'primeng/accordion';
 import { ReviewService } from '../productreview/review-service';
 import { JwtHelper } from '@/jwt/jwt-helper';
 import { InputTextModule } from 'primeng/inputtext';
+import { TabPanel, TabsModule } from "primeng/tabs";
 
 interface RelatedItem {
   variantId:number;
@@ -30,7 +31,7 @@ interface RelatedItem {
 }
 @Component({
   selector: 'app-productdetails',
-  imports: [GalleriaModule,ButtonModule,InputTextModule,AccordionPanel,AccordionModule,DialogModule, FormsModule, BadgeModule, TagModule, PanelMenuModule, CarouselModule, LoginComponent, Signup],
+  imports: [GalleriaModule,TabsModule, ButtonModule, InputTextModule, AccordionPanel, AccordionModule, DialogModule, FormsModule, BadgeModule, TagModule, PanelMenuModule, CarouselModule, LoginComponent, Signup, TabPanel],
   templateUrl: './productdetails.html',
   styleUrl: './productdetails.scss'
 })
@@ -50,20 +51,20 @@ unit: 'cm' | 'inch' = 'cm';
 //  product: Product |null=null;
 sizeGuideData = {
   cm: [
-    { size: 'XS', chest: 86, waist: 71 },
-    { size: 'S', chest: 91, waist: 76 },
-    { size: 'M', chest: 97, waist: 81},
-    { size: 'L', chest: 102, waist: 86 },
-    { size: 'XL', chest: 107, waist: 91 },
-    { size: 'XXL', chest: 112, waist: 96 }
+    { size: '32', standardSize: 'S', bust: '81-84', waist: '71-74', hip: '91-94', frontLength: '109' },
+    { size: '34', standardSize: 'M', bust: '86-89', waist: '76-79', hip: '97-99', frontLength: '112' },
+    { size: '35', standardSize: 'L', bust: '91-94', waist: '81-84', hip: '102-104', frontLength: '114' },
+    { size: '38', standardSize: 'XL', bust: '97-99', waist: '86-89', hip: '107-109', frontLength: '114' },
+    { size: '42', standardSize: 'XXL', bust: '107-109', waist: '102-104', hip: '119-122', frontLength: '114' },
+    { size: '46', standardSize: '5XL', bust: '117-119', waist: '112-114', hip: '130-132', frontLength: '117' }
   ],
   inch: [
-    { size: 'XS', chest: 34, waist: 28 },
-    { size: 'S', chest: 36, waist: 30 },
-    { size: 'M', chest: 38, waist: 32 },
-    { size: 'L', chest: 40, waist: 34 },
-    { size: 'XL', chest: 42, waist: 36 },
-    { size: 'XXL', chest: 44, waist: 38 }
+    { size: '32', standardSize: 'S', bust: '32-33', waist: '28-29', hip: '36-37', frontLength: '43' },
+    { size: '34', standardSize: 'M', bust: '34-35', waist: '30-31', hip: '38-39', frontLength: '44' },
+    { size: '35', standardSize: 'L', bust: '36-37', waist: '32-33', hip: '40-41', frontLength: '45' },
+    { size: '38', standardSize: 'XL', bust: '38-39', waist: '34-35', hip: '42-43', frontLength: '45' },
+    { size: '42', standardSize: 'XXL', bust: '42-43', waist: '40-41', hip: '47-48', frontLength: '45' },
+    { size: '46', standardSize: '5XL', bust: '46-47', waist: '44-45', hip: '51-52', frontLength: '46' }
   ]
 };
 product: Product = {
