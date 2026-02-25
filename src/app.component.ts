@@ -27,28 +27,27 @@ declare let gtag: any;
     <p-toast key="global" position="top-center" [baseZIndex]="10000"></p-toast>
 <div
   *ngIf="isLoading"
-  class="zfc-loader fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-md z-50"
+  class="zfc-loader fixed inset-0 flex items-center justify-center"
 >
   <div class="zfc-text dune-font">
-    <span>Z</span><span>F</span><span>C</span>
+    <span>Z</span><span>Y</span><span>R</span><span>A</span>
   </div>
 </div>
 
     <router-outlet></router-outlet>
   `,styles: [`
-    .zfc-text {
+    .zfc-text span {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: reveal 0.6s ease forwards;
+  font-size: 4rem; font-weight: 800; letter-spacing: 0.2em; display: flex; gap: 0.4rem; background: linear-gradient(90deg, #c9892b, #f5d77c, #c9892b); background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
       
-  font-size: 4rem;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  display: flex;
-  gap: 0.4rem;
-  background: linear-gradient(90deg, #c9892b, #f5d77c, #c9892b);
-  background-size: 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: goldFlow 3s linear infinite;
 }
+
+.zfc-text span:nth-child(1) { animation-delay: 0.1s; }
+.zfc-text span:nth-child(2) { animation-delay: 0.2s; }
+.zfc-text span:nth-child(3) { animation-delay: 0.3s; }
+.zfc-text span:nth-child(4) { animation-delay: 0.4s; }
 
 @keyframes goldFlow {
   0% { background-position: 0%; }
@@ -61,6 +60,12 @@ declare let gtag: any;
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
   `]

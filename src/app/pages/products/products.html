@@ -75,8 +75,8 @@
       class="bg-red-100 relative min-w-[140px] sm:min-w-[160px] h-[600px]  overflow-hidden shadow-md border border-gray-100 bg-white cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl group">
 
       <!-- PrimeNG Icon Button for Wishlist -->
-      <p-button [icon]="isInWishlist(variant) ? 'pi pi-heart-fill' : 'pi pi-heart'"
-        [severity]="isInWishlist(variant) ? 'danger' : 'help'" outlined [raised]="isInWishlist(variant) ? true:false"
+      <p-button [icon]="isInWishlist(variant) ? 'pi pi-heart-fill' : 'pi pi-heart'" 
+        [severity]="isInWishlist(variant) ? 'danger' : 'secondary'" outlined  [raised]="isInWishlist(variant) ? true:false"
         rounded size="small" class="absolute top-2 right-2 z-10"
         pTooltip="{{ isInWishlist(variant) ? 'Remove from Wishlist' : 'Add to Wishlist' }}" tooltipPosition="left"
         (onClick)="toggleWishlist(variant, $event)">

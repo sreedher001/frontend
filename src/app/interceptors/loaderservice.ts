@@ -12,7 +12,6 @@ export class LoaderService {
   show(): void {
   this.zone.run(() => {
     this.loaderCount++;
-    console.log('LoaderService: show called, count =', this.loaderCount);
     this.loadingSubject.next(true);
   });
 }
@@ -20,7 +19,6 @@ export class LoaderService {
 hide(): void {
   this.zone.run(() => {
     this.loaderCount = Math.max(this.loaderCount - 1, 0);
-    console.log('LoaderService: hide called, count =', this.loaderCount);
     if (this.loaderCount === 0) {
       this.loadingSubject.next(false);
     }
