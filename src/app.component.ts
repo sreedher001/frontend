@@ -39,15 +39,17 @@ declare let gtag: any;
     .zfc-text span {
   opacity: 0;
   transform: translateY(20px);
-  animation: reveal 0.6s ease forwards;
-  font-size: 4rem; font-weight: 800; letter-spacing: 0.2em; display: flex; gap: 0.4rem; background: linear-gradient(90deg, #c9892b, #f5d77c, #c9892b); background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+  animation: reveal 0.6s ease-in-out infinite;
+  font-size: 4rem; font-weight: 800; letter-spacing: 0.2em; display: flex; gap: 0.4rem;
+   background: linear-gradient(90deg, #c9892b, #f5d77c, #c9892b); background-size: 200%;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
       
 }
 
-.zfc-text span:nth-child(1) { animation-delay: 0.1s; }
-.zfc-text span:nth-child(2) { animation-delay: 0.2s; }
-.zfc-text span:nth-child(3) { animation-delay: 0.3s; }
-.zfc-text span:nth-child(4) { animation-delay: 0.4s; }
+.zfc-text span:nth-child(1) { animation-delay: 0.3s; }
+.zfc-text span:nth-child(2) { animation-delay: 0.6s; }
+.zfc-text span:nth-child(3) { animation-delay: 0.9s; }
+.zfc-text span:nth-child(4) { animation-delay: 1.2s; }
 
 @keyframes goldFlow {
   0% { background-position: 0%; }
@@ -55,16 +57,28 @@ declare let gtag: any;
 }
 
 .zfc-loader {
-  animation: fadeIn 0.4s ease-in-out;
+  animation: fadeIn 4s ease-in-out;
 }
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 @keyframes reveal {
-  to {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  40% {
     opacity: 1;
     transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px);
   }
 }
 
