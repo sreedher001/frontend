@@ -7,10 +7,11 @@ import { RevenueStreamWidget } from './components/revenuestreamwidget';
 import { Adminorder } from "../admin/adminorder/adminorder";
 import { Salestrend } from "./salestrend/salestrend";
 import { ExpenseAnalytics } from "../admin/expense-analytics/expense-analytics";
+import { AdminStockInterest } from "../admin/admin-stock-interest/admin-stock-interest";
 
 @Component({
     selector: 'app-dashboard',
-    imports: [Adminorder, Salestrend, NotificationsWidget, ExpenseAnalytics],
+    imports: [Adminorder, Salestrend, ExpenseAnalytics, AdminStockInterest],
     template: `
         <div class="grid grid-cols-12 gap-8">
             <!-- <app-stats-widget class="contents" /> -->
@@ -18,11 +19,14 @@ import { ExpenseAnalytics } from "../admin/expense-analytics/expense-analytics";
                 <!-- <app-recent-sales-widget /> -->
                  <app-salestrend/>
                  <app-expense-analytics/>
+                 
                 <!-- <app-best-selling-widget /> -->
             </div>
             <div class="col-span-12 xl:col-span-6">
                 <app-adminorder/>
-                <app-notifications-widget />
+                <app-admin-stock-interest />
+                <!-- <app-notifications-widget /> -->
+                 
             </div>
         </div>
     `

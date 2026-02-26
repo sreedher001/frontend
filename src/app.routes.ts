@@ -33,6 +33,7 @@ import { AdminReturns } from '@/pages/admin/admin-returns/admin-returns';
 import { AdminReturnDetailComponent } from '@/pages/admin/admin-returns/admin-return-detail-component/admin-return-detail-component';
 import { Termsandconditions } from '@/pages/termsandconditions/termsandconditions';
 import { ExpenseAnalytics } from '@/pages/admin/expense-analytics/expense-analytics';
+import { AdminStockInterest } from '@/pages/admin/admin-stock-interest/admin-stock-interest';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -57,6 +58,7 @@ export const appRoutes: Routes = [
             { path: 'admin/invoice-list', component: Invoicelist,canActivate: [AuthGuard]},
             { path: 'admin/order-details/:id', component: Adminorderdetails},
             { path: 'admin/expense', component: ExpenseAnalytics},
+            { path: 'admin/stock-interest', component: AdminStockInterest},
             { path: 'track/:orderNumber',component: Orderstatus},
             { path: 'admin/sales/trend', component: Salestrend,canActivate: [AuthGuard]},
             { path: 'admin/order/ship/:id', component: Shiporder,canActivate: [AuthGuard]},

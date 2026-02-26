@@ -1,0 +1,76 @@
+<div class="grid">
+<h1>Stock Demand Overview</h1>
+  <!-- Summary Card -->
+   <div class="col-md-12 ">
+  <div class="col-6 ">
+    <p-card >
+      <div class="summary-content">
+        <div class="summary-number font-semibold">Total customers  Waiting : {{ totalWaiting }}</div>
+        
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Table -->
+  <div class="col-6">
+    <p-card header="In Demand">
+
+      <div *ngIf="loading" class="flex justify-content-center p-4">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+
+      <p-table
+        *ngIf="!loading"
+        [value]="interests"
+        responsiveLayout="scroll"
+        styleClass="p-datatable-striped">
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-left">Variant ID</th>
+            <th class="text-left">Size</th>
+            <th class="text-center">No.of Request</th>
+            <th class="text-left">Oldest Request</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+          <tr class="clickable-row "
+              (click)="goToProduct(item.variantId)">
+
+            <td>{{ item.variantId }}</td>
+
+            <td>
+              <span class="size-badge">
+                {{ item.size }}
+              </span>
+            </td>
+
+            <td class="text-center">
+              <p-tag
+                [value]="item.waitingCount"
+                [severity]="getSeverity(item.waitingCount)">
+              </p-tag>
+            </td>
+
+            <td>
+              {{ item.oldestRequest | date:'medium' }}
+            </td>
+
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4" class="text-center p-4">
+              No stock interest requests 🎉
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+
+    </p-card>
+  </div>
+</div>
+</div>
