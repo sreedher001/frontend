@@ -1,8 +1,8 @@
 
 <div
   class="mx-auto mt-11 relative overflow-hidden
-       bg-black
-       text-yellow-300 shadow-2xl">
+       bg-white
+       text-black-300">
 
 
   <div class="marquee-wrapper py-4">
@@ -23,12 +23,12 @@
 
 
 <div
-  class="mx-auto px-4 sm:px-6 py-8 mt-11 flex flex-col
+  class="mx-auto px-4 sm:px-6 py-8  flex flex-col
   
    shadow-md  relative overflow-hidden">
 
   <!-- Animated Background Gradient -->
-  <div class="absolute inset-0  animate-gradient-x opacity-30 "></div>
+  <div class=" inset-0  animate-gradient-x opacity-30 "></div>
 
   <!-- Banner Carousel -->
   <p-carousel
@@ -48,19 +48,18 @@
         >
 
         <img [src]="banner.imageUrl" alt="{{ banner.title }}"
-          class="w-full h-52 sm:h-72 object-cover" />
+          class="w-full h-72 sm:h-72 object-cover" />
 
-        <div class="p-3 text-center">
+        <!-- <div class="p-3 text-center">
           <p class="font-semibold text-yellow-900 text-base sm:text-lg">
             {{ banner.title }}
           </p>
-        </div>
+        </div> -->
       </div>
     </ng-template>
   </p-carousel>
-  
+  <span><div><app-review-banner-component></app-review-banner-component></div></span>
 </div>
-<app-review-banner-component></app-review-banner-component>
 
 
 
@@ -72,7 +71,7 @@
     @for (variant of product.variants; track variant.id) {
     @if (variant.styleCategory === 'Ethnic Wear' && variant.isFeatured) { 
     <div (click)="onCardClick(product, variant)"
-      class="bg-red-100 relative min-w-[140px] sm:min-w-[160px] h-[600px]  overflow-hidden shadow-md border border-gray-100 bg-white cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl group">
+      class="bg-red-100 relative min-w-[140px] sm:min-w-[60px] h-[520px]  overflow-hidden shadow-md border border-gray-100 bg-white cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl group">
 
       <!-- PrimeNG Icon Button for Wishlist -->
       <p-button [icon]="isInWishlist(variant) ? 'pi pi-heart-fill' : 'pi pi-heart'" 
