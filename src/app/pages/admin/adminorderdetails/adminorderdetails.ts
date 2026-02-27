@@ -95,7 +95,12 @@ shipOrder(id: any) {
   this.router.navigate(['/admin/order/ship', id]);
 }
 
-goToDetails(variantId: number) {
+goToDetails(variantId?: number) {
+  if (!variantId) {
+    console.error('Variant ID is missing:', variantId);
+    return;
+  }
+
   this.router.navigate(['/product-details', variantId]);
 }
 
