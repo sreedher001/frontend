@@ -30,7 +30,7 @@ import { CountryService } from '../service/country.service';
 import { NodeService } from '../service/node.service';
 import { MessageService, TreeNode } from 'primeng/api';
 import { Country } from '../service/customer.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../products/product.service';
 import { ProductResponse } from '@/models/product-response.model';
 import { Product } from '@/models/product.model';
@@ -147,7 +147,7 @@ isStyleCategoryLoaded = false;
 isProductLoaded = false;
 
 constructor(private route: ActivatedRoute, private productService: ProductService,private addProductService: Addproductservice,
-    private messageService: MessageService) { }
+    private messageService: MessageService,private router: Router) { }
   ngOnInit() {
       this.getStyleCategory();
       this.getColor();
@@ -626,6 +626,7 @@ let fileToSend = img.file!;
       });
       this.displayConfirmation = false;
      // window.location.reload();
+     this.router.navigate(['/admin/products/manageproducts']);
     },
     error: (err:any) => {
       this.messageService.add({

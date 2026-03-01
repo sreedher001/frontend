@@ -27,7 +27,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { MessageService, TreeNode } from 'primeng/api';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductResponse } from '@/models/product-response.model';
 import { Product } from '@/models/product.model';
 import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
@@ -218,7 +218,7 @@ autoFilteredWorkTypeValue: any[] = [];
   }
 
   constructor(private route: ActivatedRoute, private productService: ProductService, private addProductService: Addproductservice,
-    private messageService: MessageService) { }
+    private messageService: MessageService,private router: Router) { }
   ngOnInit(): void {
     this.maxFilesize=1000000;
     this.loading = true;
@@ -596,7 +596,7 @@ this.uploadedFiles.forEach((item, index) => {
   const newFileName =
     index === 0
       ? `front.${extension}`
-      : `${originalFile}.${extension}`;
+      : `image-${index}.${extension}`;
 
   const renamedFile = new File(
     [originalFile],
@@ -618,6 +618,7 @@ this.uploadedFiles.forEach((item, index) => {
           sticky: true,
           detail: res.message || 'New product has been added successfully'
         });
+        this.router.navigate(['/admin/products/manageproducts']);
       },
       error: (err: any) => {
         this.messageService.add({

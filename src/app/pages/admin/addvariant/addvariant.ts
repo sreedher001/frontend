@@ -664,7 +664,7 @@ this.uploadedFiles.forEach((item, index) => {
   const newFileName =
     index === 0
       ? `front.${extension}`
-      : `${originalFile}.${extension}`;
+      : `image-${index}.${extension}`;
 
   const renamedFile = new File(
     [originalFile],
