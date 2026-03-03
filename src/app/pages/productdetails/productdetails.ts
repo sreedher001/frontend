@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, Injectable, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { GalleriaModule } from 'primeng/galleria';
@@ -126,6 +126,7 @@ reviews: any[] = [];
 reviewSummary: any;
 showReviews = false;
 ratingRows: any[] = [];
+thumbnailPosition: any;
 
 page = 0;
 size = 5;
@@ -134,11 +135,12 @@ variantId!: number;
 showNotifyModal = false;
 selectedOutOfStockSize: any;
 guestEmail: string = '';
-  constructor(private route: ActivatedRoute,private productService: ProductService, private cartService: CartService,
+  constructor(private route: ActivatedRoute, private cd: ChangeDetectorRef, private productService: ProductService, private cartService: CartService,
     private jwtHelper: JwtHelper,private messageService: MessageService,private router: Router,private reviewService:ReviewService) {}
   
   ngOnInit(): void {
     this.loading=true;
+    this.setThumbnailPosition();
     this.prepareRatingBreakdown();
     this.route.paramMap.subscribe(params => {
     this.productId = Number(params.get('id'));
@@ -162,7 +164,9 @@ guestEmail: string = '';
 }   
   });
   }
-
+ngAfterViewInit() {
+  this.setThumbnailPosition();
+}
   isInWishlist(variant: any): boolean {
   return this.wishlistVariantIds.has(variant.id);
 }
@@ -186,7 +190,21 @@ guestEmail: string = '';
       }
     });
   }
-  
+  @HostListener('window:resize')
+onResize() {
+  this.setThumbnailPosition();
+}
+
+setThumbnailPosition() {
+   const isDesktop = window.innerWidth >= 1024;
+
+  const newPosition = isDesktop ? 'left' : 'bottom';
+
+  if (this.thumbnailPosition !== newPosition) {
+    this.thumbnailPosition = newPosition;
+    this.cd.detectChanges(); // 👈 Force refresh
+  }
+}
   getRatingSeverity(rating: number): string {
   if (rating >= 4) return 'bg-white-100 text-green-500';      // high rating
   if (rating >= 3) return 'bg-white-100 text-yellow-500';     // medium rating
@@ -360,9 +378,9 @@ console.log("guestCart",guestCart);
   }
 
   responsiveOptions = [
-    { breakpoint: '1024px', numVisible: 5 },
-    { breakpoint: '768px', numVisible: 5 },
-    { breakpoint: '560px', numVisible: 5 }
+    { breakpoint: '1024px', numVisible: 4 },
+    { breakpoint: '768px', numVisible: 4 },
+    { breakpoint: '560px', numVisible: 4 }
   ];
 
  showStylePanel = false;

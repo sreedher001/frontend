@@ -1,15 +1,16 @@
 @if (!loading && product) {
 <div class="mb-4 mt-11"></div>
 
-<div class="flex flex-col lg:flex-row items-start gap-6">
+<div class="flex flex-col lg:flex-row items-start ">
   <!-- Product Carousel -->
-  <p-galleria [value]="images" [showItemNavigators]="true" [responsiveOptions]="responsiveOptions" [circular]="true" 
+  <p-galleria [value]="images" [showItemNavigators]="true" [responsiveOptions]="responsiveOptions" 
+  [thumbnailsPosition]="thumbnailPosition" [circular]="true" 
     [numVisible]="3" [containerStyle]="{ 'width': '100%', 'maxWidth': '640px' }" class="w-full lg:w-1/2">
     <ng-template #item let-item>
       <div class="relative aspect-w-4 aspect-h-3">
         <img [src]="item.itemImageSrc" (load)="onImageLoad($event)"
-          class="object-contain w-full h-full rounded-lg shadow" />
-        <p-button severity="secondary" class="absolute bottom-2 left-2 p-1 rounded"
+          class="object-contain w-full h-full  shadow " />
+        <p-button severity="secondary" class="absolute bottom-2 left-2 p-1"
           pTooltip="View Similar" label="View Similar" tooltipPosition="top"
           (click)="viewSimilar(product.variant.id); $event.stopPropagation()" type="button">
           <i class="pi pi-clone text-xl"></i>
@@ -26,7 +27,7 @@
     </ng-template>
 
     <ng-template #thumbnail let-item>
-      <img [src]="item.thumbnailImageSrc" class="h-20 w-20 object-cover rounded" />
+      <img [src]="item.thumbnailImageSrc" class="h-43 w-30 " />
     </ng-template>
   </p-galleria>
 
@@ -38,14 +39,14 @@
     <div class="flex items-center gap-4">
       <p-tag   class="text-lg font-semibold  font-semibold">{{ product.variant.variantName }}</p-tag>
       <!-- <p-tag   class="whitespace-nowrap">{{ product.category }}</p-tag> -->
-     <div class="p-2 rounded-full flex items-center gap-2" [ngClass]="getRatingSeverity(product.variant.rating)">
+     <!-- <div class="p-2 rounded-full flex items-center gap-2" [ngClass]="getRatingSeverity(product.variant.rating)">
         <span class="font-medium text-lg dune-font">{{ product.variant.rating }}</span>
         <i class="pi pi-star-fill text-xs" [ngClass]="{
     'text-green-600': product.variant.rating != null && product.variant.rating >= 4,
     'text-yellow-600': product.variant.rating != null && product.variant.rating >= 3 && product.variant.rating < 4,
     'text-red-600': product.variant.rating != null && product.variant.rating < 3
   }"></i>
-      </div>
+      </div> -->
     </div>
 
     <h3 class="text-lg font-semibold mb-2  ">Price</h3>
