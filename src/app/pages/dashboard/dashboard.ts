@@ -13,7 +13,7 @@ import { AdminStockInterest } from "../admin/admin-stock-interest/admin-stock-in
     selector: 'app-dashboard',
     imports: [Adminorder, Salestrend, ExpenseAnalytics, AdminStockInterest],
     template: `
-        <div class="grid grid-cols-12 gap-8">
+        <div class="grid grid-cols-12 gap-8 mt-5">
             <!-- <app-stats-widget class="contents" /> -->
             <div class="col-span-12 xl:col-span-6">
                 <!-- <app-recent-sales-widget /> -->
