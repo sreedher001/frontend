@@ -34,6 +34,7 @@ import { AdminReturnDetailComponent } from '@/pages/admin/admin-returns/admin-re
 import { Termsandconditions } from '@/pages/termsandconditions/termsandconditions';
 import { ExpenseAnalytics } from '@/pages/admin/expense-analytics/expense-analytics';
 import { AdminStockInterest } from '@/pages/admin/admin-stock-interest/admin-stock-interest';
+import { MobileCategory } from '@/pages/mobile-category/mobile-category';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -68,6 +69,7 @@ export const appRoutes: Routes = [
             { path: 'admin/reviews', component: AdminReviewsComponent},
             { path: 'admin/returns-view', component: AdminReturns},
             { path: 'order-status', component: Orderstatus},
+             { path: 'category', component: MobileCategory },
             { path: 'terms-and-conditions', component: Termsandconditions},
             { path: 'admin/returns/:returnId', component: AdminReturnDetailComponent},
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },

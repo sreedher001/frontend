@@ -21,6 +21,8 @@ import { ChipModule } from 'primeng/chip';
 import { Signup } from "../auth/signup/signup";
 import {  LoginComponent } from "../auth/login";
 import { ReviewBannerComponent } from "../productreview/review-banner-component/review-banner-component";
+import { MOOD_CONFIG } from './mood-config';
+import { COLLECTION_CONFIG } from './collection-config';
 
 @Component({
   selector: 'app-products',
@@ -75,6 +77,8 @@ size: number = 10;
 lastPage: boolean = false;
 showWearSections = false;
 private aiIndex = 0;
+moods = MOOD_CONFIG;
+collections = COLLECTION_CONFIG;
 
   constructor(private productService: ProductService,private router: Router,private jwtHelper: JwtHelper,
      private cartService: CartService,
@@ -601,5 +605,7 @@ selectSuggestion(text: string) {
   this.userInput = text;
   this.sendMessage();
 }
-
+goCategory(){
+ this.router.navigate(['/category']);
+}
 }

@@ -1,9 +1,76 @@
-<div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1 cursor-pointer mt-12">
+<div
+  class="mx-auto mt-11 relative overflow-hidden
+       bg-white
+       text-black-300">
+
+
+  <div class="marquee-wrapper py-4">
+    <div class="marquee-track">
+      <span class="marquee-item">🚚 Fast Shipping </span>
+      <span class="marquee-item">💳 100% Secure Payments</span>
+      <span class="marquee-item">🔥 Flash Sale Live Now</span>
+    </div>
+
+    <div class="marquee-track">
+      <span class="marquee-item">🚚 Fast Shipping </span>
+      <span class="marquee-item">💳 100% Secure Payments</span>
+      <span class="marquee-item">🔥 Flash Sale Live Now</span>
+    </div>
+  </div>
+  
+</div>
+
+<div
+  class="mx-auto px-4 sm:px-6 py-8  flex flex-col
+  
+   shadow-md  relative overflow-hidden">
+
+  <!-- Animated Background Gradient -->
+  <div class=" inset-0  animate-gradient-x opacity-30 "></div>
+
+  <!-- Banner Carousel -->
+  <p-carousel
+    [value]="banners"
+    [numVisible]="1"
+    [numScroll]="1"
+    [circular]="true"
+    [autoplayInterval]="4000"
+    [showIndicators]="true"
+    [showNavigators]="true"
+    class="w-full relative z-10"
+    contentClass="gap-3">
+    <ng-template let-banner pTemplate="item">
+      <div
+        class=" bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 
+        shadow-md overflow-hidden transition-transform duration-500 transform hover:scale-105 cursor-pointer"
+        >
+
+        <img [src]="banner.imageUrl" alt="{{ banner.title }}"
+          class="w-full h-72 sm:h-72 object-cover" />
+
+        <div class="p-3 text-center">
+          <p class="font-semibold text-yellow-900 text-base sm:text-lg">
+            {{ banner.title }}
+          </p>
+        </div>
+      </div>
+    </ng-template>
+  </p-carousel>
+</div>
+
+<div
+  class="grid gap-1 cursor-pointer mt-12"
+  [ngClass]="{
+    'grid-cols-1': gridView === 1,
+    'grid-cols-2': gridView === 2,
+    'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4': gridView === 4
+  }"
+>
   @for (product of products; track product.productId) {
   @for (variant of product.variants; track variant.id) {
 
   <div
-    class="bg-white rounded-2xl shadow-md border border-orange-100 overflow-hidden hover:shadow-lg transition duration-300 relative"
+    class="bg-white  shadow-md border border-orange-100 overflow-hidden hover:shadow-lg transition duration-300 relative"
     (click)="onCardClick(product, variant)">
 
     @if (isAdmin) {
@@ -28,51 +95,80 @@
 
     }
 
-    <div class="relative w-full h-80 sm:h-96 md:h-[30rem]">
+   <div
+  class="relative w-full overflow-hidden"
+  [ngClass]="{
+    'aspect-[4/5]': gridView === 1,
+    'aspect-[3/4]': gridView === 2,
+    'aspect-square': gridView === 4
+  }"
+>
   <img
-    class="w-full h-full object-cover"
+    class="w-full h-full transition-all duration-300"
+    [ngClass]="{
+      'object-contain': gridView === 1,
+      'object-cover': gridView !== 1
+    }"
     [src]="getVariantFrontImage(variant)"
     [alt]="variant.variantName"
     loading="lazy"
   />
+
+  <!-- Rating Badge -->
+  <div
+    class="absolute bottom-2 left-2 bg-white/90 backdrop-blur px-2 py-1 rounded-md 
+           flex items-center gap-1 text-xs font-semibold shadow-sm"
+  >
+    <i class="pi pi-star-fill text-yellow-500 text-xs"></i>
+    <span>{{ variant.rating }}</span>
+  </div>
+
 </div>
 
     <div class="p-3 sm:p-4">
-      <p class="text-base sm:text-sm text-gray-700 font-medium line-clamp-2 w-full block" title="{{ product.name }}">
+      <p class="text-base  text-pink-900 font-medium line-clamp-2 w-full block" title="{{ product.name }}">
         {{ product.name }}
       </p>
 
-      <div class="flex justify-between items-center ">
-        <div class="flex flex-col">
-          <span class="price text-green-800 font-semibold dune-font">
-            ₹{{ getVariantFinalPrice(variant) | number:'1.0-0' }}
-          </span>
-          @if (getBestSize(variant)?.discountPercentage > 0) {
-          <span class="text-xs sm:text-sm text-red-500 line-through dune-font">
-            ₹{{ getBestSize(variant)?.price }}
-          </span>
-          }
-        </div>
+      <div class="flex items-center gap-2">
+  
+  <!-- Final Price -->
+  <span class="text-black font-semibold text-md ">
+    ₹{{ getVariantFinalPrice(variant) | number:'1.0-0' }}
+  </span>
 
-        <div class="flex justify-start items-center mt-2">
-          <p-badge [value]="'⭐ ' + variant.rating" severity="secondary"
-            class="text-sm sm:text-base px-3 py-2 font-medium rounded-lg dune-font">
-          </p-badge>
-        </div>
+  <!-- MRP -->
+  @if (getBestSize(variant)?.discountPercentage > 0) {
+  <span class="text-md text-gray-400 line-through ">
+    ₹{{ getBestSize(variant)?.price }}
+  </span>
+  }
+
+  <!-- Discount -->
+  @if (getBestSize(variant)?.discountPercentage > 0) {
+  <span class="text-md font-semibold text-green-600 ">
+    {{ getBestSize(variant)?.discountPercentage }}% OFF
+  </span>
+  }
+
+</div>
+<div class="text-sm text-yellow-900">
+        Best price in last 30 days
       </div>
 
       @if (hasDiscount(variant)) {
       <p-badge [value]="getVariantSavings(variant)" severity="success"></p-badge>
       }
 
-      <!-- <div class="mt-2 text-xs sm:text-sm text-gray-500">
+      <div class="mt-2 text-sm sm:text-sm text-brown-400 text--500">
         Get it by {{ getDeliveryDate() }}
-      </div> -->
+      </div>
     </div>
   </div>
 
 
   }
+  
   }
 
   <!-- BACKDROP (only if modal open and not logged in) -->
@@ -161,3 +257,280 @@
 <div class="flex justify-center my-8" *ngIf="loading">
   <i class="pi pi-spin pi-spinner text-orange-500 text-3xl"></i>
 </div>
+
+<!-- Mobile Bottom Actions -->
+<div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-md 
+            flex justify-around items-center py-3 z-40 sm:hidden">
+
+  <!-- Grid -->
+  <div
+    class="flex items-center gap-2 text-gray-700 cursor-pointer"
+    (click)="toggleGrid()"
+  >
+    <i class="pi pi-th-large text-lg"></i>
+
+    <div class="flex flex-col leading-tight">
+      <span class="text-lg font-medium">Grid</span>
+      <span class="text-[12px] text-gray-400">{{gridView}}x</span>
+    </div>
+  </div>
+<div class="border-l border-gray-200 h-8"></div>
+  <!-- Filter -->
+  <div
+    class="flex items-center gap-2 text-gray-700 cursor-pointer"
+    (click)="openFilter()"
+  >
+    <i class="pi pi-filter text-lg"></i>
+
+    <div class="flex flex-col leading-tight">
+      <span class="text-lg font-medium">Filter</span>
+      <span class="text-[12px] text-gray-400">
+  {{ getFilterSummary() }}
+</span>
+    </div>
+  </div>
+<div class="border-l border-gray-200 h-8"></div>
+  <!-- Sort -->
+  <div
+    class="flex items-center gap-2 text-gray-700 cursor-pointer"
+    (click)="openSort()"
+  >
+    <i class="pi pi-sort-alt text-lg"></i>
+
+    <div class="flex flex-col leading-tight">
+      <span class="text-lg font-medium">Sort</span>
+      <span class="text-[12px] text-gray-400">{{selectedSortLabel}}</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- FILTER PANEL (only on mobile) -->
+@if(showFilter){
+
+<!-- BACKDROP -->
+<div class="fixed inset-0 bg-black/40 z-40" (click)="closeFilter()"></div>
+
+<!-- FILTER PANEL -->
+<div
+ class="fixed bottom-0 left-0 w-full h-[75vh] bg-white z-50 rounded-t-2xl
+        shadow-xl transform transition-transform duration-300 flex flex-col">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center px-4 py-3 ">
+    <h4 class="text-sm font-semibold">Filters</h4>
+    <i class="pi pi-times text-xl cursor-pointer" (click)="closeFilter()"></i>
+  </div>
+
+  <!-- Body -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Left Filter Categories -->
+    <div class="w-1/3 bg-gray-100 text-sm">
+  @for(filter of filters; track filter.key){
+
+  <div
+  class="p-3 cursor-pointer transition-all duration-200 flex flex-col relative"
+  [ngClass]="{
+    'bg-white font-semibold text-gray-900 shadow-sm border-l-4 border-black': activeFilter?.key === filter.key,
+    'text-gray-600 hover:bg-gray-50': activeFilter?.key !== filter.key
+  }"
+  (click)="setFilterCategory(filter)"
+>
+
+  <!-- Category Name -->
+  <div class="flex justify-between items-center text-lg">
+    <span>{{filter.name}}</span>
+  </div>
+
+  <!-- Selected values -->
+ <div class="flex flex-wrap gap-1 mt-1">
+
+  <!-- Range filter -->
+  <p-chip
+    *ngIf="filter.type === 'range' && selectedFilters.price"
+    [label]="'₹' + selectedFilters.price[0] + ' - ₹' + selectedFilters.price[1]"
+    class="text-[10px]">
+  </p-chip>
+
+  <!-- Normal filters -->
+  <p-chip
+    *ngFor="let label of getSelectedLabels(filter)"
+    [label]="label"
+    removable="true"
+    (onRemove)="removeFilter(filter, label)"
+    class="text-[10px]">
+  </p-chip>
+
+</div>
+
+  <!-- Count badge at bottom -->
+  <span
+    *ngIf="getFilterCount(filter) > 0 && filter.type != 'range'"
+    class="mt-1 text-[10px] bg-gray-300 text-black px-2 py-0.5  w-fit">
+    {{getFilterCount(filter)}} selected
+  </span>
+
+</div>
+
+  }
+</div>
+
+    <div class="flex-1 p-4 overflow-y-auto text-sm">
+      @if(activeFilter.type === 'range'){
+
+<div class="px-2 py-4">
+
+  <p-slider
+    [(ngModel)]="selectedFilters.price"
+    [range]="true"
+    [min]="activeFilter.min"
+    [max]="activeFilter.max"
+    styleClass="w-full">
+  </p-slider>
+
+  <div class="flex justify-between text-xs text-gray-500 mt-3">
+
+    <span>
+      ₹{{ selectedFilters.price?.[0] || activeFilter.min }}
+    </span>
+
+    <span>
+      ₹{{ selectedFilters.price?.[1] || activeFilter.max }}
+    </span>
+
+  </div>
+
+</div>
+
+}
+
+<!-- RADIO FILTER -->
+@if(activeFilter.type === 'radio'){
+  @for(option of activeFilter.options; track option.value){
+
+  <div class="flex justify-between items-center py-2">
+    <span class="text-lg">{{option.label}}</span>
+
+   <p-radioButton
+  [name]="activeFilter.key"
+  [value]="option.value"
+  [(ngModel)]="selectedFilters[activeFilter.key]"
+  (onClick)="updateFilter()">
+</p-radioButton>
+
+  </div>
+
+  }
+}
+
+
+
+@if(activeFilter.type === 'checkbox'){
+
+  @for(option of activeFilter.options; track option.value){
+
+  <div class="flex justify-between items-center py-2">
+
+    <div class="flex items-center gap-2">
+
+      <!-- color preview -->
+      @if(option.code){
+        <span
+          class="w-4 h-4 rounded-full border"
+          [style.background]="option.code">
+        </span>
+      }
+
+      <span class="text-lg">{{option.label}}</span>
+
+    </div>
+
+    <p-checkbox
+  [value]="option.value"
+  [(ngModel)]="selectedFilters[activeFilter.key]"
+  (onChange)="updateFilter()">
+</p-checkbox>
+
+  </div>
+
+  }
+
+}
+
+</div>
+
+  </div>
+
+ <div class="p-4 flex gap-3">
+
+  <!-- Clear All -->
+  <p-button
+    label="Clear All"
+    outlined size="large"
+    icon="pi pi-times"
+    class="flex-1"
+    (onClick)="clearAllFilters()"
+    styleClass="w-full py-4 text-base font-semibold rounded-none">
+  </p-button>
+
+  <!-- Apply Filters -->
+  <p-button
+    label="Apply Filters"
+    icon="pi pi-check"
+    class="flex-1"
+    size="large"
+    (onClick)="applyFilters()"
+    styleClass="w-full py-4 text-base font-semibold rounded-none">
+  </p-button>
+
+</div>
+
+</div>
+
+}
+
+@if(showSort){
+
+<div class="fixed inset-0 bg-black/40  z-40"
+     (click)="closeSort()"></div>
+
+<div class="fixed bottom-0 left-0 w-full bg-white rounded-t-2xl
+            shadow-xl z-50 animate-slideUp">
+
+  <!-- Header -->
+  <div class="p-4  border border-bt border-b border-gray-200  flex justify-between items-center">
+    <h3 class="font-semibold text-lg">Sort by</h3>
+
+    <i class="pi pi-times cursor-pointer"
+       (click)="closeSort()"></i>
+  </div>
+
+  <!-- Options -->
+
+  <div class="p-4 space-y-3">
+
+    @for(option of sortOptions; track option.value){
+
+    <div class=" items-center justify-between
+                p-3  cursor-pointer hover:bg-gray-50"
+         (click)="applySort(option)">
+
+       <div class="flex items-center gap-3">
+  <p-radioButton
+    [value]="option.value"
+    [(ngModel)]="selectedSort">
+  </p-radioButton>
+
+  <span class="text-lg">{{ option.label }}</span>
+</div>
+
+    </div>
+
+    }
+
+  </div>
+
+</div>
+
+}
