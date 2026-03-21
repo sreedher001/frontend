@@ -40,6 +40,7 @@ export interface AiSuggestionResponse {
 export class ProductService {
   
   
+  
 
   commonService:CommonService = new CommonService;
       private apiUrl = this.commonService.baseUrl;
@@ -71,6 +72,14 @@ getRelatedProductsByCategory(category: string, page = 0, size = 10): Observable<
     `${this.apiUrl}/products/search/category/${category}`, 
     { params }
   );
+}
+searchProducts(searchPayload: any): Observable<any> {
+
+  return this.http.post<any>(
+    `${this.apiUrl}/products/category/search`,
+    searchPayload
+  );
+
 }
 
 getProductByVariantId(variantId: number): Observable<Product> {

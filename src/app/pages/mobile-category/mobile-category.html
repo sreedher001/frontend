@@ -1,21 +1,23 @@
 <div class="mt-10 flex h-[calc(100vh-60px)] overflow-hidden">
 
   <!-- LEFT CATEGORY MENU -->
-  <div class="w-1/3 bg-gray-50 border-r border-gray-200 overflow-y-auto py-3">
+<div
+  class="w-1/3 bg-gray-50 border-r border-gray-200 py-3 sticky top-0 h-full"
+  (wheel)="redirectScroll($event)">
 
-    <div
-      *ngFor="let cat of categories"
-      (click)="scrollToCategory(cat)"
-      [ngClass]="selectedCategory === cat ?
-      'bg-white text-black font-semibold border-l-4 border-black shadow-sm' :
-      'text-gray-500'"
-      class="px-4 py-4 text-sm cursor-pointer transition-all duration-200">
-      
-      {{cat}}
+  <div
+    *ngFor="let cat of categories"
+    (click)="scrollToCategory(cat)"
+    [ngClass]="selectedCategory === cat ?
+    'bg-white text-black font-semibold border-l-4 border-black shadow-sm' :
+    'text-gray-500'"
+    class="px-4 py-4 text-sm cursor-pointer transition-all duration-200">
 
-    </div>
+    {{cat}}
 
   </div>
+
+</div>
 
 
   <!-- RIGHT CONTENT -->

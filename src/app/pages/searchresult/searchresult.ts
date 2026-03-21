@@ -10,7 +10,7 @@ import { FluidModule } from 'primeng/fluid';
 import { TagModule } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
 import { Product } from '@/models/product.model';
-
+import { combineLatest } from 'rxjs';
 import { ProductResponse } from '@/models/product-response.model';
 import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
 import { Banner, ProductService } from '../products/product.service';
@@ -25,7 +25,7 @@ import { SliderModule } from 'primeng/slider';
 
 @Component({
   selector: 'app-searchresult',
-  imports: [CardModule, CommonModule,CheckboxModule, ButtonModule, FluidModule, TagModule, FormsModule, BadgeModule, Tooltip, CarouselModule,
+  imports: [CardModule, CommonModule,CheckboxModule, ButtonModule, FluidModule, TagModule, FormsModule, BadgeModule, CarouselModule,
     ChipModule, Signup, LoginComponent,RadioButtonModule,SliderModule],
   templateUrl: './searchresult.html',
   styleUrl: './searchresult.scss'
@@ -52,8 +52,8 @@ sortOptions = [
   { label: 'Featured', value: 'featured' },
   { label: 'New Arrival', value: 'new' },
   { label: 'Best Selling', value: 'bestselling' },
-  { label: 'Price: Low to High', value: 'priceAsc' },
-  { label: 'Price: High to Low', value: 'priceDesc' }
+  { label: 'Price: Low to High', value: 'priceLowHigh' },
+  { label: 'Price: High to Low', value: 'priceHighLow' }
 ];
 
 selectedSort = '';
@@ -63,11 +63,48 @@ showSort = false;
 selectedFilters:any = {
   price: [0,10000]
 };
+searchPayload: any = {
+  filters: {
+    color: [],
+    size: [],
+    subCategory: [],
+    pattern: [],
+    styleCategory: []
+  },
+  minPrice: 0,
+  maxPrice: 10000,
+  sort: '',
+  page: 0,
+  size: 20
+};
+prods: any[] = [];
+urlFilters: any = {};
     constructor(private productService: ProductService,private router: Router,private jwtHelper: JwtHelper,
 
     private messageService: MessageService,public route: ActivatedRoute
   ) { }
     ngOnInit(): void {
+
+this.route.queryParamMap.subscribe(paramMap => {
+
+  this.urlFilters = {};
+
+  paramMap.keys.forEach(key => {
+
+    const value = paramMap.get(key);
+    if (!value) return;
+
+    this.urlFilters[key] = value.split(',');
+
+  });
+
+  this.buildPayload();
+
+  this.searchProducts();
+
+});
+
+
       this.getBanners();
       const roles = this.jwtHelper.getUserRoles();
   if (roles.includes('ROLE_ADMIN')) {
@@ -90,13 +127,88 @@ selectedFilters:any = {
   });
 }
 
-      
-      this.route.paramMap.subscribe(params => {
-    const style = params.get('style');
-    this.getWearType(style);
-  });
   this.filter();
     }
+    buildPayload() {
+
+  // reset filters
+  this.searchPayload.filters = {
+    color: [],
+    size: [],
+    subCategory: [],
+    pattern: [],
+    styleCategory: []
+  };
+
+  // apply URL filters
+  Object.keys(this.urlFilters).forEach(key => {
+    if (this.searchPayload.filters.hasOwnProperty(key)) {
+      this.searchPayload.filters[key] = this.urlFilters[key];
+    }
+  });
+
+  // apply UI filters
+  Object.keys(this.selectedFilters).forEach(key => {
+    if (this.searchPayload.filters.hasOwnProperty(key)) {
+      this.searchPayload.filters[key] = this.selectedFilters[key];
+    }
+  });
+
+}
+applyFilters() {
+  if (this.selectedFilters.price) {
+    this.searchPayload.minPrice = this.selectedFilters.price[0];
+    this.searchPayload.maxPrice = this.selectedFilters.price[1];
+  }
+
+  this.buildPayload();
+this.searchProducts();
+  this.lastPage = false;
+
+
+  this.showFilter = false;
+}
+loadMore() {
+  this.searchProducts(true);
+}
+
+searchProducts(append: boolean = false) {
+
+  console.log('Executing search with payload:', this.searchPayload);
+
+  if (!append) {
+    this.prods = [];
+    this.searchPayload.page = 0;
+    this.lastPage = false;
+  }
+
+  if (this.loading) return;
+
+  this.loading = true;
+
+  this.productService.searchProducts(this.searchPayload).subscribe({
+    next: (res: any) => {
+
+      if (append) {
+        this.prods.push(...res.content);
+      } else {
+        this.prods = res.content;
+      }
+
+      this.lastPage = res.last;
+      this.searchPayload.page++;
+
+      this.loading = false;
+    },
+    error: (err:any) => {
+      console.error(err);
+      this.loading = false;
+    }
+  });
+
+}
+
+ 
     getBanners() {
    this.productService.getAllBanners().subscribe({
       next: (data) => (this.banners = data),
@@ -230,7 +342,12 @@ getFilterSummary(): string {
   //     this.loading = false;
   //   });
   // }
+ getcollection(style: string | null) {
+    if (this.loading || this.lastPage) return;
+  this.loading = true;
 
+
+  }
   getWearType(style: string | null, append: boolean = false) {
   if (this.loading || this.lastPage) return;
   this.loading = true;
@@ -258,8 +375,8 @@ getFilterSummary(): string {
   });
 }
 
-  onCardClick(product:Product,variant:ProductVariantResponseDto) {
-  this.router.navigate(['/product-details',variant.id]);
+  onCardClick(item:any){
+  this.router.navigate(['/product-details', item.variantId]);
 }
 isInWishlist(variant: any): boolean {
   return this.wishlistVariantIds.has(variant.id);
@@ -409,22 +526,7 @@ updateFilter(){
   this.selectedFilters = { ...this.selectedFilters };
 }
 
-applyFilters(){
 
-  const filterPayload = this.selectedFilters;
-
-  console.log("Applied Filters:", filterPayload);
-
-  // this.getWearType(
-  //   this.route.snapshot.paramMap.get('style'),
-  //   true,
-  //   filterPayload
-  // );
-
-  // close filter panel if mobile
-  this.showFilter = false;
-
-}
 clearAllFilters(){
 
   this.selectedFilters = {};
@@ -490,19 +592,23 @@ closeSort(){
   this.showSort = false;
 }
 
-applySort(option:any){
+applySort(option: any) {
 
   this.selectedSort = option.value;
   this.selectedSortLabel = option.label;
 
   this.showSort = false;
 
-  // reload products
-  this.getWearType(
-    this.route.snapshot.paramMap.get('style'),
-    true
-  );
+  // update payload sort
+  this.searchPayload.sort = option.value;
 
+  // reset pagination
+  this.searchPayload.page = 0;
+  this.lastPage = false;
+  this.prods = [];
+
+  // call API again with same filters + new sort
+  this.searchProducts();
 }
 
 toggleGrid() {

@@ -546,8 +546,10 @@ offers = [
 //     });
 // }
 
-getWearType(style:any){
-  this.router.navigate(['/search', style]);
+getWearType(styleCategory: any) {
+  this.router.navigate(['/search'], {
+    queryParams: { styleCategory }
+  });
 }
 
 

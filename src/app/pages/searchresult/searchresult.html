@@ -66,14 +66,13 @@
     'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4': gridView === 4
   }"
 >
-  @for (product of products; track product.productId) {
-  @for (variant of product.variants; track variant.id) {
+ @for (item of prods; track item.id) {
 
   <div
     class="bg-white  shadow-md border border-orange-100 overflow-hidden hover:shadow-lg transition duration-300 relative"
-    (click)="onCardClick(product, variant)">
+    (click)="onCardClick(item)">
 
-    @if (isAdmin) {
+    <!-- @if (isAdmin) {
     <div class="absolute top-2 right-2 flex space-x-2 z-10">
       <p-button pTooltip="Edit" icon="pi pi-pencil" severity="info" raised rounded outlined
         (onClick)="editProduct(variant,$event); $event.stopPropagation()">
@@ -93,7 +92,7 @@
     </p-button>
 
 
-    }
+    } -->
 
    <div
   class="relative w-full overflow-hidden"
@@ -109,10 +108,49 @@
       'object-contain': gridView === 1,
       'object-cover': gridView !== 1
     }"
-    [src]="getVariantFrontImage(variant)"
-    [alt]="variant.variantName"
+    [src]="item.imageUrl"
+    [alt]="item.variantName"
     loading="lazy"
   />
+
+  <!-- Discount Tag -->
+ <!-- BIG DISCOUNT TAG -->
+<div
+  *ngIf="item.discountPercentage >= 30"
+  class="absolute -top-2 right-2 flex flex-col items-center
+         animate-[swing_3s_ease-in-out_infinite] z-20"
+>
+
+  <!-- String -->
+  <div class="w-[2px] h-6 bg-gray-300"></div>
+
+  <!-- Tag -->
+  <div
+    class="relative bg-red-600 text-white text-[10px] sm:text-xs
+           font-bold py-3 px-2 rounded-md shadow-xl rotate-2
+           flex flex-col items-center"
+  >
+
+    <!-- Hole -->
+    <span class="absolute -top-1 w-2 h-2 bg-white rounded-full border border-gray-300"></span>
+
+    <span>{{ item.discountPercentage }}%</span>
+    <span class="text-[9px]">OFF</span>
+
+  </div>
+
+</div>
+
+
+<!-- SMALL DISCOUNT BADGE -->
+<div
+  *ngIf="item.discountPercentage > 0 && item.discountPercentage < 30"
+  class="absolute top-2 right-2 bg-red-500 text-white
+         text-[10px] sm:text-xs font-semibold
+         px-2 py-1 rounded shadow-md"
+>
+  {{ item.discountPercentage }}% OFF
+</div>
 
   <!-- Rating Badge -->
   <div
@@ -120,34 +158,34 @@
            flex items-center gap-1 text-xs font-semibold shadow-sm"
   >
     <i class="pi pi-star-fill text-yellow-500 text-xs"></i>
-    <span>{{ variant.rating }}</span>
+    <span>{{ item.rating }}</span>
   </div>
 
 </div>
 
     <div class="p-3 sm:p-4">
-      <p class="text-base  text-pink-900 font-medium line-clamp-2 w-full block" title="{{ product.name }}">
-        {{ product.name }}
+      <p class="text-base  text-pink-900 font-medium line-clamp-2 w-full block" title="{{ item.variantName }}">
+        {{ item.variantName }}
       </p>
 
       <div class="flex items-center gap-2">
   
   <!-- Final Price -->
   <span class="text-black font-semibold text-md ">
-    ₹{{ getVariantFinalPrice(variant) | number:'1.0-0' }}
+    ₹{{ item.finalPrice | number:'1.0-0' }}
   </span>
 
   <!-- MRP -->
-  @if (getBestSize(variant)?.discountPercentage > 0) {
+  @if (item?.discountPercentage > 0) {
   <span class="text-md text-gray-400 line-through ">
-    ₹{{ getBestSize(variant)?.price }}
+    ₹{{ item?.price }}
   </span>
   }
 
   <!-- Discount -->
-  @if (getBestSize(variant)?.discountPercentage > 0) {
+  @if (item?.discountPercentage > 0) {
   <span class="text-md font-semibold text-green-600 ">
-    {{ getBestSize(variant)?.discountPercentage }}% OFF
+    {{ item.discountPercentage }}% OFF
   </span>
   }
 
@@ -155,10 +193,12 @@
 <div class="text-sm text-yellow-900">
         Best price in last 30 days
       </div>
-
-      @if (hasDiscount(variant)) {
-      <p-badge [value]="getVariantSavings(variant)" severity="success"></p-badge>
-      }
+<!-- @if (item.discountPercentage > 0) {
+  <p-badge 
+    [value]="item.discountPercentage + '% OFF'" 
+    severity="success">
+  </p-badge>
+} -->
 
       <div class="mt-2 text-sm sm:text-sm text-brown-400 text--500">
         Get it by {{ getDeliveryDate() }}
@@ -169,7 +209,7 @@
 
   }
   
-  }
+
 
   <!-- BACKDROP (only if modal open and not logged in) -->
 @if (showSignupPanel && !isLoggedIn) {

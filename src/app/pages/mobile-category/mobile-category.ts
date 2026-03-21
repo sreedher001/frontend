@@ -23,8 +23,9 @@ categories = [
 ];
 
 selectedCategory = 'MEN';
-
+isManualScroll = false;
 @ViewChild('scrollContainer') scrollContainer!: ElementRef;
+@ViewChild('leftMenu') leftMenu!: ElementRef;
 
 items = [
  {category:'MEN', name:'T SHIRTS', image:'assets/tshirt.jpg'},
@@ -41,6 +42,7 @@ items = [
  {category:'WOMEN', name:'SHORTS', image:'assets/shorts.jpg'},
  {category:'WOMEN', name:'SHIRTS', image:'assets/shirts.jpg'}
 ];
+
 
 
 getItems(cat:string){
@@ -60,41 +62,52 @@ openItem(item:any){
   // example navigation
   // this.router.navigate(['/products'], { queryParams:{category}});
 }
-scrollToCategory(cat:string){
+redirectScroll(event: WheelEvent) {
 
- this.selectedCategory = cat;
+  const container = this.scrollContainer.nativeElement;
 
- const element = document.getElementById(cat);
+  container.scrollTop += event.deltaY;
 
- element?.scrollIntoView({
-  behavior:'smooth',
-  block:'start'
- });
+}
+scrollToCategory(cat: string) {
+
+  this.isManualScroll = true; // prevent scroll detection
+  this.selectedCategory = cat;
+
+  const container = this.scrollContainer.nativeElement;
+  const element = container.querySelector('#' + cat);
+
+  if (!element) return;
+
+  container.scrollTo({
+    top: element.offsetTop,
+    behavior: 'smooth'
+  });
+
+  setTimeout(() => {
+    this.isManualScroll = false;
+  }, 500); // wait for smooth scroll to finish
 
 }
 
 
-onScroll(){
+onScroll() {
 
- const container = this.scrollContainer.nativeElement;
+  if (this.isManualScroll) return;
 
- for(let cat of this.categories){
+  const container = this.scrollContainer.nativeElement;
+  const scrollTop = container.scrollTop;
 
-   const el = document.getElementById(cat);
+  for (let cat of this.categories) {
 
-   if(!el) continue;
+    const el = container.querySelector('#' + cat);
+    if (!el) continue;
 
-   const rect = el.getBoundingClientRect();
+    if (el.offsetTop - 60 <= scrollTop) {
+      this.selectedCategory = cat;
+    }
 
-   if(rect.top >= 0 && rect.top < window.innerHeight/2){
-
-     this.selectedCategory = cat;
-
-     break;
-
-   }
-
- }
+  }
 
 }
 }

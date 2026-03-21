@@ -53,7 +53,7 @@ export const appRoutes: Routes = [
             { path: 'wishlist', component: Wishlist},
             { path: 'myprofile', component: Profile},
             { path: 'admin/banner', component: BannerComponent},
-            { path: 'search/:style', component: Searchresult},
+            { path: 'search', component: Searchresult},
             { path: 'admin/orders', component: Adminorder,canActivate: [AuthGuard]},
             { path: 'admin/invoice', component: Invoice,canActivate: [AuthGuard]},
             { path: 'admin/invoice-list', component: Invoicelist,canActivate: [AuthGuard]},
