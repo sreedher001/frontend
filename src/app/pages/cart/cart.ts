@@ -31,7 +31,7 @@ export class Cart implements OnInit {
 
   showSignupPanel = false;
 showLogin = false;
-shippingFee: number = 50;
+shippingFee: number = 0;
 
   product: Product | undefined ;
   // products : Products[]=[];
@@ -39,10 +39,21 @@ shippingFee: number = 50;
   cartCount$ = this.cartCountSubject.asObservable();
   cart: CartResponse = {
     cartId: 0,
+    shippingFee: 0,
+    totalAmount: 0,
+    appliedPromotions: [],
+    availableCoupons: [],
+    lockedCoupons: [],
     items: []
   };
   isLoggedIn:boolean =false;
   sizeOptions:any[]=[];
+
+  couponCode = '';
+appliedCoupon: string | null = null;
+discount = 0;
+couponError = '';
+showCouponsPanel = true;
 
 autoFilteredSizeValue: any[] = [];
   
@@ -127,6 +138,12 @@ private buildCartFromGuest() {
   const raw = this.getGuestCartRaw();
   this.cart = {
     cartId: 0,
+    shippingFee: 0,
+    totalAmount:0,
+    appliedPromotions: [],
+    availableCoupons: [],
+    lockedCoupons: [],
+
     items: raw.map(r => ({
       ...this.normalizeGuestItem(r),
       availableSizes: r.availableSizes || [],
@@ -254,11 +271,11 @@ goToShop() {
 }
 
 getShippingFee(): number {
-  return this.getCartSubtotal() >= 999 ? 0 : this.shippingFee;
+  return this.cart.shippingFee;
 }
 
 getFinalTotal(): number {
-  return this.getCartSubtotal() + this.getShippingFee();
+  return this.cart.totalAmount;;
 }
 
    goToCheckout(): void {
@@ -591,11 +608,54 @@ async handleLoginSuccess($event: any) {
   }
 }
 
-
-
-
 toggleLogin() {
   this.showLogin = !this.showLogin;
+}
+
+applyCoupon(couponCode: string) {
+
+  this.couponError = '';
+
+  this.cartService.applyCoupon(couponCode)
+  .subscribe({
+    next: (res:any) => {
+
+      this.cart = res;
+
+      // rebuild UI state
+      this.cart.items.forEach((item:any) => {
+        item.sizeOptions = item.availableSizes;
+        item.selectedSizeObj = item.sizeOptions.find(
+          (opt:any) => opt.size === item.size
+        );
+      });
+
+      this.appliedCoupon = res.appliedCoupon;
+      this.discount = res.discount;
+
+      this.couponCode = '';
+    },
+    error: (err) => {
+      this.couponError = err.error?.message || 'Invalid coupon';
+    }
+  });
+}
+
+removeCoupon(){
+
+  this.cartService.removeCoupon()
+  .subscribe(res => {
+
+    this.cart = res;
+
+    this.appliedCoupon = null;
+    this.discount = 0;
+
+  });
+
+}
+showCouponsPanelToggle(){
+  this.showCouponsPanel = !this.showCouponsPanel;
 }
 
 }

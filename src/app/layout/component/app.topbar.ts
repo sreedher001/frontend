@@ -349,6 +349,11 @@ export class AppTopbar implements OnInit {
   items!: MenuItem[];
   cart: CartResponse = {
     cartId: 0,
+    shippingFee: 0,
+    totalAmount: 0,
+    appliedPromotions: [],
+      availableCoupons: [],
+      lockedCoupons: [],
     items: []
 
   };

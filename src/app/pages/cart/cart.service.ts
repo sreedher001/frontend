@@ -179,6 +179,20 @@ updateCartItem(productId: number, quantity: number, size: string, sizeId: number
   );
 }
 
+applyCoupon(code:string){
+
+  return this.http.post<CartResponse>(`${this.baseUrl}/cart/apply-coupon`,{
+    couponCode: code
+  });
+
+}
+
+removeCoupon(){
+
+  return this.http.post<CartResponse>(`${this.baseUrl}/cart/remove-coupon`,{});
+
+}
+
 //   refreshCartCount() {
 //   this.getCart().subscribe({
 //     error: () => this.cartCountSubject.next(0)
@@ -193,5 +207,7 @@ refreshCartCount() {
     error: () => this.cartCountSubject.next(0)
   });
 }
+
+
 
 }

@@ -1,0 +1,128 @@
+<div class="card mt-5">
+
+    <div class="flex justify-between items-center mb-3">
+
+        <h2 class="text-xl font-semibold">Promotions</h2>
+
+        <p-button pButton label="Create Promotion" icon="pi pi-plus" (click)="createPromotion()">
+        </p-button>
+
+    </div>
+
+
+    <p-table #dt [value]="promotions" [paginator]="true" [rows]="10" [loading]="loading"
+        [rowsPerPageOptions]="[10,20,50]" [globalFilterFields]="['name','couponCode','type']" responsiveLayout="scroll"
+        sortMode="multiple">
+
+        <ng-template pTemplate="caption">
+
+            <div class="flex justify-end">
+
+                <span class="p-input-icon-left">
+
+                    <i class="pi pi-search"></i>
+
+                    <input pInputText #searchInput type="text" placeholder="Search promotions" 
+                        (input)="dt.filterGlobal(searchInput.value, 'contains')" />
+
+                </span>
+
+            </div>
+
+        </ng-template>
+
+
+        <ng-template pTemplate="header">
+
+            <tr>
+
+                <th pSortableColumn="name">
+                    Name
+                    <p-sortIcon field="name"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="type">
+                    Type
+                    <p-sortIcon field="type"></p-sortIcon>
+                </th>
+
+                <th>Coupon</th>
+
+                <th pSortableColumn="priority">
+                    Priority
+                    <p-sortIcon field="priority"></p-sortIcon>
+                </th>
+                <th pSortableColumn="group">
+  Group
+  <p-sortIcon field="group"></p-sortIcon>
+</th>
+
+                <th>Status</th>
+
+                <th>Start</th>
+
+                <th>End</th>
+
+                <th style="width:140px">Actions</th>
+
+            </tr>
+
+        </ng-template>
+
+
+        <ng-template pTemplate="body" let-promo>
+
+            <tr>
+
+                <td>{{promo.name}}</td>
+
+                <td>
+                    <p-tag class="p-tag" [value]="promo.type" [severity]="promo.type === 'COUPON' ? 'info':'success'">
+                    </p-tag>
+                </td>
+
+                <td>
+                    @if(promo.couponCode){<span class="text-gray-600 font-medium">
+                        {{promo.couponCode}}
+                    </span>}
+                    @else{
+                    <ng-template #autoPromo>
+                        <span class="text-gray-400">AUTO</span>
+                    </ng-template>}
+
+                </td>
+
+                <td>{{promo.priority}}</td>
+<td>
+  <p-tag [value]="promo.promotionGroup" severity="secondary"></p-tag>
+</td>
+                <td>
+
+                    <p-tag [value]="promo.active ? 'Active':'Inactive'" [severity]="promo.active ? 'success':'danger'">
+                    </p-tag>
+
+                </td>
+
+                <td>{{promo.startDate | date:'dd MMM yyyy'}}</td>
+
+                <td>{{promo.endDate | date:'dd MMM yyyy'}}</td>
+
+                <td>
+
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info mr-2"
+                        (click)="editPromotion(promo)">
+                    </button>
+
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger"
+                        (click)="deletePromotion(promo)">
+                    </button>
+
+                </td>
+
+            </tr>
+
+        </ng-template>
+
+    </p-table>
+
+</div>

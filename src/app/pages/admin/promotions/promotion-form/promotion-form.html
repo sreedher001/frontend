@@ -1,0 +1,226 @@
+<div class="flex justify-center p-6 bg-gray-50 min-h-screen">
+
+  <div class="w-full max-w-6xl bg-white shadow-lg rounded-2xl p-8">
+
+    <h2 class="text-2xl font-semibold mb-6 text-center">
+      {{isEdit ? 'Edit Promotion' : 'Create Promotion'}}
+    </h2>
+
+    <form [formGroup]="promotionForm" (ngSubmit)="savePromotion()" class="space-y-8">
+
+      <!-- BASIC INFO -->
+
+      <div>
+
+        <h3 class="text-lg font-semibold mb-4">Basic Info</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div>
+            <label>Name</label>
+            <input pInputText formControlName="name" class="w-full">
+          </div>
+
+          <div>
+            <label>Promotion Type</label>
+            <p-select [options]="promotionTypes" optionLabel="label" optionValue="value" formControlName="type"
+              class="w-full">
+            </p-select>
+          </div>
+          <div>
+            <label>Promotion Group</label>
+            <p-select [options]="promotionGroups" optionLabel="label" optionValue="value" formControlName="group"
+              class="w-full">
+            </p-select>
+          </div>
+
+          <div *ngIf="promotionForm.get('type')?.value === 'COUPON'">
+            <label>Coupon Code</label>
+            <input pInputText formControlName="couponCode" class="w-full">
+          </div>
+
+          
+
+          <div class="md:col-span-2">
+            <label>Description</label>
+            <input pInputText formControlName="description" class="w-full">
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- CONDITIONS -->
+
+      <div>
+
+        <h3 class="text-lg font-semibold mb-4">Conditions</h3>
+
+        <div formArrayName="conditions">
+
+          <div *ngFor="let cond of conditions.controls; let i=index" [formGroupName]="i"
+            class="grid grid-cols-12 gap-3 mb-3 border p-3 rounded">
+
+            <div class="col-span-4">
+              <p-select [options]="conditionTypes" formControlName="conditionType" class="w-full">
+              </p-select>
+            </div>
+
+            <div class="col-span-3">
+              <p-select [options]="operators" formControlName="operator" class="w-full">
+              </p-select>
+            </div>
+
+            <div class="col-span-3">
+              <input pInputText formControlName="value" class="w-full">
+            </div>
+
+            <div class="col-span-2">
+              <button pButton icon="pi pi-trash" class="p-button-danger w-full" (click)="removeCondition(i)"
+                type="button">
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+        <button pButton type="button" icon="pi pi-plus" label="Add Condition" class="p-button-outlined"
+          (click)="addCondition()">
+        </button>
+
+      </div>
+
+      <!-- ACTION -->
+
+      <div>
+
+        <h3 class="text-lg font-semibold mb-4">Reward</h3>
+
+        <div formGroupName="action" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+          <div>
+            <label>Action</label>
+            <p-select [options]="actionTypes" formControlName="actionType" class="w-full">
+            </p-select>
+          </div>
+
+          <div *ngIf="promotionForm.get('action.actionType')?.value !== 'FREE_SHIPPING'">
+
+            <label>Discount Type</label>
+
+            <p-select [options]="discountTypes" formControlName="discountType" class="w-full">
+            </p-select>
+
+          </div>
+
+          <div *ngIf="promotionForm.get('action.actionType')?.value !== 'FREE_SHIPPING'">
+
+            <label>Value</label>
+
+            <p-inputNumber formControlName="value" class="w-full">
+            </p-inputNumber>
+
+          </div>
+
+          <div *ngIf="promotionForm.get('action.discountType')?.value === 'PERCENTAGE'">
+
+            <label>Max Discount</label>
+
+            <p-inputNumber formControlName="maxDiscount" class="w-full">
+            </p-inputNumber>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- LIMITS -->
+
+      <div>
+
+        <h3 class="text-lg font-semibold mb-4">Controls</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+
+          <div>
+            <label>Priority</label>
+            <p-inputNumber formControlName="priority" class="w-full"></p-inputNumber>
+          </div>
+
+          <div>
+            <label>Usage Limit</label>
+            <p-inputNumber formControlName="usageLimit" class="w-full"></p-inputNumber>
+          </div>
+
+          <div class="flex items-center gap-2 mt-6">
+            <p-checkbox formControlName="active" binary="true"></p-checkbox>
+            <label>Active</label>
+          </div>
+
+          <div class="flex items-center gap-2 mt-6">
+            <p-checkbox formControlName="stackable" binary="true"></p-checkbox>
+            <label>Stackable</label>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- SCHEDULE -->
+
+      <div>
+
+        <h3 class="text-lg font-semibold mb-4">Schedule</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div>
+            <label>Start Date</label>
+            <p-datepicker formControlName="startDate" [showTime]="true" class="w-full">
+            </p-datepicker>
+          </div>
+
+          <div>
+            <label>End Date</label>
+            <p-datepicker formControlName="endDate" [showTime]="true" class="w-full">
+            </p-datepicker>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="mt-5 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+
+  <div class="flex items-center gap-2 mb-2">
+    <i class="pi pi-eye text-orange-500"></i>
+    <span class="font-semibold text-gray-700">Promotion Preview</span>
+  </div>
+
+  <p class="text-sm text-gray-700">
+    {{ getPromotionPreview() || 'Promotion description will appear here' }}
+  </p>
+
+</div>
+
+      <!-- BUTTONS -->
+
+      <div class="flex justify-end gap-3 pt-4 border-t">
+
+        <button pButton type="submit" label="Save" icon="pi pi-check">
+        </button>
+
+        <button pButton type="button" label="Cancel" icon="pi pi-times" class="p-button-secondary" (click)="cancel()">
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+  
+
+</div>

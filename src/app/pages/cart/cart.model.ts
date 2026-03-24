@@ -20,5 +20,13 @@ export interface CartItemDto {
 
 export interface CartResponse {
   cartId: number;
+  userId?: number;
+  shippingFee: number;
+  subtotal?: number;
+  totalAmount: number;
+discount?: number;
   items: CartItemDto[];
+  appliedPromotions:any[];
+  availableCoupons:any[];
+  lockedCoupons:any[];
 }

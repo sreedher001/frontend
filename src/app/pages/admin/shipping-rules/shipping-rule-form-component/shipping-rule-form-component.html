@@ -1,0 +1,98 @@
+<div class="p-6 w-full">
+
+  <p-card>
+
+    <ng-template pTemplate="title">
+     <h2> {{ id ? 'Edit' : 'Create' }} Shipping Rule </h2>
+    </ng-template>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-6">
+
+      <!-- GRID -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+        <!-- Rule Name -->
+        <div class="flex flex-col gap-2">
+          <label>Rule Name</label>
+          <input
+            pInputText
+            formControlName="name"
+            placeholder="Rule name"/>
+        </div>
+
+        <!-- Min Cart -->
+        <div class="flex flex-col gap-2">
+          <label>Min Cart Value</label>
+          <p-inputNumber
+            formControlName="minCartValue"
+            mode="decimal"
+            [min]="0">
+          </p-inputNumber>
+        </div>
+
+        <!-- Max Cart -->
+        <div class="flex flex-col gap-2">
+          <label>Max Cart Value</label>
+          <p-inputNumber
+            formControlName="maxCartValue"
+            mode="decimal"
+            [min]="0">
+          </p-inputNumber>
+        </div>
+
+        <!-- Shipping Fee -->
+        <div class="flex flex-col gap-2">
+          <label>Shipping Fee</label>
+          <p-inputNumber
+            formControlName="shippingFee"
+            mode="currency"
+            currency="INR"
+            locale="en-IN">
+          </p-inputNumber>
+        </div>
+
+        <!-- Priority -->
+        <div class="flex flex-col gap-2">
+          <label>Priority</label>
+          <p-inputNumber
+            formControlName="priority"
+            [min]="1">
+          </p-inputNumber>
+        </div>
+
+        <!-- Free Shipping -->
+        <div class="flex items-center gap-3 mt-6">
+          <p-checkbox
+            formControlName="freeShipping"
+            binary="true">
+          </p-checkbox>
+          <label>Free Shipping</label>
+        </div>
+
+        <!-- Active -->
+        <div class="flex items-center gap-3">
+          <p-checkbox
+            formControlName="active"
+            binary="true">
+          </p-checkbox>
+          <label>Active</label>
+        </div>
+
+      </div>
+
+      <!-- SUBMIT -->
+      <div class="flex justify-end">
+        <p-button
+          
+          type="submit"
+          label="Save"
+          icon="pi pi-check"
+          >
+        </p-button>
+      </div>
+
+    </form>
+
+  </p-card>
+
+</div>

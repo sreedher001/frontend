@@ -1,0 +1,104 @@
+<div class="p-6">
+
+  <div class="flex justify-between mb-4">
+    <h2 class="text-xl font-bold">Shipping Rules</h2>
+
+    <p-button
+      
+      (click)="create()">
+      + Add Rule
+    </p-button>
+  </div>
+
+  <p-table
+    [value]="rules"
+    class="p-datatable-sm"
+    responsiveLayout="scroll">
+
+    <!-- HEADER -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Min Cart</th>
+        <th>Max Cart</th>
+        <th>Fee</th>
+        <th>Free</th>
+        <th>Priority</th>
+        <th>Active</th>
+        <th style="width:150px">Actions</th>
+      </tr>
+    </ng-template>
+
+    <!-- BODY -->
+    <ng-template pTemplate="body" let-rule>
+      <tr>
+
+        <td>{{ rule.name }}</td>
+
+        <td>{{ rule.minCartValue }}</td>
+
+        <td>
+          {{ rule.maxCartValue ?? '∞' }}
+        </td>
+
+        <td>
+          ₹{{ rule.shippingFee }}
+        </td>
+
+        <td>
+          @if(rule.freeShipping){<span
+            class="px-2 py-1 text-xs rounded bg-green-100 text-green-700">
+            Free
+          </span>}
+          @if(!rule.freeShipping){<span class="px-2 py-1 text-xs rounded bg-gray-100 text-gray-500">
+            No
+          </span>}
+        </td>
+
+        <td>
+          {{ rule.priority }}
+        </td>
+
+        <td>
+          <p-tag
+            class="px-2 py-1 text-xs rounded"
+            [styleClass]="rule.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'">
+
+            {{ rule.active ? 'Active' : 'Disabled' }}
+
+          </p-tag>
+        </td>
+
+        <td class="flex gap-3">
+
+          <p-button
+            
+            icon="pi pi-pencil"
+            outlined
+            (click)="edit(rule.id!)">
+          </p-button>
+
+          <p-button
+            outlined 
+            icon="pi pi-trash"
+            
+            (click)="delete(rule.id!)">
+          </p-button>
+
+        </td>
+
+      </tr>
+    </ng-template>
+
+    <!-- EMPTY STATE -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center p-4">
+          No shipping rules found
+        </td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+
+</div>

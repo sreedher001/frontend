@@ -132,7 +132,9 @@ styleOptions = ['Casual Wear', 'Ethnic Wear'];
                 
                 { label: 'View Expense', icon: 'pi pi-eye', routerLink: ['/admin/invoice-list'] },
                 { label: 'Banners', icon: 'pi pi-image', routerLink: ['/admin/banner'] },
-                { label: 'Returns', icon: 'pi pi-box', routerLink: ['/admin/returns-view'] }
+                { label: 'Returns', icon: 'pi pi-box', routerLink: ['/admin/returns-view'] },
+                { label: 'Promotions', icon: 'pi pi-tags', routerLink: ['/admin/promotions'] },
+                { label: 'Shipping Rules', icon: 'pi pi-shipping-fast', routerLink: ['/admin/shipping-rules'] },
 
             ]
             },
