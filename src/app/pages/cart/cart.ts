@@ -20,6 +20,7 @@ import { LoginComponent } from "../auth/login";
 import { Signup } from "../auth/signup/signup";
 import { firstValueFrom } from 'rxjs';
 import confetti from 'canvas-confetti';
+import lottie from 'lottie-web';
 @Component({
   selector: 'app-cart',
   standalone: true,
@@ -35,6 +36,7 @@ export class Cart implements OnInit {
   couponSuccess = false;
 showCouponStamp = false;
   @ViewChild('cartPanel', { static: false }) cartPanel!: ElementRef;
+  @ViewChild('couponAnimation') couponAnimation!: ElementRef;
   product: Product | undefined;
   // products : Products[]=[];
   private cartCountSubject = new BehaviorSubject<number>(0);
@@ -673,7 +675,17 @@ showCouponStamp = false;
 
   this.couponSuccess = true;
 this.showCouponStamp = true;
-
+setTimeout(() => {
+  if(this.couponAnimation){
+    lottie.loadAnimation({
+      container: this.couponAnimation.nativeElement,
+      renderer: 'svg',
+      loop: false,
+      autoplay: true,
+      path: 'assets/animations/coupon-success.json'
+    });
+  }
+},1000);
   
   const canvas = document.createElement('canvas');
 
@@ -687,7 +699,7 @@ this.showCouponStamp = true;
 
   this.cartPanel.nativeElement.appendChild(canvas);
 
-  const myConfetti = confetti.create(canvas, {
+  const myConfetti =confetti.create(canvas, {
     resize: true,
     useWorker: true
   });
@@ -704,7 +716,7 @@ this.showCouponStamp = true;
     canvas.remove();
     this.couponSuccess = false;
     this.showCouponStamp = false;
-  }, 4000);
+  }, 2000);
 }
 
       },

@@ -153,6 +153,29 @@ body {
   }
 }
 
+.cart-panel{
+  position:relative;
+}
+
+/* LOTTIE ANIMATION CENTER */
+
+.coupon-lottie-wrapper{
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  pointer-events:none;
+  z-index:10001;
+}
+
+.coupon-lottie{
+  width:260px;
+  height:260px;
+}
+
+/* COUPON STAMP BELOW */
+
 .coupon-stamp{
   position:absolute;
   inset:0;
@@ -171,24 +194,31 @@ body {
   border-radius:10px;
   font-size:18px;
   letter-spacing:2px;
-  transform:scale(0) rotate(-12deg);
-  animation:stampDrop 0.6s ease forwards;
   box-shadow:0 10px 25px rgba(0,0,0,0.2);
+
+  transform:scale(0) rotate(-12deg) translateY(130px);
+  animation:stampDrop 0.6s ease forwards;
 }
+
+/* STAMP ANIMATION */
 
 @keyframes stampDrop{
 
   0%{
-    transform:scale(0) rotate(-12deg);
+    transform:scale(0) rotate(-12deg) translateY(130px);
     opacity:0;
   }
 
   60%{
-    transform:scale(1.2) rotate(5deg);
+    transform:scale(1.2) rotate(5deg) translateY(130px);
+  }
+
+  80%{
+    transform:scale(0.95) rotate(-2deg) translateY(130px);
   }
 
   100%{
-    transform:scale(1) rotate(0deg);
+    transform:scale(1) rotate(0deg) translateY(130px);
     opacity:1;
   }
 

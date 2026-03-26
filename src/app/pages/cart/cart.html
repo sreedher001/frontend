@@ -200,6 +200,9 @@ bg-white p-3 rounded-lg  shadow-sm hover:shadow-md transition">
 </div>
 }
 @if(showCouponStamp){
+<div class="coupon-lottie-wrapper">
+  <div #couponAnimation class="coupon-lottie"></div>
+</div>
 <div class="coupon-stamp">
   <div class="stamp-inner">
     <i class="pi pi-ticket"></i>
@@ -207,7 +210,6 @@ bg-white p-3 rounded-lg  shadow-sm hover:shadow-md transition">
   </div>
 </div>
 }
-
 @if(cart.lockedCoupons.length > 0){
 
 <div class="mt-4 rounded-xl border border-orange-200 
