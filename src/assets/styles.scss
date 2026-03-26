@@ -60,6 +60,11 @@
   font-size: small;
 }
 
+.dune-font-large {
+  font-family: 'Dune Rise';
+  font-size: large;
+}
+
 body {
     
     background-color: #ffffff;
@@ -111,4 +116,80 @@ body {
   .marquee-track {
     animation-duration: 15s;
   }
+}
+@keyframes swing {
+  0%   { transform: rotate(3deg); }
+  50%  { transform: rotate(-3deg); }
+  100% { transform: rotate(3deg); }
+}
+
+
+.coupon-success-banner{
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e2f7ea;
+  color: #0aa244;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  z-index:10000;
+  animation: slideDown 0.9s ease;
+}
+
+@keyframes slideDown{
+  from{
+    transform: translate(-50%, -40px);
+    opacity:0;
+  }
+  to{
+    transform: translate(-50%, 0);
+    opacity:1;
+  }
+}
+
+.coupon-stamp{
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  pointer-events:none;
+  z-index:10000;
+}
+
+.stamp-inner{
+  background:#ef4444;
+  color:white;
+  font-weight:700;
+  padding:18px 26px;
+  border-radius:10px;
+  font-size:18px;
+  letter-spacing:2px;
+  transform:scale(0) rotate(-12deg);
+  animation:stampDrop 0.6s ease forwards;
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+@keyframes stampDrop{
+
+  0%{
+    transform:scale(0) rotate(-12deg);
+    opacity:0;
+  }
+
+  60%{
+    transform:scale(1.2) rotate(5deg);
+  }
+
+  100%{
+    transform:scale(1) rotate(0deg);
+    opacity:1;
+  }
+
 }

@@ -1,5 +1,5 @@
 <!-- CART ROOT (Drawer Safe) -->
-<div class="cart-drawer-root h-full w-full overflow-x-hidden">
+<div #cartPanel class="cart-drawer-root h-full w-full overflow-x-hidden">
 
   <!-- CART CONTENT -->
   <div class="flex flex-col h-full">
@@ -19,26 +19,26 @@
           @for (item of cart.items; track item.id) {
 
           <!-- CART ITEM -->
-          <div
-            class="relative flex gap-3 p-3 border  bg-white shadow-sm w-full">
+<div
+  class="relative flex gap-3 p-3 border border-gray-300 rounded-lg bg-white shadow-sm w-full transition-all duration-200 hover:shadow-md"
+  [class.opacity-50]="item.selectedSizeObj?.availableQuantity <= 0">
 
             <!-- REMOVE -->
-            <div class="absolute top-2 right-2">
-              <p-button
-                icon="pi pi-trash"
-                severity="contrast"
-                size="small"
-                outlined
-                (onClick)="removeFromCart(item)">
-              </p-button>
-            </div>
+          <div class="absolute -top-3 -right-3 z-30 border-2 border-white rounded-full shadow">
+  <p-button
+    icon="pi pi-trash" 
+    size="small"
+    (click)="removeFromCart(item)">
+  </p-button>
+</div>
 
             <!-- IMAGE -->
             <div class="w-20 h-25 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center">
               <img
-                [src]="item.imageUrl"
+               [src]="item.imageUrl"
                 class="max-w-full max-h-full object-contain cursor-pointer"
                 (click)="goToProductDetails(item.variantId)" />
+                
             </div>
 
             <!-- DETAILS -->
@@ -48,35 +48,61 @@
                 {{ item.variantName }}
               </p>
               <div class="flex items-center gap-2 text-sm sm:text-base">
-    <!-- Discounted price -->
-    <span class="font-semibold text-green-600">
-      ₹{{ item.price }}
-    </span>
+  <span class="font-semibold text-green-600 text-base">
+    ₹{{ item.price }}
+  </span>
 
-    <!-- Original price (striked) -->
-    <span class="text-gray-400 text-sm line-through">
-      ₹{{ item.originalPrice }}
-    </span>
+  <span class="text-gray-400 text-sm line-through">
+    ₹{{ item.originalPrice }}
+  </span>
 
-    <!-- Discount percentage -->
-    <span class="text-red-500 font-medium">
-      ({{ item.discount }}% OFF)
-    </span>
+@if(item.discount > 0){ <div
+  class="absolute -top-2 right-2 flex flex-col items-center
+         animate-[swing_3s_ease-in-out_infinite] z-20"
+>
+
+  <!-- String -->
+  <div class="w-[2px] h-6 bg-gray-300"></div>
+
+  <!-- Tag -->
+  <div
+    class="relative bg-red-600 text-white text-[10px] sm:text-xs
+           font-bold py-3 px-2 rounded-md shadow-xl
+           flex flex-col items-center"
+  >
+
+    <!-- Hole -->
+    <span class="absolute -top-2 -left-2 flex flex-col items-center
+       animate-[swing_3s_ease-in-out_infinite] z-20"></span>
+
+    <span class="leading-none">{{ item.discount }}%</span>
+    <span class="text-[9px] leading-none">OFF</span>
+
   </div>
-              <p class="font-medium text-sm sm:text-base">
-                Color: {{ item.color }}
-              </p>
 
-              
+</div>}
+</div>
+  <div class="flex-1  flex-col ">
+              <div class="flex items-center gap-2 text-sm sm:text-base">
+  <span
+    class="w-3 h-3 rounded-full border border-gray-300"
+    [style.background]="item.color">
+  </span>
+  <span class="font-medium">
+    {{ item.color }}
+  </span>
+</div>
 
               <!-- STOCK -->
+               <span>
               @if(item.selectedSizeObj?.availableQuantity > 0){
                 <p-tag value="In Stock" severity="success" class="text-xs"></p-tag>
               }
               @if(item.selectedSizeObj?.availableQuantity <= 0){
                 <p-tag value="Out of Stock" severity="danger" class="text-xs"></p-tag>
               }
-
+              </span>
+</div>
               <!-- QTY + SIZE -->
               <div class="flex flex-col sm:flex-row gap-2 w-full">
 
@@ -114,6 +140,124 @@
           }
         </div>
 
+
+
+
+@if(cart.availableCoupons.length > 0){
+
+  <div class="mt-4 border rounded-lg p-3 bg-blue-50 border-blue-200">
+
+    <div class="flex justify-between items-center mb-2">
+      <span class="font-semibold text-sm">Available Coupons</span>
+      <span class="text-xs text-blue-600 flex items-center gap-1">
+  <i class="pi pi-ticket text-xs"></i>
+  Apply a coupon to save more
+</span>
+    </div>
+
+    @for(coupon of cart.availableCoupons; track coupon.couponCode){
+
+      <div class="flex justify-between items-center
+bg-white p-3 rounded-lg  shadow-sm hover:shadow-md transition">
+
+  <div>
+
+    <div class="flex items-center gap-2 mb-1">
+      <i class="pi pi-ticket text-blue-500 text-sm"></i>
+
+      <span class="px-2 py-1 text-xs font-semibold
+      bg-gray-100 rounded-md border">
+        {{ coupon.couponCode }}
+      </span>
+    </div>
+
+    <p class="text-xs text-gray-500">
+      {{ coupon.description }}
+    </p>
+
+  </div>
+
+ 
+
+  <div #applyBtnWrapper>
+    <p-button
+      label="Apply"
+      (click)="applyCoupon(coupon.couponCode)"
+      size="small">
+    </p-button>
+  </div>
+
+
+</div>
+    }
+
+  </div>
+}
+@if(couponSuccess){
+<div class="coupon-success-banner">
+  <i class="pi pi-check-circle"></i>
+  Coupon Applied! 🎉
+</div>
+}
+@if(showCouponStamp){
+<div class="coupon-stamp">
+  <div class="stamp-inner">
+    <i class="pi pi-ticket"></i>
+    COUPON APPLIED
+  </div>
+</div>
+}
+
+@if(cart.lockedCoupons.length > 0){
+
+<div class="mt-4 rounded-xl border border-orange-200 
+            bg-gradient-to-br from-orange-50 to-amber-50 
+            p-4 shadow-sm">
+
+  <!-- HEADER -->
+  <div class="flex items-center gap-2 mb-3">
+    <i class="pi pi-bolt text-orange-500 text-sm"></i>
+    <span class="font-semibold text-sm text-orange-700">
+      Unlock More Savings
+    </span>
+  </div>
+
+  @for(coupon of cart.lockedCoupons; track coupon.couponCode){
+
+  <div class="mt-2 flex justify-between items-start 
+              bg-white p-3 rounded-lg border border-orange-100 
+              shadow-sm hover:shadow-md transition">
+
+    <div class="flex flex-col gap-1">
+
+      <!-- COUPON CODE BADGE -->
+      <span class="inline-block px-2 py-1 text-xs font-semibold 
+                   bg-gray-100 border rounded-md w-fit">
+        {{ coupon.couponCode }}
+      </span>
+
+      <!-- DESCRIPTION -->
+      <p class="text-xs text-gray-500">
+        {{ coupon.description }}
+      </p>
+
+      <!-- UNLOCK MESSAGE -->
+      <p class="text-xs text-orange-600 font-medium flex items-center gap-1">
+        <i class="pi pi-lock text-[10px]"></i>
+        {{ coupon.unlockMeaasage }}
+      </p>
+
+    </div>
+
+  </div>
+
+  }
+
+</div>
+
+}
+
+
       } @else {
 
         <!-- EMPTY STATE -->
@@ -128,61 +272,10 @@
 
     </div>
 
-    <!-- CART FOOTER -->
-    <!-- @if(hasCartItems){
-    <div class="sticky bottom-0 bg-white border-t px-4 py-3">
-
-      <div class="flex justify-between items-center mb-3">
-        <span class="text-sm">
-          Subtotal ({{ cart.items.length }} items)
-        </span>
-        <span class="font-semibold">
-          ₹{{ getCartTotal() | number:'1.2-2' }}
-        </span>
-      </div>
-
-      <p-button
-        label="Proceed to Buy"
-        severity="contrast"
-        size="large"
-        styleClass="w-full"
-        (click)="goToCheckout()">
-      </p-button>
-
-    </div>
-    } -->
-
-    <!-- @if(showCouponsPanel){
 
 
-  <div class="flex justify-between items-center mb-4">
-    <h4 class="font-semibold">Available Coupons</h4>
 
-    <i class="pi pi-times cursor-pointer"
-       (click)="showCouponsPanelToggle()"></i>
-  </div>
 
-  <div class="space-y-3">
-
-    <div class="border p-3 rounded flex justify-between items-center">
-
-      <div>
-        <p class="font-medium">FESTIVE10</p>
-        <p class="text-xs text-gray-500">Save ₹100</p>
-      </div>
-
-      <p-button
-        label="Apply"
-        size="small"
-        (click)="applyCoupon(cou)">
-      </p-button>
-
-    </div>
-
-  </div>
-
-} -->
-    
 
 
     @if(hasCartItems){
@@ -236,68 +329,6 @@
 }
 
 
-@if(cart.availableCoupons.length > 0){
-
-  <div class="mt-4 border rounded-lg p-3 bg-blue-50 border-blue-200">
-
-    <div class="flex justify-between items-center mb-2">
-      <span class="font-semibold text-sm">Available Coupons</span>
-      <span class="text-xs text-blue-600 cursor-pointer"
-            (click)="showCouponsPanelToggle()">
-        View All
-      </span>
-    </div>
-
-    @for(coupon of cart.availableCoupons; track coupon.couponCode){
-
-      <div class="flex justify-between items-center mb-2 bg-white p-2 rounded border">
-
-        <div>
-          <p class="font-medium text-sm">{{ coupon.couponCode }}</p>
-          <p class="text-xs text-gray-500">{{ coupon.description }}</p>
-        </div>
-
-        <p-button
-          label="Apply"
-          size="small"
-          (click)="applyCoupon(coupon.couponCode)">
-        </p-button>
-
-      </div>
-
-    }
-
-  </div>
-}
-
-@if(cart.lockedCoupons.length > 0){
-
-  <div class="mt-3 border rounded-lg p-3 bg-orange-50 border-orange-200">
-
-    <span class="font-semibold text-sm text-orange-700">
-      Unlock More Savings
-    </span>
-
-    @for(coupon of cart.lockedCoupons; track coupon.couponCode){
-
-      <div class="mt-2 flex justify-between items-center bg-white p-2 rounded border">
-
-        <div>
-          <p class="font-medium text-sm">{{ coupon.couponCode }}</p>
-          <p class="text-xs text-gray-500">{{ coupon.description }}</p>
-
-          <!-- 🔥 Unlock message -->
-          <p class="text-xs text-orange-600 font-medium">
-            {{ coupon.unlockMeaasage }}
-          </p>
-        </div>
-
-      </div>
-
-    }
-
-  </div>
-}
 
 
 
@@ -384,3 +415,19 @@
   <span class="font-medium whitespace-nowrap text-sm sm:text-base">SIGN UP / SIGN IN</span>
 </div>
 }
+<script>
+  window.addEventListener('load', () => {
+    (function () {
+      const runConfetti = document.querySelector('#hs-run-on-click-run-confetti');
+      runConfetti.addEventListener('click', () => {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: {
+            y: 0.6
+          }
+        });
+      });
+    })();
+  });
+</script>

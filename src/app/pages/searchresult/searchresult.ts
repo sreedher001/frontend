@@ -101,7 +101,7 @@ this.route.queryParamMap.subscribe(paramMap => {
   this.buildPayload();
 
   this.searchProducts();
-
+this.gridView = window.innerWidth >= 1024 ? 4 : 2;
 });
 
 

@@ -106,8 +106,8 @@ border border-green-100 shadow-sm text-green-900 text-[11px]">
 </div>
 
 <h2 class="px-4 text-center mb-2 text-red-800">Shop By Collection</h2>
-<div class="w-full px-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-  <div *ngFor="let collection of collections" class="text-center">
+<div class="w-full px-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 bg-gradient-to-br from-pink-50 via-orange-50 to-pink-50 shadow-md overflow-hidden transition-transform duration-500 transform hover:scale-105 cursor-pointer rounded-xl">
+  <div *ngFor="let collection of collections" class="text-center mt-5">
     <div 
          class="overflow-hidden shadow-lg border border-gray-200 bg-white cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl group rounded-xl">
       <img [src]="collection.imageUrl" [alt]="collection.title" 
@@ -120,7 +120,14 @@ border border-green-100 shadow-sm text-green-900 text-[11px]">
 </div>
 
 <!-- Ethnic Wear Section -->
-@if(showWearSections){<h2 class="px-4 text-center mb-2 text-red-800 dune-font">ETHNIC WEAR</h2>
+@if(showWearSections){<h4 class="text-center mb-4">
+  <span class="dune-font-large text-red-800 ">
+    ZYRA 
+  </span>
+  <span class="text-gray-700 text-xxl ml-3">
+    SPECIALS
+  </span>
+</h4>
 <div class="w-full overflow-x-auto scrollbar-hide">
   <div class="flex space-x-4 px-4 pb-2 min-w-max">
     @for (product of products; track product.id) {
@@ -165,16 +172,31 @@ border border-green-100 shadow-sm text-green-900 text-[11px]">
     }
   </div>
 </div>
-<div class="text-center mt-4">
-  <p-button class="p-button-sm dune-font text-xs" outlined severity="secondary" (onClick)="getWearType('Ethnic Wear')">
-     VIEW MORE
-  </p-button>
+<div class="flex justify-center mt-8">
+  <button
+  class="px-16 py-4 border border-gray-500 text-black 
+         text-lg font-medium tracking-widest
+         flex items-center gap-3
+         hover:bg-blue-50 transition-all duration-200"
+  (click)="getWearType('Ethnic Wear')"
+>
+  Shop All Specials
+  <i class="pi pi-arrow-right"></i>
+</button>
 </div>}
 
 
 
 <!-- Casuals Section -->
-@if(showWearSections){<h2 class="px-4 text-center mb-2 text-red-800 dune-font">CASUALS</h2>
+@if(showWearSections){<h4 class="text-center mb-4">
+  <span class="dune-font-large text-red-800 ">
+    ZYRA
+  </span>
+  <span class="text-gray-700 text-xxl ml-3">
+    Picks For You
+  </span>
+</h4>
+<span class="text-center text-gray-500 mb-4 block text-lg">Zyra's handpicked collection</span>
 <div class="w-full overflow-x-auto scrollbar-hide">
   <div class="flex space-x-1 px-4 pb-2 min-w-max">
     @for (product of products; track product.id) {
@@ -214,11 +236,19 @@ border border-green-100 shadow-sm text-green-900 text-[11px]">
     }
   </div>
 </div>
-<div class="text-center mt-4">
-  <p-button class="p-button-sm dune-font" outlined="" severity="secondary" (onClick)="getWearType('Casual Wear')">
-     VIEW MORE
-  </p-button>
+<div class="flex justify-center mt-8">
+  <button
+    class="px-16 py-4 border border-gray-500 text-black font-bold tracking-wide
+           text-lg font-medium tracking-widest 
+           hover:bg-blue-50 transition-all duration-200"
+    (click)="getWearType('Casual Wear')"
+  >
+    Shop All Handpics
+    <i class="pi pi-arrow-right"></i>
+  </button>
 </div>}
+
+
 
 <!-- Kids Section -->
 @if(showWearSections){
@@ -262,6 +292,8 @@ border border-green-100 shadow-sm text-green-900 text-[11px]">
     }
   </div>
 </div>}
+
+
 
 <!-- Grid Layout Section -->
 <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1 cursor-pointer mt-5">
