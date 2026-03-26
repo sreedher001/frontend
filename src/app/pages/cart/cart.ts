@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CartService } from './cart.service';
@@ -52,6 +52,7 @@ showCouponStamp = false;
   };
   isLoggedIn: boolean = false;
   sizeOptions: any[] = [];
+  couponAnim: any;
 
   couponCode = '';
   appliedCoupon: string | null = null;
@@ -62,11 +63,14 @@ showCouponStamp = false;
   autoFilteredSizeValue: any[] = [];
 
   relatedProducts: Product[] = [];
+remainingTime: number = 0;
+  displayTime: string = '';
+  interval: any;
 
   
 
   constructor(private cartService: CartService, private productDetails: Productdetails, private prod: Products,
-    private productService: ProductService, private messageService: MessageService, private router: Router
+    private productService: ProductService, private messageService: MessageService, private router: Router,private cd: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -75,8 +79,41 @@ showCouponStamp = false;
     }
     this.loadCart();
 
+    
+
   }
 
+  startTimer() {
+    this.interval = setInterval(() => {
+      this.remainingTime -= 1000;
+
+      if (this.remainingTime <= 0) {
+        clearInterval(this.interval);
+        this.displayTime = '00h : 00m : 00s';
+        return;
+      }
+
+      this.displayTime = this.formatTime(this.remainingTime);
+    }, 1000);
+  }
+
+  formatTime(ms: number): string {
+    const totalSeconds = Math.floor(ms / 1000);
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${this.pad(hours)}h : ${this.pad(minutes)}m : ${this.pad(seconds)}s`;
+  }
+
+  pad(value: number): string {
+    return value < 10 ? '0' + value : value.toString();
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.interval);
+  }
   // ---------- Helper functions for guest cart ----------
   private guestCartKey = 'guestCart';
 
@@ -265,6 +302,7 @@ showCouponStamp = false;
 
   goToShop() {
     this.router.navigate(['/products']);
+    this.cartService.closeDrawer();
   }
 
   // getCartTotal(): number {
@@ -676,16 +714,18 @@ showCouponStamp = false;
   this.couponSuccess = true;
 this.showCouponStamp = true;
 setTimeout(() => {
-  if(this.couponAnimation){
-    lottie.loadAnimation({
+  if (this.couponAnimation) {
+
+    this.couponAnim = lottie.loadAnimation({
       container: this.couponAnimation.nativeElement,
       renderer: 'svg',
       loop: false,
       autoplay: true,
       path: 'assets/animations/coupon-success.json'
     });
+
   }
-},1000);
+}, 10);
   
   const canvas = document.createElement('canvas');
 
@@ -704,19 +744,34 @@ setTimeout(() => {
     useWorker: true
   });
 
-  myConfetti({
-    particleCount: 140,
-    spread: 120,
-    startVelocity: 45,
-    gravity: 0.7,
-    origin: { x: 0.5, y: 0.2 }
-  });
+  // LEFT burst
+myConfetti({
+  particleCount: 70,
+  spread: 100,
+  startVelocity: 45,
+  gravity: 0.7,
+  origin: { x: 0.1, y: 0.3 }
+});
 
-  setTimeout(() => {
-    canvas.remove();
-    this.couponSuccess = false;
-    this.showCouponStamp = false;
-  }, 2000);
+// RIGHT burst
+myConfetti({
+  particleCount: 70,
+  spread: 100,
+  startVelocity: 45,
+  gravity: 0.7,
+  origin: { x: 0.9, y: 0.3 }
+});
+
+ setTimeout(() => {
+
+  canvas.remove();
+this.couponSuccess = false;
+  this.showCouponStamp = false;
+  if(this.couponAnim){
+    this.couponAnim.destroy();
+  }
+  this.cd.detectChanges();
+}, 3000);
 }
 
       },
@@ -725,7 +780,17 @@ setTimeout(() => {
       }
     });
 }
+getEstimatedDelivery() {
+  const today = new Date();
+  const estimatedDate = new Date(today);
 
+  estimatedDate.setDate(today.getDate() + 8); // add 8 days
+
+  return estimatedDate.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short'
+  });
+}
   removeCoupon() {
 
     this.cartService.removeCoupon()

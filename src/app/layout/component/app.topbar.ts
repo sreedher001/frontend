@@ -282,10 +282,18 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   [(visible)]="visibleCartDrawer"
   position="right"
   header="My Cart"
- [style]="{ width: drawerWidth }"
+  [style]="{ width: drawerWidth }"
 >
+
+  <!-- Full width timer -->
+  <div class="-mx-4 bg-green-100 text-green-800 text-center text-md font-semibold py-3 ">
+    ⏳ Sale ends in {{ displayTime }}
+  </div>
+
   <app-cart></app-cart>
-</p-drawer>
+
+</p-drawer> 
+
 <!-- Mobile Search Modal -->
 @if (showMobileSearch) {
   <div class="fixed inset-0 bg-black/40 z-50 flex items-start justify-start px-4x mt-15">
@@ -366,6 +374,10 @@ export class AppTopbar implements OnInit {
   visibleCartDrawer=false;
   drawerWidth = '520px';
   cartItems: any[] = [];
+
+   remainingTime: number = 0;
+  displayTime: string = '';
+  interval: any;
   ngOnInit(): void {
     
      this.cartService.drawerVisible$.subscribe(
@@ -403,6 +415,21 @@ this.setDrawerWidth();
         this.isAdmin = true;
       }
     }
+
+
+
+    const savedEndTime = localStorage.getItem('saleEndTime');
+
+    if (savedEndTime) {
+      this.remainingTime = +savedEndTime - Date.now();
+    } else {
+      // 1 hour timer
+      const endTime = Date.now() + (60 * 60 * 3000);
+      localStorage.setItem('saleEndTime', endTime.toString());
+      this.remainingTime = 60 * 60 * 3000;
+    }
+
+    this.startTimer();
 
   }
   constructor(public layoutService: LayoutService, private cartService: CartService, private messageService: MessageService,private sanitizer: DomSanitizer,
@@ -445,6 +472,38 @@ setDrawerWidth() {
   //   //const query = event.query;
   //   this.searchSubject.next(event.query);
   // }
+
+  startTimer() {
+    this.interval = setInterval(() => {
+      this.remainingTime -= 1000;
+
+      if (this.remainingTime <= 0) {
+        clearInterval(this.interval);
+        this.displayTime = '00h : 00m : 00s';
+        return;
+      }
+
+      this.displayTime = this.formatTime(this.remainingTime);
+    }, 1000);
+  }
+
+  formatTime(ms: number): string {
+    const totalSeconds = Math.floor(ms / 1000);
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${this.pad(hours)}h : ${this.pad(minutes)}m : ${this.pad(seconds)}s`;
+  }
+
+  pad(value: number): string {
+    return value < 10 ? '0' + value : value.toString();
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.interval);
+  }
 
   filterProducts(event: any) {
   const query = event.query.trim().toLowerCase();

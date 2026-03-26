@@ -75,32 +75,27 @@
   </div>
 </div>
 
-<div class="relative mt-3 grid grid-cols-3 mx-2 overflow-hidden rounded-sm
-bg-gradient-to-r from-green-50 via-green-100 to-green-50 
-border border-green-100 shadow-sm text-green-900 text-[11px]">
+<div class="flex items-center bg-green-50 border border-green-100 rounded-lg mx-2 mt-3 text-[12px] text-green-900">
 
-  <!-- shimmer -->
-  <div class="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
-
-  <div class="relative flex items-center justify-center gap-2 py-3 border-r border-green-200">
-    <i class="pi pi-wallet text-xl text-green-700"></i>
-    <span class="leading-tight font-semibold">
-      CASH ON <br> DELIVERY
+  <div class="flex-1 flex items-center justify-center gap-2 py-3">
+    <span class="flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-sm">
+      <i class="pi pi-wallet text-green-700 text-lg"></i>
     </span>
+    <span class="font-semibold">Cash on Delivery</span>
   </div>
 
-  <div class="relative flex items-center justify-center gap-2 py-3 border-r border-green-200">
-    <i class="pi pi-truck text-xl text-green-700"></i>
-    <span class="leading-tight font-semibold">
-      FREE <br> SHIPPING
+  <div class="flex-1 flex items-center justify-center gap-2 py-3 border-x border-green-200">
+    <span class="flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-sm">
+      <i class="pi pi-truck text-green-700 text-lg"></i>
     </span>
+    <span class="font-semibold">Free Shipping</span>
   </div>
 
-  <div class="relative flex items-center justify-center gap-2 py-3">
-    <i class="pi pi-refresh text-xl text-green-700"></i>
-    <span class="leading-tight font-semibold">
-      EASY <br> RETURNS
+  <div class="flex-1 flex items-center justify-center gap-2 py-3">
+    <span class="flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-sm">
+      <i class="pi pi-refresh text-green-700 text-lg"></i>
     </span>
+    <span class="font-semibold">Easy Returns</span>
   </div>
 
 </div>
@@ -489,10 +484,19 @@ border border-green-100 shadow-sm text-green-900 text-[11px]">
 }
 </div>
 @if(!lastPage){<div class="text-center mt-4" >
-  <p-button label="Load More" (onClick)="fetchProducts()" [disabled]="loading"  
-            class="dune-font" outlined >
-    @if(loading){<i class="pi pi-spin pi-spinner"></i>}
-  </p-button>
+  <div class="flex justify-center mt-8">
+  <button
+  class="px-16 py-4 border border-gray-500 text-black 
+         text-lg font-medium tracking-widest
+         flex items-center gap-3
+         hover:bg-blue-50 transition-all duration-200"
+  (click)="fetchProducts()"
+>
+  Load More
+  <i class="pi pi-arrow-right"></i>
+  @if(loading){<i class="pi pi-spin pi-spinner"></i>}
+</button>
+</div>
 </div>}
 
 

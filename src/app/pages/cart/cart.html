@@ -14,112 +14,110 @@
 
       @if (hasCartItems) {
 
-        <div class="space-y-4">
+      <div class="space-y-4">
 
-          @for (item of cart.items; track item.id) {
+        @for (item of cart.items; track item.id) {
 
-          <!-- CART ITEM -->
-<div
-  class="relative flex gap-3 p-3 border border-gray-300 rounded-lg bg-white shadow-sm w-full transition-all duration-200 hover:shadow-md"
-  [class.opacity-50]="item.selectedSizeObj?.availableQuantity <= 0">
+        <!-- CART ITEM -->
+        <div
+          class="relative flex gap-3 p-3 border border-gray-300 rounded-lg bg-white shadow-sm w-full transition-all duration-200 hover:shadow-md"
+          [class.opacity-50]="item.selectedSizeObj?.availableQuantity <= 0">
 
-            <!-- REMOVE -->
+          <!-- REMOVE -->
           <div class="absolute -top-3 -right-3 z-30 border-2 border-white rounded-full shadow">
-  <p-button
-    icon="pi pi-trash" 
-    size="small"
-    (click)="removeFromCart(item)">
-  </p-button>
-</div>
+            <p-button icon="pi pi-trash" size="small" (click)="removeFromCart(item)">
+            </p-button>
+          </div>
 
-            <!-- IMAGE -->
-            <div class="w-20 h-25 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center">
-              <img
-               [src]="item.imageUrl"
-                class="max-w-full max-h-full object-contain cursor-pointer"
-                (click)="goToProductDetails(item.variantId)" />
-                
-            </div>
+          <!-- IMAGE -->
+          <div class="w-20 h-25 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center">
+            <img [src]="item.imageUrl" class="max-w-full max-h-full object-contain cursor-pointer"
+              (click)="goToProductDetails(item.variantId)" />
 
-            <!-- DETAILS -->
-            <div class="flex-1  flex-col ">
+          </div>
 
-              <p class="font-medium text-sm sm:text-base">
-                {{ item.variantName }}
-              </p>
-              <div class="flex items-center gap-2 text-sm sm:text-base">
-  <span class="font-semibold text-green-600 text-base">
-    ₹{{ item.price }}
-  </span>
+          <!-- DETAILS -->
+          <div class="flex-1  flex-col ">
 
-  <span class="text-gray-400 text-sm line-through">
-    ₹{{ item.originalPrice }}
-  </span>
+            <p class="font-medium text-lg sm:text-base">
+              {{ item.variantName }}
+            </p>
+            <div class="flex items-center gap-2 text-sm sm:text-base">
+              <span class="font-semibold text-black text-lg sm:text-base">
+                ₹{{ item.price }}
+              </span>
 
-@if(item.discount > 0){ <div
-  class="absolute -top-2 right-2 flex flex-col items-center
-         animate-[swing_3s_ease-in-out_infinite] z-20"
->
+              <span class="text-gray-400 text-sm line-through">
+                ₹{{ item.originalPrice }}
+              </span>
 
-  <!-- String -->
-  <div class="w-[2px] h-6 bg-gray-300"></div>
+              @if(item.discount > 0){
+              <span class="ml-2 px-2 py-[2px] text-[11px] font-semibold
+             text-green-700 bg-green-50 border border-green-200
+             rounded-md tracking-wide">
+                Saved ₹{{ item.originalPrice - item.price }}/- per item
+              </span>}
 
-  <!-- Tag -->
-  <div
-    class="relative bg-red-600 text-white text-[10px] sm:text-xs
+              @if(item.discount > 0){ <div class="absolute -top-2 right-2 flex flex-col items-center
+         animate-[swing_3s_ease-in-out_infinite] z-20">
+
+                <!-- String -->
+                <div class="w-[2px] h-6 bg-gray-300"></div>
+
+                <!-- Tag -->
+                <div class="relative bg-red-600 text-white text-[10px] sm:text-xs
            font-bold py-3 px-2 rounded-md shadow-xl
-           flex flex-col items-center"
-  >
+           flex flex-col items-center">
 
-    <!-- Hole -->
-    <span class="absolute -top-2 -left-2 flex flex-col items-center
+                  <!-- Hole -->
+                  <span class="absolute -top-2 -left-2 flex flex-col items-center
        animate-[swing_3s_ease-in-out_infinite] z-20"></span>
 
-    <span class="leading-none">{{ item.discount }}%</span>
-    <span class="text-[9px] leading-none">OFF</span>
+                  <span class="leading-none">{{ item.discount }}%</span>
+                  <span class="text-[9px] leading-none">OFF/item</span>
 
-  </div>
-
-</div>}
-</div>
-  <div class="flex-1  flex-col ">
-              <div class="flex items-center gap-2 text-sm sm:text-base">
-  <span
-    class="w-3 h-3 rounded-full border border-gray-300"
-    [style.background]="item.color">
-  </span>
-  <span class="font-medium">
-    {{ item.color }}
-  </span>
-</div>
-
-              <!-- STOCK -->
-               <span>
-              @if(item.selectedSizeObj?.availableQuantity > 0){
-                <p-tag value="In Stock" severity="success" class="text-xs"></p-tag>
-              }
-              @if(item.selectedSizeObj?.availableQuantity <= 0){
-                <p-tag value="Out of Stock" severity="danger" class="text-xs"></p-tag>
-              }
-              </span>
-</div>
-              <!-- QTY + SIZE -->
-              <div class="flex flex-col sm:flex-row gap-2 w-full">
-
-                <!-- QUANTITY -->
-                <div class="flex items-center gap-1">
-                  <p-button severity="secondary" size="small" outlined (click)="decreaseQuantity(item)">
-                    <i class="pi pi-minus"></i>
-                  </p-button>
-
-                  <p-tag value="{{ item.quantity }}" severity="contrast"></p-tag>
-
-                  <p-button severity="secondary" size="small" outlined (click)="increaseQuantity(item)">
-                    <i class="pi pi-plus"></i>
-                  </p-button>
                 </div>
 
-                <div class="w-40 w-full">
+
+              </div>}
+            </div>
+            <div class="flex-1  flex-col ">
+              <div class="flex items-center gap-2 text-sm sm:text-base">
+                <span class="w-3 h-3 rounded-full border border-gray-300" [style.background]="item.color">
+                </span>
+                <span class="font-medium text-gray-600 text-lg sm:text-base">
+                  {{ item.color }}
+                </span>
+              </div>
+
+              <!-- STOCK -->
+              <span>
+                @if(item.selectedSizeObj?.availableQuantity > 0){
+                <p class="text-pink-800 text-sm ">Lowest price in last 30 days</p>
+                <i class="pi pi-truck text-gray-400"> Estimated delivery by {{ getEstimatedDelivery() }}</i>
+                }
+                @if(item.selectedSizeObj?.availableQuantity <= 0){ <p-tag value="Out of Stock" severity="danger"
+                  class="text-xs"></p-tag>
+                  }
+              </span>
+            </div>
+            <!-- QTY + SIZE -->
+            <div class="flex flex-col sm:flex-row gap-2 w-full">
+
+              <!-- QUANTITY -->
+              <div class="flex items-center gap-1">
+                <p-button severity="secondary" size="small" outlined (click)="decreaseQuantity(item)">
+                  <i class="pi pi-minus"></i>
+                </p-button>
+
+                <p-tag value="{{ item.quantity }}" severity="contrast"></p-tag>
+
+                <p-button severity="secondary" size="small" outlined (click)="increaseQuantity(item)">
+                  <i class="pi pi-plus"></i>
+                </p-button>
+              </div>
+
+              <div class="w-40 w-full">
                 <p-autocomplete [(ngModel)]="item.selectedSizeObj" name="size" #size="ngModel" required
                   [suggestions]="autoFilteredSizeValue" optionLabel="size" field="size" dropdown forceSelection="true"
                   type="false" (completeMethod)="filterSize($event,item)" inputId="size"
@@ -127,234 +125,250 @@
                   [inputStyle]="{ 'caretColor': 'transparent' }" class="w-full">
                 </p-autocomplete>
                 @if(item?.selectedSizeObj?.availableQuantity <= 0 && getItemLength(item)>1){ <span>
-                  <p-tag value="Check other quantity" severity="danger" class="text-xs font-medium">
-                  </p-tag>
+                    <p-tag value="Check other quantity" severity="danger" class="text-xs font-medium">
+                    </p-tag>
                   </span>
                   }
               </div>
 
-              </div>
-
             </div>
+
           </div>
-          }
+        </div>
+        }
+      </div>
+
+
+
+
+      @if(cart.availableCoupons.length > 0){
+
+      <div class="mt-4 border rounded p-3 bg-green-50 border-green-200">
+
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-semibold text-sm">Available Coupons</span>
+          <span class="text-xs text-green-600 flex items-center gap-1">
+            <i class="pi pi-ticket text-xs"></i>
+            Apply a coupon to save more
+          </span>
         </div>
 
+        @for(coupon of cart.availableCoupons; track coupon.couponCode){
 
-
-
-@if(cart.availableCoupons.length > 0){
-
-  <div class="mt-4 border rounded-lg p-3 bg-blue-50 border-blue-200">
-
-    <div class="flex justify-between items-center mb-2">
-      <span class="font-semibold text-sm">Available Coupons</span>
-      <span class="text-xs text-blue-600 flex items-center gap-1">
-  <i class="pi pi-ticket text-xs"></i>
-  Apply a coupon to save more
-</span>
-    </div>
-
-    @for(coupon of cart.availableCoupons; track coupon.couponCode){
-
-      <div class="flex justify-between items-center
+        <div class="flex justify-between items-center
 bg-white p-3 rounded-lg  shadow-sm hover:shadow-md transition">
 
-  <div>
+          <div>
 
-    <div class="flex items-center gap-2 mb-1">
-      <i class="pi pi-ticket text-blue-500 text-sm"></i>
+            <div class="flex items-center gap-2 mb-1">
+              <i class="pi pi-ticket text-green-500 text-sm"></i>
 
-      <span class="px-2 py-1 text-xs font-semibold
-      bg-gray-100 rounded-md border">
-        {{ coupon.couponCode }}
-      </span>
-    </div>
+             <span class="px-3 py-1 text-xs font-bold tracking-wider
+bg-white border border-green-200 text-green-700 rounded-md">
+  {{ coupon.couponCode }}
+</span>
+            </div>
 
-    <p class="text-xs text-gray-500">
-      {{ coupon.description }}
-    </p>
+            <p class="text-xs text-gray-500">
+              {{ coupon.description }}
+            </p>
 
-  </div>
-
- 
-
-  <div #applyBtnWrapper>
-    <p-button
-      label="Apply"
-      (click)="applyCoupon(coupon.couponCode)"
-      size="small">
-    </p-button>
-  </div>
+          </div>
 
 
-</div>
-    }
 
-  </div>
-}
-@if(couponSuccess){
-<div class="coupon-success-banner">
-  <i class="pi pi-check-circle"></i>
-  Coupon Applied! 🎉
-</div>
-}
-@if(showCouponStamp){
-<div class="coupon-lottie-wrapper">
-  <div #couponAnimation class="coupon-lottie"></div>
-</div>
-<div class="coupon-stamp">
-  <div class="stamp-inner">
-    <i class="pi pi-ticket"></i>
-    COUPON APPLIED
-  </div>
-</div>
-}
-@if(cart.lockedCoupons.length > 0){
+          <div #applyBtnWrapper>
+            <p-button label="Apply" severity="contrast" outlined  (click)="applyCoupon(coupon.couponCode)" size="small">
+            </p-button>
+          </div>
 
-<div class="mt-4 rounded-xl border border-orange-200 
+
+        </div>
+        }
+
+      </div>
+      }
+
+      <div *ngIf="couponSuccess" class="coupon-success-banner">
+        <i class="pi pi-check-circle"></i>
+        Coupon Applied! 🎉
+      </div>
+
+
+      @if(showCouponStamp){<div class="coupon-lottie-wrapper">
+        <div #couponAnimation class="coupon-lottie"></div>
+      </div>
+      <div class="coupon-stamp">
+        <div class="stamp-inner">
+          <i class="pi pi-ticket"></i>
+          COUPON APPLIED 🎉
+        </div>
+      </div>}
+
+      @if(cart.lockedCoupons.length > 0){
+
+      <div class="mt-4 rounded-xl border border-orange-200 
             bg-gradient-to-br from-orange-50 to-amber-50 
             p-4 shadow-sm">
 
-  <!-- HEADER -->
-  <div class="flex items-center gap-2 mb-3">
-    <i class="pi pi-bolt text-orange-500 text-sm"></i>
-    <span class="font-semibold text-sm text-orange-700">
-      Unlock More Savings
-    </span>
-  </div>
+        <!-- HEADER -->
+        <div class="flex items-center gap-2 mb-3">
+          <i class="pi pi-bolt text-orange-500 text-sm"></i>
+          <span class="font-semibold text-sm text-orange-700">
+            Unlock More Savings
+          </span>
+        </div>
 
-  @for(coupon of cart.lockedCoupons; track coupon.couponCode){
+        @for(coupon of cart.lockedCoupons; track coupon.couponCode){
 
-  <div class="mt-2 flex justify-between items-start 
+        <div class="mt-2 flex justify-between items-start 
               bg-white p-3 rounded-lg border border-orange-100 
               shadow-sm hover:shadow-md transition">
 
-    <div class="flex flex-col gap-1">
+          <div class="flex flex-col gap-1">
 
-      <!-- COUPON CODE BADGE -->
-      <span class="inline-block px-2 py-1 text-xs font-semibold 
+            <!-- COUPON CODE BADGE -->
+            <span class="inline-block px-2 py-1 text-xs font-semibold 
                    bg-gray-100 border rounded-md w-fit">
-        {{ coupon.couponCode }}
-      </span>
+              {{ coupon.couponCode }}
+            </span>
 
-      <!-- DESCRIPTION -->
-      <p class="text-xs text-gray-500">
-        {{ coupon.description }}
-      </p>
+            <!-- DESCRIPTION -->
+            <p class="text-xs text-gray-500">
+              {{ coupon.description }}
+            </p>
 
-      <!-- UNLOCK MESSAGE -->
-      <p class="text-xs text-orange-600 font-medium flex items-center gap-1">
-        <i class="pi pi-lock text-[10px]"></i>
-        {{ coupon.unlockMeaasage }}
-      </p>
+            <!-- UNLOCK MESSAGE -->
+            <p class="text-md text-orange-600 font-medium flex items-center gap-1">
+              <i class="pi pi-lock text-[10px]"></i>
+              {{ coupon.unlockMeaasage }}
+            </p>
 
-    </div>
+          </div>
 
-  </div>
+        </div>
 
-  }
+        }
 
-</div>
+      </div>
 
-}
+      }
 
 
       } @else {
 
-        <!-- EMPTY STATE -->
-        <div class="flex flex-col items-center justify-center h-full text-center text-gray-500">
-          <div class="text-5xl mb-3">🛒</div>
-          <p class="text-lg">Your cart is empty</p>
-          <p class="text-sm mb-4">Start adding items</p>
-          <p-button severity="contrast" (click)="goToShop()">Explore Products</p-button>
-        </div>
+      <!-- EMPTY STATE -->
+      <div class="flex flex-col items-center justify-center h-full text-center text-gray-500">
+        <div class="text-5xl mb-3">🛒</div>
+        <p class="text-lg">Your cart is empty</p>
+        <p class="text-sm mb-4">Start adding items</p>
+        <p-button severity="contrast" (click)="goToShop()">Explore Products</p-button>
+      </div>
 
       }
+      <div class="mt-15 secure-payment">
+        <img src="assets/paymentmethods.png" alt="Payment Methods" class="payment-methods-img" />
+
+      </div>
 
     </div>
-
-
-
-
 
 
 
     @if(hasCartItems){
-<div class="sticky bottom-0 bg-white border-t px-4 py-3">
-
-  <!-- Subtotal -->
-  <div class="flex justify-between items-center mb-2">
-    <span class="text-sm">
-      Subtotal ({{ cart.items.length }} items)
-    </span>
-    <span>
-      ₹{{ getCartSubtotal() | number:'1.2-2' }}
-    </span>
-  </div>
-
-  <!-- Shipping -->
-  <div class="flex justify-between items-center mb-2">
-    <span class="text-sm">Shipping</span>
-    <span>
-      @if(getShippingFee() === 0){
-        <span class="text-green-600 font-medium">FREE</span>
-      }@else{
-        ₹{{ getShippingFee() | number:'1.2-2' }}
-      }
-    </span>
-  </div>
-
- @if(cart.appliedPromotions.length > 0){
-
-  @for(promo of cart.appliedPromotions; track promo.name){
-
-    <div
-      class="flex justify-between items-center mb-2 
-             bg-green-50 border border-green-200 
-             rounded-md px-3 py-2 text-green-700 text-sm">
-
-      <div class="flex items-center gap-2">
-        <i class="pi pi-check-circle text-green-600 text-xs"></i>
-        <span class="font-medium">
-          {{ promo.description }}
+    <div class="sticky bottom-0 bg-white  px-4 py-3">
+      <h5 class="text-lg font-semibold mb-3">Order Summary</h5>
+      <!-- Subtotal -->
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-md">
+          Subtotal ({{ cart.items.length }} items)
+        </span>
+        <span>
+          ₹{{ getCartSubtotal() | number:'1.2-2' }}
         </span>
       </div>
 
-      <span class="font-semibold">
-        -₹{{ promo.discount | number:'1.2-2' }}
-      </span>
+      <!-- Shipping -->
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-md">Shipping</span>
+        <span>
+          @if(getShippingFee() === 0){
+          <span class="text-green-600 font-medium">FREE</span>
+          }@else{
+          ₹{{ getShippingFee() | number:'1.2-2' }}
+          }
+        </span>
+      </div>
 
-    </div>
+      @if(cart.appliedPromotions.length > 0){
 
-  }
-}
+      @for(promo of cart.appliedPromotions; track promo.name){
+
+      <div class="flex justify-between items-center mb-2 
+             bg-green-50 border border-green-200 
+             rounded-md px-3 py-2 text-green-700 text-lg">
+
+        <div class="flex items-center gap-2">
+          <i class="pi pi-check-circle text-green-600 text-xs"></i>
+          <span class="font-medium">
+            {{ promo.description }}
+          </span>
+        </div>
+
+        <span class="font-semibold">
+          -₹{{ promo.discount | number:'1.2-2' }}
+        </span>
+
+      </div>
+
+      }
+      }
 
 
 
 
 
-  <hr class="my-2">
+      <hr class="my-2">
 
-  <!-- Final Total -->
-  <div class="flex justify-between items-center mb-3">
-    <span class="font-semibold">Total</span>
-    <span class="font-semibold">
-      ₹{{ getFinalTotal() | number:'1.2-2' }}
-    </span>
-  </div>
+      <!-- Final Total -->
+      <div class="flex justify-between items-center mb-3">
+        <span class="font-semibold text-lg">Total Payable</span>
+        <span class="font-semibold text-lg">
+          ₹{{ getFinalTotal() | number:'1.2-2' }}
+        </span>
+      </div>
 
-  <p-button
+      <!-- <p-button
     label="Proceed to Buy"
     icon="pi pi-credit-card"
     severity="contrast"
     size="large"
     styleClass="w-full"
     (click)="goToCheckout()">
-  </p-button>
+  </p-button> -->
 
-</div>
-}
+
+      <div class="flex items-center mt-4 border-t pt-4">
+
+        <!-- LEFT : Total -->
+        <div class="flex flex-col mr-4">
+          <span class="text-xs text-gray-500">Total Payable</span>
+          <span class="text-xl font-bold text-black">
+            ₹{{ getFinalTotal() | number:'1.2-2' }}
+          </span>
+        </div>
+
+        <!-- RIGHT : Large Button -->
+        <button (click)="goToCheckout()" class="flex-1 bg-black text-white py-4 rounded
+           text-lg font-semibold
+           hover:bg-gray-800 transition-all">
+          Proceed to Checkout →
+        </button>
+
+      </div>
+
+    </div>
+    }
 
 
   </div>
