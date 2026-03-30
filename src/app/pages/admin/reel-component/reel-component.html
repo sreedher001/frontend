@@ -1,0 +1,82 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="p-4 mt-10">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold">Reels Management</h2>
+
+    <button pButton label="Add Reel" icon="pi pi-plus"
+      (click)="openCreateDialog()"></button>
+  </div>
+
+  <!-- TABLE -->
+  <p-table [value]="reels" [paginator]="true" [rows]="10" [loading]="loading">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Title</th>
+        <th>Thumbnail</th>
+        <th>Caption</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-reel>
+      <tr>
+        <td>{{ reel.title }}</td>
+
+        <td>
+          <img [src]="reel.thumbnailUrl" [alt]="reel.title" width="20" height="3" />
+        </td>
+
+        <td>{{ reel.caption }}</td>
+
+        <td class="flex gap-2">
+          <button pButton icon="pi pi-pencil" class="p-button-text"
+            (click)="editReel(reel)"></button>
+
+          <button pButton icon="pi pi-trash"
+            class="p-button-text p-button-contrast"
+            (click)="confirmDelete(reel.id)"></button>
+        </td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+
+</div>
+
+<!-- DIALOG -->
+<p-dialog [(visible)]="displayDialog" [modal]="true" [style]="{width: '500px'}">
+
+  <ng-template pTemplate="header">
+    {{ isEdit ? 'Edit Reel' : 'Create Reel' }}
+  </ng-template>
+
+  <div class="flex flex-col gap-3">
+
+    
+<input pInputText placeholder="Variant ID" [(ngModel)]="form.variantId" />
+    <input pInputText placeholder="Title" [(ngModel)]="form.title" />
+    <input pInputText placeholder="Caption" [(ngModel)]="form.caption" />
+    <input pInputText placeholder="Video URL" [(ngModel)]="form.videoUrl" />
+    <input pInputText placeholder="Thumbnail URL" [(ngModel)]="form.thumbnailUrl" />
+
+    <input type="number" pInputText placeholder="Duration"
+      [(ngModel)]="form.durationSeconds" />
+
+    <!-- Variant Dropdown -->
+    
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" class="p-button-text"
+      (click)="displayDialog=false"></button>
+
+    <button pButton label="Save"
+      (click)="saveReel()"></button>
+  </ng-template>
+
+</p-dialog>

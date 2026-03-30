@@ -1,6 +1,6 @@
 import { Product } from '@/models/product.model';
 import { CommonModule } from '@angular/common';
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, ElementRef, Injectable, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { Carousel, CarouselModule } from 'primeng/carousel';
@@ -23,6 +23,8 @@ import {  LoginComponent } from "../auth/login";
 import { ReviewBannerComponent } from "../productreview/review-banner-component/review-banner-component";
 import { MOOD_CONFIG } from './mood-config';
 import { COLLECTION_CONFIG } from './collection-config';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ReelService } from '../admin/reel-component/reel.service';
 
 @Component({
   selector: 'app-products',
@@ -35,7 +37,11 @@ import { COLLECTION_CONFIG } from './collection-config';
   providedIn: 'root' 
 })
 export class Products implements OnInit {
+  @ViewChild('collectionContainer') collectionContainer!: ElementRef;
+  showSizes = false;
+selectedSize: any = null; selectedVariant: any;
  showAiAssistant = false;
+ isViewerOpen= false;
   userInput = '';
   chatMessages: any[] = [];
 banners: Banner[] = [];
@@ -59,7 +65,7 @@ isTyping = false;
   ];
   aiTagline = this.aiTaglines[0];
   private index = 0;
-
+ scrollTimeout: any;
 Math = Math;
 wishlistVariantIds: Set<number> = new Set(); // Store variant IDs in wishlist
 wishlistItems: any[] = [];
@@ -80,10 +86,25 @@ private aiIndex = 0;
 moods = MOOD_CONFIG;
 collections = COLLECTION_CONFIG;
 
+reels: any[] = [];
+activeIndex = 0;
+//@ViewChildren('videoPlayer') videos!: QueryList<ElementRef<HTMLVideoElement>>;
+@ViewChildren('reelCard', { read: ElementRef }) reelCards!: QueryList<ElementRef>;
+@ViewChild('carousel') carousel!: ElementRef;
+@ViewChildren('previewVideo') videos!: QueryList<ElementRef<HTMLVideoElement>>;
   constructor(private productService: ProductService,private router: Router,private jwtHelper: JwtHelper,
-     private cartService: CartService,
+     private cartService: CartService, private reelService: ReelService,
     private messageService: MessageService,private route: ActivatedRoute
-  ) { }
+  ) {
+  }
+  ngAfterViewInit() {
+
+  setTimeout(() => {
+    this.onScroll();
+    this.controlVideos();
+  });
+
+}
   ngOnInit(): void {
 this.getBanners();
     this.startTaglineRotation();
@@ -132,8 +153,223 @@ if(localStorage.getItem("isLoggedIn")==="true"){
     this.jwtHelper.logout();
     this.isLoggedIn = false;
   }
+  this.loadReels();
 
   }
+  loadReels() {
+
+  this.reelService.getAllReels().subscribe({
+    next: (data) => {
+
+      this.reels = data;
+
+    },
+    error: (err) => {
+      console.error("Failed to load reels", err);
+    }
+  });
+
+}
+  openCollection(collection: any) {
+
+  this.router.navigate(['/search'], {
+    queryParams: {
+      [collection.filterKey]: collection.filterValue
+    }
+  });
+
+}
+getDeviceId(): string {
+
+  let deviceId = localStorage.getItem('deviceId');
+
+  if (!deviceId) {
+    deviceId = crypto.randomUUID();
+    localStorage.setItem('deviceId', deviceId);
+  }
+
+  return deviceId;
+}
+toggleLike(reel: any, event: Event) {
+
+  event.stopPropagation();
+const userId = this.jwtHelper.getUserInfo()?.id || null;
+  const deviceId = this.getDeviceId();
+  this.reelService.toggleLike(reel.id, userId, deviceId)
+    .subscribe((res: any) => {
+
+      reel.likes = res.likes;
+      reel.liked = res.liked;
+
+    });
+}
+shareReel(reel: any, event: Event) {
+
+  event.stopPropagation();
+
+  if (navigator.share) {
+
+    navigator.share({
+      title: reel.title,
+      text: reel.caption,
+      url: window.location.origin + '/reel/' + reel.id
+    });
+
+  } else {
+
+    navigator.clipboard.writeText(window.location.origin + '/reel/' + reel.id);
+    alert('Link copied!');
+  }
+
+}
+  centerOnLoad() {
+  setTimeout(() => {
+    if (!this.reelCards || this.reelCards.length === 0) return;
+
+    this.activeIndex = 0;
+    this.scrollToCenter(0);
+  }, 200);
+}
+  scrollToCenter(index: number) {
+  const container = this.carousel.nativeElement;
+  const card = this.reelCards.toArray()[index].nativeElement;
+
+  const containerRect = container.getBoundingClientRect();
+  const cardRect = card.getBoundingClientRect();
+
+  const containerCenter = containerRect.left + containerRect.width / 2;
+  const cardCenter = cardRect.left + cardRect.width / 2;
+
+  const scrollOffset = cardCenter - containerCenter;
+
+  container.scrollBy({
+    left: scrollOffset,
+    behavior: 'smooth'
+  });
+}
+ onScroll() {
+
+  clearTimeout(this.scrollTimeout);
+
+  this.scrollTimeout = setTimeout(() => {
+    this.detectActiveCard();
+  }, 10);
+
+}
+
+detectActiveCard() {
+
+  const container = this.carousel.nativeElement;
+  const center = container.scrollLeft + container.offsetWidth / 2;
+
+  let closestIndex = 0;
+  let closestDistance = Infinity;
+
+  this.reelCards.forEach((card, index) => {
+
+    const el = card.nativeElement;
+    const cardCenter = el.offsetLeft + el.offsetWidth / 2;
+    const distance = Math.abs(center - cardCenter);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestIndex = index;
+    }
+
+  });
+
+  if (this.activeIndex !== closestIndex) {
+    this.activeIndex = closestIndex;
+    this.controlVideos();
+  }
+
+}
+
+controlVideos() {
+
+  this.videos.forEach((videoRef, index) => {
+
+    const video = videoRef.nativeElement;
+
+    if (index === this.activeIndex) {
+
+      video.muted = true;
+      video.play().catch(() => {});
+
+    } else {
+
+      video.pause();
+      video.currentTime = 0;
+
+    }
+
+  });
+
+}
+openSizes(variant: any) {
+  this.selectedVariant = variant;
+  this.showSizes = true;
+}
+
+closeSizes() {
+  this.showSizes = false;
+  this.selectedSize = null;
+}
+
+selectSize(size: any) {
+  console.log("size =",size )
+  if (size.availableQuantity === 0) return;
+
+  this.selectedSize = size;
+  console.log("selectedsize =",this.selectedSize )
+
+  // Auto add
+ this.addToCart();
+}
+addToCart() {
+
+ 
+if (!this.selectedSize || !this.selectedVariant) return;
+
+  const variant = this.selectedVariant;
+
+  const payload = {
+    variantId: variant.id,
+    sizeId: this.selectedSize.id,
+    color: variant.color,
+    quantity: 1
+  };
+
+  this.cartService.addToCart(payload).subscribe({
+    next: () => {
+      this.messageService.add({
+        key: 'global',
+        severity: 'success',
+        summary: 'Added to Bag',
+        detail: `${variant.variantName} added successfully`
+      });
+
+      this.closeSizes();
+      this.selectedSize = null;
+    },
+    error: () => {
+      this.messageService.add({
+        key: 'global',
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to add item'
+      });
+    }
+  });
+
+  this.closeSizes();
+  this.selectedSize = null;
+}
+
+getStartingPrice(sizes: any[]): number {
+  return Math.min(...sizes.map(s => s.price));
+}
+
   getBanners() {
    this.productService.getAllBanners().subscribe({
       next: (data) => (this.banners = data),
@@ -371,9 +607,9 @@ toggleSignupPanel() {
   this.showSignupPanel = !this.showSignupPanel;
 
   // Optional: reset to signup when panel opens
-  if (this.showSignupPanel) {
-    this.showLogin = false;
-  }
+  // if (this.showSignupPanel) {
+  //   this.showLogin = false;
+  // }
 }
 toggleLogin() {
   this.showLogin = !this.showLogin;
@@ -607,7 +843,54 @@ selectSuggestion(text: string) {
   this.userInput = text;
   this.sendMessage();
 }
-goCategory(){
- this.router.navigate(['/category']);
+// goCategory(){
+//  //this.router.navigate(['/category']);
+
+// }
+
+goCategory() {
+  this.collectionContainer.nativeElement.scrollIntoView({
+    behavior: 'smooth'
+  });
+}
+
+openReel(index: number) {
+  this.isViewerOpen = true;
+
+  // disable background scroll
+  document.body.style.overflow = 'hidden';
+
+  setTimeout(() => {
+    const container = document.querySelector('.reel-container');
+    container?.scrollTo({
+      top: window.innerHeight * index,
+      behavior: 'instant'
+    });
+
+    this.setupObserver();
+  }, 200);
+}
+
+closeReel() {
+  this.isViewerOpen = false;
+
+  // restore scroll
+  document.body.style.overflow = 'auto';
+}
+
+setupObserver() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const video = entry.target as HTMLVideoElement;
+
+      if (entry.isIntersecting) {
+        video.play();
+      } else {
+        video.pause();
+      }
+    });
+  }, { threshold: 0.7 });
+
+  this.videos.forEach(v => observer.observe(v.nativeElement));
 }
 }

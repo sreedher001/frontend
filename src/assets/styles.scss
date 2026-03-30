@@ -130,7 +130,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   background: #e2f7ea;
-  color: #0aa244;
+  color: #067d33;
   padding: 10px 18px;
   border-radius: 8px;
   font-weight: 600;
@@ -243,4 +243,12 @@ body {
 .payment-methods-img{
   width: 340px;;
   opacity:0.95;
+}
+
+
+
+.p-drawer-content {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding: 0% !important;
 }

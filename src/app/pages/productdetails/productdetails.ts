@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, Injectable, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Injectable, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { GalleriaModule } from 'primeng/galleria';
@@ -23,6 +23,7 @@ import { ReviewService } from '../productreview/review-service';
 import { JwtHelper } from '@/jwt/jwt-helper';
 import { InputTextModule } from 'primeng/inputtext';
 import { TabPanel, TabsModule } from "primeng/tabs";
+import { ImageModule } from 'primeng/image';
 
 interface RelatedItem {
   variantId:number;
@@ -31,7 +32,7 @@ interface RelatedItem {
 }
 @Component({
   selector: 'app-productdetails',
-  imports: [GalleriaModule,TabsModule, ButtonModule, InputTextModule, AccordionPanel, AccordionModule, DialogModule, FormsModule, BadgeModule, TagModule, PanelMenuModule, CarouselModule, LoginComponent, Signup, TabPanel],
+  imports: [GalleriaModule,TabsModule,ImageModule, ButtonModule, InputTextModule, AccordionPanel, AccordionModule, DialogModule, FormsModule, BadgeModule, TagModule, PanelMenuModule, CarouselModule, LoginComponent, Signup, TabPanel],
   templateUrl: './productdetails.html',
   styleUrl: './productdetails.scss'
 })
@@ -39,6 +40,8 @@ interface RelatedItem {
   providedIn: 'root' 
 })
 export class Productdetails implements OnInit {
+@ViewChild('carousel') carousel!: ElementRef;
+
 viewSimilar(arg0: number) {
 this.showStylePanel = !this.showStylePanel;
 this.showSizeSelector=false;
@@ -127,7 +130,8 @@ reviewSummary: any;
 showReviews = false;
 ratingRows: any[] = [];
 thumbnailPosition: any;
-
+activeIndex = 0;
+fullscreen = false;
 page = 0;
 size = 5;
 last = false;
@@ -169,6 +173,52 @@ ngAfterViewInit() {
 }
   isInWishlist(variant: any): boolean {
   return this.wishlistVariantIds.has(variant.id);
+}
+
+
+scrollToImage(index: number) {
+
+  const container = this.carousel.nativeElement;
+  const width = container.offsetWidth;
+
+  container.scrollTo({
+    left: width * index,
+    behavior: 'smooth'
+  });
+
+  this.activeIndex = index;
+
+}
+
+nextImage() {
+
+  if (this.activeIndex < this.images.length - 1) {
+    this.activeIndex++;
+    this.scrollToImage(this.activeIndex);
+  }
+
+}
+
+prevImage() {
+
+  if (this.activeIndex > 0) {
+    this.activeIndex--;
+    this.scrollToImage(this.activeIndex);
+  }
+
+}
+
+openFullscreen(index: number) {
+
+  this.activeIndex = index;
+  this.fullscreen = true;
+
+}
+
+closeFullscreen() {
+
+  this.fullscreen = false;
+
 }
   fetchSimilarProducts(variantId:number) {
     this.productService.getSimilarProducts(variantId).subscribe({

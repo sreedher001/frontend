@@ -59,6 +59,7 @@ showCouponStamp = false;
   discount = 0;
   couponError = '';
   showCouponsPanel = true;
+  showLockedCouponsPopup = false;
 
   autoFilteredSizeValue: any[] = [];
 
@@ -66,7 +67,6 @@ showCouponStamp = false;
 remainingTime: number = 0;
   displayTime: string = '';
   interval: any;
-
   
 
   constructor(private cartService: CartService, private productDetails: Productdetails, private prod: Products,
@@ -79,6 +79,25 @@ remainingTime: number = 0;
     }
     this.loadCart();
 
+     let savedEndTime = localStorage.getItem('saleEndTime');
+  const now = Date.now();
+
+  if (savedEndTime) {
+    this.remainingTime = +savedEndTime - now;
+
+    // If timer expired, reset it for another 3 hours
+    if (this.remainingTime <= 0) {
+      const newEndTime = now + 3 * 60 * 60 * 1000; // 3 hours
+      localStorage.setItem('saleEndTime', newEndTime.toString());
+      this.remainingTime = 3 * 60 * 60 * 1000;
+    }
+  } else {
+    const endTime = now + 3 * 60 * 60 * 1000; // 3 hours
+    localStorage.setItem('saleEndTime', endTime.toString());
+    this.remainingTime = 3 * 60 * 60 * 1000;
+  }
+
+  this.startTimer();
     
 
   }

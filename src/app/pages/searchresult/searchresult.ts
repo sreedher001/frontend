@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
@@ -44,7 +44,7 @@ showLogin = false;
 wishlistVariantIds: Set<number> = new Set(); // Store variant IDs in wishlist
 wishlistItems: any[] = [];
 isAdmin: boolean = false;
-gridView = 2;
+gridView = 1;
 showFilter = false;
 filters: any[] = [];
 activeFilter: any;
@@ -101,7 +101,7 @@ this.route.queryParamMap.subscribe(paramMap => {
   this.buildPayload();
 
   this.searchProducts();
-this.gridView = window.innerWidth >= 1024 ? 4 : 2;
+  this.updateGridView();
 });
 
 
@@ -129,6 +129,14 @@ this.gridView = window.innerWidth >= 1024 ? 4 : 2;
 
   this.filter();
     }
+    updateGridView() {
+  this.gridView = window.innerWidth >= 1024 ? 4 : 1;
+}
+@HostListener('window:resize')
+onResize() {
+  this.updateGridView();
+}
+    
     buildPayload() {
 
   // reset filters

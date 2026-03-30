@@ -1,22 +1,31 @@
 export const COLLECTION_CONFIG = [
+
   {
-    title: 'New Arrivals',
-    imageUrl: 'assets/images/collections/new-arrivals.jpg',
-    link: '/collections/new'
+    title: 'Coord Sets',
+    imageUrl: 'assets/images/collections/coord-sets.webp',
+    filterKey: 'styleCategory',
+    filterValue: 'Coord Sets'
   },
+
   {
-    title: 'Ethnic Wear',
-    imageUrl: 'assets/images/collections/ethnic-wear.jpg',
-    link: '/collections/ethnic'
+    title: 'A-line',
+    imageUrl: 'assets/images/collections/kurti.webp',
+    filterKey: 'pattern',
+    filterValue: 'A-line'
   },
+
   {
-    title: 'Casuals',
-    imageUrl: 'assets/images/collections/casuals.jpg',
-    link: '/collections/casuals'
+    title: 'Solids',
+    imageUrl: 'assets/images/collections/Solid.webp',
+    filterKey: 'pattern',
+    filterValue: 'Solid'
   },
+
   {
-    title: 'Kids',
-    imageUrl: 'assets/images/collections/kids.jpg',
-    link: '/collections/kids'
+    title: 'Beyond Basics',
+    imageUrl: 'assets/images/collections/beyond-basics.webp',
+    filterKey: 'styleCategory',
+    filterValue: 'Beyond Basics'
   }
+
 ];

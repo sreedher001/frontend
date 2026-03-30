@@ -1,8 +1,11 @@
 <!-- CART ROOT (Drawer Safe) -->
-<div #cartPanel class="cart-drawer-root h-full w-full overflow-x-hidden">
 
+<div #cartPanel class="cart-drawer-root h-full w-full overflow-x-hidden flex flex-col">
+<div class="sticky top-0 w-full bg-black text-white text-center text-md font-semibold py-3 z-10">
+    ⏳ Sale ends in {{ displayTime }}
+  </div>
   <!-- CART CONTENT -->
-  <div class="flex flex-col h-full">
+  <div class="flex-1 overflow-y-auto">
 
     <!-- CART HEADER
     <div class="sticky top-0 z-10 bg-white border-b px-4 py-3">
@@ -10,7 +13,7 @@
     </div> -->
 
     <!-- CART BODY -->
-    <div class="flex-1 overflow-y-auto px-4 py-3">
+    <div class="px-4 py-3">
 
       @if (hasCartItems) {
 
@@ -93,8 +96,8 @@
               <!-- STOCK -->
               <span>
                 @if(item.selectedSizeObj?.availableQuantity > 0){
-                <p class="text-pink-800 text-sm ">Lowest price in last 30 days</p>
-                <i class="pi pi-truck text-gray-400"> Estimated delivery by {{ getEstimatedDelivery() }}</i>
+                <!-- <p class="text-pink-800 text-sm ">Lowest price in last 30 days</p>
+                <i class="pi pi-truck text-gray-400"> Estimated delivery by {{ getEstimatedDelivery() }}</i> -->
                 }
                 @if(item.selectedSizeObj?.availableQuantity <= 0){ <p-tag value="Out of Stock" severity="danger"
                   class="text-xs"></p-tag>
@@ -207,52 +210,59 @@ bg-white border border-green-200 text-green-700 rounded-md">
 
       @if(cart.lockedCoupons.length > 0){
 
-      <div class="mt-4 rounded-xl border border-orange-200 
-            bg-gradient-to-br from-orange-50 to-amber-50 
-            p-4 shadow-sm">
+<div class="mt-4 rounded-xl border border-orange-200 
+      bg-gradient-to-br from-orange-50 to-amber-50 
+      p-4 shadow-sm">
 
-        <!-- HEADER -->
-        <div class="flex items-center gap-2 mb-3">
-          <i class="pi pi-bolt text-orange-500 text-sm"></i>
-          <span class="font-semibold text-sm text-orange-700">
-            Unlock More Savings
-          </span>
-        </div>
+  <!-- HEADER -->
+  <div class="flex justify-between items-center mb-3">
 
-        @for(coupon of cart.lockedCoupons; track coupon.couponCode){
+    <div class="flex items-center gap-2">
+      <i class="pi pi-bolt text-orange-500 text-sm"></i>
+      <span class="font-semibold text-sm text-orange-700">
+        Unlock More Savings
+      </span>
+    </div>
 
-        <div class="mt-2 flex justify-between items-start 
-              bg-white p-3 rounded-lg border border-orange-100 
-              shadow-sm hover:shadow-md transition">
+    @if(cart.lockedCoupons.length > 1){
+      <button 
+        class="text-xs text-orange-600 font-semibold hover:underline"
+        (click)="showLockedCouponsPopup = true">
+        View all ({{ cart.lockedCoupons.length }})
+      </button>
+    }
 
-          <div class="flex flex-col gap-1">
+  </div>
 
-            <!-- COUPON CODE BADGE -->
-            <span class="inline-block px-2 py-1 text-xs font-semibold 
-                   bg-gray-100 border rounded-md w-fit">
-              {{ coupon.couponCode }}
-            </span>
+  <!-- SHOW ONLY FIRST COUPON -->
+  @let coupon = cart.lockedCoupons[0];
 
-            <!-- DESCRIPTION -->
-            <p class="text-xs text-gray-500">
-              {{ coupon.description }}
-            </p>
+  <div class="flex justify-between items-start 
+        bg-white p-3 rounded-lg border border-orange-100 
+        shadow-sm">
 
-            <!-- UNLOCK MESSAGE -->
-            <p class="text-md text-orange-600 font-medium flex items-center gap-1">
-              <i class="pi pi-lock text-[10px]"></i>
-              {{ coupon.unlockMeaasage }}
-            </p>
+    <div class="flex flex-col gap-1">
 
-          </div>
+      <span class="inline-block px-2 py-1 text-xs font-semibold 
+             bg-gray-100 border rounded-md w-fit">
+        {{ coupon.couponCode }}
+      </span>
 
-        </div>
+      <p class="text-xs text-gray-500">
+        {{ coupon.description }}
+      </p>
 
-        }
+      <p class="text-md text-orange-600 font-medium flex items-center gap-1">
+        <i class="pi pi-lock text-[10px]"></i>
+        {{ coupon.unlockMeaasage }}
+      </p>
 
-      </div>
+    </div>
 
-      }
+  </div>
+
+</div>
+}
 
 
       } @else {
@@ -266,17 +276,59 @@ bg-white border border-green-200 text-green-700 rounded-md">
       </div>
 
       }
-      <div class="mt-15 secure-payment">
-        <img src="assets/paymentmethods.png" alt="Payment Methods" class="payment-methods-img" />
-
-      </div>
+      
 
     </div>
 
+    
+<!-- unlock coupons popup -->
+ @if(showLockedCouponsPopup){
+
+<div class="fixed inset-0 bg-black/40 z-50 flex items-end">
+
+  <div class="w-full bg-white rounded-t-2xl p-4 max-h-[70vh] overflow-y-auto">
+
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="font-semibold text-lg">Locked Coupons</h3>
+
+      <i class="pi pi-times cursor-pointer"
+         (click)="showLockedCouponsPopup = false"></i>
+    </div>
+
+    @for(coupon of cart.lockedCoupons; track coupon.couponCode){
+
+    <div class="mb-3 bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+
+      <span class="px-2 py-1 text-xs font-semibold 
+             bg-gray-100 border rounded-md">
+        {{ coupon.couponCode }}
+      </span>
+
+      <p class="text-xs text-gray-500 mt-1">
+        {{ coupon.description }}
+      </p>
+
+      <p class="text-sm text-orange-600 mt-1 flex items-center gap-1">
+        <i class="pi pi-lock text-[10px]"></i>
+        {{ coupon.unlockMeaasage }}
+      </p>
+
+    </div>
+
+    }
+
+  </div>
+
+</div>
+
+}
+
+    
 
 
-    @if(hasCartItems){
-    <div class="sticky bottom-0 bg-white  px-4 py-3">
+  </div>
+  @if(hasCartItems){
+   <div class="sticky bottom-0 bg-white px-4 py-4 border-t shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
       <h5 class="text-lg font-semibold mb-3">Order Summary</h5>
       <!-- Subtotal -->
       <div class="flex justify-between items-center mb-2">
@@ -300,7 +352,8 @@ bg-white border border-green-200 text-green-700 rounded-md">
         </span>
       </div>
 
-      @if(cart.appliedPromotions.length > 0){
+      
+@if(cart.appliedPromotions.length > 0){
 
       @for(promo of cart.appliedPromotions; track promo.name){
 
@@ -327,7 +380,6 @@ bg-white border border-green-200 text-green-700 rounded-md">
 
 
 
-
       <hr class="my-2">
 
       <!-- Final Total -->
@@ -337,15 +389,6 @@ bg-white border border-green-200 text-green-700 rounded-md">
           ₹{{ getFinalTotal() | number:'1.2-2' }}
         </span>
       </div>
-
-      <!-- <p-button
-    label="Proceed to Buy"
-    icon="pi pi-credit-card"
-    severity="contrast"
-    size="large"
-    styleClass="w-full"
-    (click)="goToCheckout()">
-  </p-button> -->
 
 
       <div class="flex items-center mt-4 border-t pt-4">
@@ -369,9 +412,6 @@ bg-white border border-green-200 text-green-700 rounded-md">
 
     </div>
     }
-
-
-  </div>
 </div>
 <!-- BACKDROP (only if modal open and not logged in) -->
 @if (showSignupPanel && !isLoggedIn) {
@@ -431,19 +471,3 @@ bg-white border border-green-200 text-green-700 rounded-md">
   <span class="font-medium whitespace-nowrap text-sm sm:text-base">SIGN UP / SIGN IN</span>
 </div>
 }
-<script>
-  window.addEventListener('load', () => {
-    (function () {
-      const runConfetti = document.querySelector('#hs-run-on-click-run-confetti');
-      runConfetti.addEventListener('click', () => {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: {
-            y: 0.6
-          }
-        });
-      });
-    })();
-  });
-</script>

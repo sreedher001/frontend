@@ -39,6 +39,7 @@ import { Promotions } from '@/pages/admin/promotions/promotions';
 import { PromotionForm } from '@/pages/admin/promotions/promotion-form/promotion-form';
 import { ShippingRules } from '@/pages/admin/shipping-rules/shipping-rules';
 import { ShippingRuleFormComponent } from '@/pages/admin/shipping-rules/shipping-rule-form-component/shipping-rule-form-component';
+import { ReelComponent } from '@/pages/admin/reel-component/reel-component';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -82,6 +83,7 @@ export const appRoutes: Routes = [
             { path: 'admin/shipping-rules', component: ShippingRules },
             { path: 'admin/shipping-rules/create', component: ShippingRuleFormComponent },
             { path: 'admin/shipping-rules/edit/:id', component: ShippingRuleFormComponent },
+            { path: 'admin/reels', component: ReelComponent },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             // { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
