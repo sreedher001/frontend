@@ -12,6 +12,7 @@ import { JwtHelper } from '@/jwt/jwt-helper';
 import { MessageService } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { CartService } from '../cart/cart.service';
 
 
 
@@ -172,7 +173,7 @@ confirmPassword = '';
 
  @ViewChild('passwordInput') passwordInput!: ElementRef<HTMLInputElement>;
     constructor(private loginService: LoginService, private router: Router, private jwtHelper: JwtHelper, 
-      private messageService: MessageService,private route: ActivatedRoute) { }
+      private messageService: MessageService,private route: ActivatedRoute, private cartService: CartService) { }
 
     ngOnInit() {
   this.route.queryParams.subscribe(params => {
@@ -189,52 +190,124 @@ confirmPassword = '';
 
   
 
-    onLogin() {
-        const loginPayload: LoginRequest = {
-            email: this.email,
-            password: this.password
-        };
+    // onLogin() {
+    //     const loginPayload: LoginRequest = {
+    //         email: this.email,
+    //         password: this.password
+    //     };
 
-        this.loginService.loginUser(loginPayload).subscribe({
-            next: (res) => {
+    //     this.loginService.loginUser(loginPayload).subscribe({
+    //         next: (res) => {
               
-                this.messageService.add({
-                    key: 'global',
-                    severity: 'secondary',
-                    summary: 'TADA! You’re in!',
-                    //detail: err.error?.message || 'Username/password is incorrect'
-                    detail:'Welcome to ZFC — ready to shop? Let’s go!',
-                    sticky:false
-                });
-                const token = res?.token; // Make sure `res.token` contains the JWT
-                if (token) {
-                    localStorage.setItem('authToken', token);
-                    localStorage.setItem('isLoggedIn', "true");
-                    const userInfo = this.jwtHelper.getUserInfo();
-                    localStorage.setItem('userName', userInfo?.name);
-                }
+    //             this.messageService.add({
+    //                 key: 'global',
+    //                 severity: 'secondary',
+    //                 summary: 'TADA! You’re in!',
+    //                 //detail: err.error?.message || 'Username/password is incorrect'
+    //                 detail:'Welcome to ZFC — ready to shop? Let’s go!',
+    //                 sticky:false
+    //             });
+    //             const token = res?.token; // Make sure `res.token` contains the JWT
+    //             if (token) {
+    //                 localStorage.setItem('authToken', token);
+    //                 localStorage.setItem('isLoggedIn', "true");
+    //                 const userInfo = this.jwtHelper.getUserInfo();
+    //                 localStorage.setItem('userName', userInfo?.name);
+    //             }
 
-                this.router.navigate(['/']);
-                this.email = "";
-                this.password = "";
-                this.loginSuccess.emit(res);
-            },
-            error: (err) => {
+    //             this.router.navigate(['/']);
+    //             this.email = "";
+    //             this.password = "";
+    //             this.loginSuccess.emit(res);
+    //         },
+    //         error: (err) => {
 
-                this.email = "";
-                this.password = "";
-                this.messageService.add({
-                    key: 'global',
-                    severity: 'error',
-                    summary: 'Login Failed',
-                    //detail: err.error?.message || 'Username/password is incorrect'
-                    detail:'Username/password is incorrect',
-                    sticky:true
-                });
+    //             this.email = "";
+    //             this.password = "";
+    //             this.messageService.add({
+    //                 key: 'global',
+    //                 severity: 'error',
+    //                 summary: 'Login Failed',
+    //                 //detail: err.error?.message || 'Username/password is incorrect'
+    //                 detail:'Username/password is incorrect',
+    //                 sticky:true
+    //             });
 
-            }
-        });
+    //         }
+    //     });
+    // }
+
+
+    onLogin() {
+  const loginPayload: LoginRequest = {
+    email: this.email,
+    password: this.password
+  };
+
+  this.loginService.loginUser(loginPayload).subscribe({
+    next: (res) => {
+
+      this.messageService.add({
+        key: 'global',
+        severity: 'secondary',
+        summary: 'TADA! You’re in!',
+        detail: 'Welcome to ZFC — ready to shop? Let’s go!',
+        sticky: false
+      });
+
+      const token = res?.token;
+
+      if (token) {
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('isLoggedIn', "true");
+
+        const userInfo = this.jwtHelper.getUserInfo();
+        localStorage.setItem('userName', userInfo?.name);
+      }
+
+      //const guestId = localStorage.getItem('guestId');
+
+      //  STEP 1: MERGE CART
+      this.cartService.mergeCart().subscribe({
+        next: () => {
+
+          //  STEP 2: Refresh cart
+          this.cartService.getCart().subscribe();
+
+          //  STEP 3: Optional cleanup
+          localStorage.removeItem('guestId');
+
+          //  STEP 4: Navigate AFTER merge
+          this.router.navigate(['/']);
+        },
+        error: (err:any) => {
+          console.error('Merge failed', err);
+
+          // fallback → still navigate
+          this.router.navigate(['/']);
+        }
+      });
+
+      this.email = "";
+      this.password = "";
+      this.loginSuccess.emit(res);
+    },
+
+    error: (err) => {
+
+      this.email = "";
+      this.password = "";
+
+      this.messageService.add({
+        key: 'global',
+        severity: 'error',
+        summary: 'Login Failed',
+        detail: 'Username/password is incorrect',
+        sticky: true
+      });
     }
+  });
+}
 
 sendOtp() {
   console.log(this.forgotEmail,"forgotmail");

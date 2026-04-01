@@ -372,49 +372,6 @@ export class AppTopbar implements OnInit {
    remainingTime: number = 0;
   displayTime: string = '';
   interval: any;
-  ngOnInit(): void {
-    
-     this.cartService.drawerVisible$.subscribe(
-    visible => this.visibleCartDrawer = visible
-  );
-
-  this.cartService.cart$.subscribe(cart => {
-    this.cartItems = cart?.items || [];
-    this.cd.detectChanges();
-  });
-  
-    this.setUserMenuItem();
-this.setDrawerWidth();
-    if (localStorage.getItem("isLoggedIn") === "true") {
-      this.isLoggedIn=true;
-      this.cartService.getCart().subscribe(); // loads and updates BehaviorSubject
-      // this.getWishList();
-
-      // Keep the topbar badge live-updating
-      this.cartService.cartCount$.subscribe((count: any) => {
-        this.cartCount = count;
-        this.cd.detectChanges();
-
-        //this.productService.getWishlist().subscribe();
-    this.productService.wishlistCount$.subscribe(count => {
-      this.wishlistCount = count;
-      this.cd.detectChanges();
-    });
-      });
-    }
-    if (localStorage.getItem("isLoggedIn") === "true") {
-      const roles = this.jwtHelper.getUserRoles(); // assuming this returns an array
-
-      if (roles && roles.includes("ROLE_ADMIN")) {
-        this.isAdmin = true;
-      }
-    }
-
-
-
-   
-
-  }
   constructor(public layoutService: LayoutService, private cartService: CartService, private messageService: MessageService,private sanitizer: DomSanitizer,
     private router: Router, private jwtHelper: JwtHelper, private productService: ProductService, private cd: ChangeDetectorRef) {
     // Debounce the search input to avoid spamming API calls
@@ -441,6 +398,53 @@ this.setDrawerWidth();
     });
 
   }
+  ngOnInit(): void {
+    
+     this.cartService.drawerVisible$.subscribe(
+    visible => this.visibleCartDrawer = visible
+  );
+
+  this.cartService.cart$.subscribe(cart => {
+    this.cartItems = cart?.items || [];
+    this.cd.detectChanges();
+  });
+  
+  
+    this.setUserMenuItem();
+this.setDrawerWidth();
+    if (localStorage.getItem("isLoggedIn") === "true") {
+      this.isLoggedIn=true;
+      this.cartService.getCart().subscribe(); // loads and updates BehaviorSubject
+     
+
+      this.productService.wishlistCount$.subscribe(count => {
+      this.wishlistCount = count;
+      this.cd.detectChanges();
+    });
+      // Keep the topbar badge live-updating
+     
+      
+    }
+     this.cartService.cartCount$.subscribe((count: any) => {
+        this.cartCount = count;
+        this.cd.detectChanges();
+    
+      });
+    
+    if (localStorage.getItem("isLoggedIn") === "true") {
+      const roles = this.jwtHelper.getUserRoles(); // assuming this returns an array
+
+      if (roles && roles.includes("ROLE_ADMIN")) {
+        this.isAdmin = true;
+      }
+    }
+
+
+
+   
+
+  }
+  
 
    @HostListener('window:resize')
 setDrawerWidth() {
@@ -631,7 +635,7 @@ highlightSearch(product: any, query: string): SafeHtml {
   }
   viewCart() {
     // this.router.navigate(['/cart']);
-    this.visibleCartDrawer=true;
+    this.cartService.openDrawer();
 
   }
   wishList() {

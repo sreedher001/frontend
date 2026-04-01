@@ -68,7 +68,7 @@ export const appRoutes: Routes = [
             { path: 'track/:orderNumber', component: Orderstatus },
             { path: 'admin/sales/trend', component: Salestrend, canActivate: [AuthGuard] },
             { path: 'admin/order/ship/:id', component: Shiporder, canActivate: [AuthGuard] },
-            { path: 'checkout', component: Checkout, canActivate: [LoginGuard] },
+            { path: 'checkout', component: Checkout },
             { path: 'auth/signup', component: Signup },
             { path: 'home', component: Home },
             { path: 'admin/reviews', component: AdminReviewsComponent },

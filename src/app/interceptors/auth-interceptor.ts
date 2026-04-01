@@ -10,10 +10,23 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const loaderService = inject(LoaderService); // inject loader service
   const token = localStorage.getItem('authToken');
+  let guestId = localStorage.getItem('guestId');
 
-  const authReq = token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
+  if (!guestId) {
+    guestId = 'g_' + crypto.randomUUID();
+    localStorage.setItem('guestId', guestId);
+  }
+
+  // const authReq = token
+  //   ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+  //   : req;
+
+  const authReq = req.clone({
+    setHeaders: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      guestId: guestId
+    }
+  });
 // Show loader
   loaderService.show();
 

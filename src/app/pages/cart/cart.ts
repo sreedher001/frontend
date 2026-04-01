@@ -79,6 +79,12 @@ remainingTime: number = 0;
     }
     this.loadCart();
 
+    this.cartService.cartRefresh$.subscribe(() => {
+  // if (localStorage.getItem("isLoggedIn") !== "true") {
+  //   this.buildCartFromGuest();
+  // }
+});
+
      let savedEndTime = localStorage.getItem('saleEndTime');
   const now = Date.now();
 
@@ -245,28 +251,49 @@ remainingTime: number = 0;
   // }
 
 
-  loadCart(): void {
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  // loadCart(): void {
+  //   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
-    if (isLoggedIn) {
-      this.cartService.cart$.subscribe({
-        next: (res) => {
-          if (!res) return
-          this.cart = res;
-          this.cart.items.forEach((item) => {
-            item.sizeOptions = item.availableSizes;
-            item.selectedSizeObj = item.sizeOptions.find((opt: any) => opt.size === item.size);
-          });
-        },
-        error: (err) => {
-          console.error('Failed to load cart', err);
-        }
+  //   if (isLoggedIn) {
+  //     this.cartService.cart$.subscribe({
+  //       next: (res) => {
+  //         if (!res) return
+  //         this.cart = res;
+  //         this.cart.items.forEach((item) => {
+  //           item.sizeOptions = item.availableSizes;
+  //           item.selectedSizeObj = item.sizeOptions.find((opt: any) => opt.size === item.size);
+  //         });
+  //       },
+  //       error: (err) => {
+  //         console.error('Failed to load cart', err);
+  //       }
+  //     });
+  //   } else {
+  //     // Guest: rebuild with normalized shape
+  //     this.buildCartFromGuest();
+      
+  //   }
+  // }
+
+  loadCart(): void {
+  this.cartService.cart$.subscribe({
+    next: (res) => {
+      if (!res) return;
+
+      this.cart = res;
+
+      this.cart.items.forEach((item) => {
+        item.sizeOptions = item.availableSizes;
+        item.selectedSizeObj =
+          item.sizeOptions.find((opt: any) => opt.size === item.size);
       });
-    } else {
-      // Guest: rebuild with normalized shape
-      this.buildCartFromGuest();
     }
-  }
+  });
+
+  this.cartService.getCart().subscribe();
+}
+
+  
   //for guest cart
   calculateItemTotal(item: any): number {
     const price = item.price;
@@ -364,15 +391,16 @@ remainingTime: number = 0;
   updateCartCount(count: number) {
     this.cartCountSubject.next(count);
   }
+  
+
   // increaseQuantity(item: any) {
   //   if (!this.isLoggedIn) {
-  //     this.showSignupPanel=true;
+  //     this.showSignupPanel = true;
   //     return;
   //   }
 
-  //   const selectedSize = item.size;
-  //   const sizeInfo = item.sizeOptions.find(
-  //     (size: any) => size.size === selectedSize
+  //   const sizeInfo = item.sizeOptions?.find(
+  //     (s: any) => s.size === item.size
   //   );
 
   //   if (!sizeInfo) {
@@ -386,55 +414,20 @@ remainingTime: number = 0;
   //     return;
   //   }
 
-  //   if (item.quantity < sizeInfo.availableQuantity) {
-  //     item.quantity++;
-  //     this.updateCartItem(item);
-  //   } else {
+  //   if (item.quantity >= sizeInfo.availableQuantity) {
   //     this.messageService.add({
   //       key: 'global',
   //       severity: 'warn',
   //       summary: 'Stock Limit Reached',
-  //       detail: `Only ${sizeInfo.availableQuantity} items available in stock.`,
+  //       detail: `Only ${sizeInfo.availableQuantity} items available.`,
   //       life: 3000
   //     });
+  //     return;
   //   }
+
+  //   const nextQty = item.quantity + 1;
+  //   this.updateCartItem(item, nextQty);
   // }
-
-  increaseQuantity(item: any) {
-    if (!this.isLoggedIn) {
-      this.showSignupPanel = true;
-      return;
-    }
-
-    const sizeInfo = item.sizeOptions?.find(
-      (s: any) => s.size === item.size
-    );
-
-    if (!sizeInfo) {
-      this.messageService.add({
-        key: 'global',
-        severity: 'error',
-        summary: 'Size Info Missing',
-        detail: 'Cannot find stock info for selected size.',
-        life: 3000
-      });
-      return;
-    }
-
-    if (item.quantity >= sizeInfo.availableQuantity) {
-      this.messageService.add({
-        key: 'global',
-        severity: 'warn',
-        summary: 'Stock Limit Reached',
-        detail: `Only ${sizeInfo.availableQuantity} items available.`,
-        life: 3000
-      });
-      return;
-    }
-
-    const nextQty = item.quantity + 1;
-    this.updateCartItem(item, nextQty);
-  }
 
 
   // decreaseQuantity(item: any) {
@@ -449,11 +442,39 @@ remainingTime: number = 0;
   //   }
   // }
 
+  increaseQuantity(item: any) {
+
+  const sizeInfo = item.sizeOptions?.find(
+    (s: any) => s.size === item.size
+  );
+
+  if (!sizeInfo) {
+    this.messageService.add({
+      key: 'global',
+      severity: 'error',
+      summary: 'Size Info Missing',
+      detail: 'Cannot find stock info',
+    });
+    return;
+  }
+
+  if (item.quantity >= sizeInfo.availableQuantity) {
+    this.messageService.add({
+      key: 'global',
+      severity: 'warn',
+      summary: 'Stock Limit',
+      detail: `Only ${sizeInfo.availableQuantity} available`,
+    });
+    return;
+  }
+
+  const nextQty = item.quantity + 1;
+
+  this.updateCartItem(item, nextQty);
+}
+
   decreaseQuantity(item: any) {
-    if (!this.isLoggedIn) {
-      this.showSignupPanel = true;
-      return;
-    }
+    
 
     if (item.quantity <= 1) return;
 
@@ -463,68 +484,68 @@ remainingTime: number = 0;
 
 
 
-  updateCartItem(item: any, newQuantity: number) {
-    if (localStorage.getItem("isLoggedIn") === "true") {
-      // Logged-in: call backend
-      this.cartService.updateCartItem(item.id, newQuantity, item.size, item.sizeId)
-        .subscribe({
-          next: (res: any) => {
-            console.log('Cart updated:', res);
-            // prefer to update UI without full reload - but for now refresh:
-            //window.location.reload();
-            // const index = this.cart.items.findIndex((i: any) => i.id === item.id);
-            // if (index > -1) {
-            //   this.cart.items[index].quantity = item.quantity;
-            //   this.cart.items[index].total = item.price * item.quantity;
-            // }
-            this.cartService.getCart().subscribe();
+  // updateCartItem(item: any, newQuantity: number) {
+  //   if (localStorage.getItem("isLoggedIn") === "true") {
+  //     // Logged-in: call backend
+  //     this.cartService.updateCartItem(item.id, newQuantity, item.size, item.sizeId)
+  //       .subscribe({
+  //         next: (res: any) => {
+  //           console.log('Cart updated:', res);
+  //           // prefer to update UI without full reload - but for now refresh:
+  //           //window.location.reload();
+  //           // const index = this.cart.items.findIndex((i: any) => i.id === item.id);
+  //           // if (index > -1) {
+  //           //   this.cart.items[index].quantity = item.quantity;
+  //           //   this.cart.items[index].total = item.price * item.quantity;
+  //           // }
+  //           this.cartService.getCart().subscribe();
 
-          },
-          error: (err: any) => {
-            console.error('Update failed:', err);
-          }
-        });
-    } else {
-      // Guest: update localStorage
-      const guestCart = this.getGuestCartRaw();
-      const idx = guestCart.findIndex((ci: any) => {
-        const ciVariant = ci.variantId ?? ci.id ?? ci.productId;
-        const ciSizeId = ci.sizeId ?? ci.size?.sizeId ?? ci.size;
-        const itemVariant = item.variantId ?? item.id ?? item.productId;
-        const itemSizeId = item.sizeId ?? item.selectedSizeObj?.sizeId ?? item.size;
-        return (ciVariant === itemVariant) && (ciSizeId === itemSizeId);
-      });
+  //         },
+  //         error: (err: any) => {
+  //           console.error('Update failed:', err);
+  //         }
+  //       });
+  //   } else {
+  //     // Guest: update localStorage
+  //     const guestCart = this.getGuestCartRaw();
+  //     const idx = guestCart.findIndex((ci: any) => {
+  //       const ciVariant = ci.variantId ?? ci.id ?? ci.productId;
+  //       const ciSizeId = ci.sizeId ?? ci.size?.sizeId ?? ci.size;
+  //       const itemVariant = item.variantId ?? item.id ?? item.productId;
+  //       const itemSizeId = item.sizeId ?? item.selectedSizeObj?.sizeId ?? item.size;
+  //       return (ciVariant === itemVariant) && (ciSizeId === itemSizeId);
+  //     });
 
-      if (idx >= 0) {
-        // update quantity & total
-        guestCart[idx].quantity = item.quantity;
-        // keep price/discount etc as they are
-        this.saveGuestCartRaw(guestCart);
-        this.buildCartFromGuest();
-      } else {
-        // item not found — fallback: search by variant then update that
-        const byVariant = guestCart.find((ci: any) => (ci.variantId ?? ci.id ?? ci.productId) === (item.variantId ?? item.id));
-        if (byVariant) {
-          byVariant.quantity = item.quantity;
-          this.saveGuestCartRaw(guestCart);
-          this.buildCartFromGuest();
-        } else {
-          console.warn('Guest cart item to update not found', item);
-        }
-      }
-    }
-  }
-
-  //  onSizeChange(item: any) {
-  //   if (item.selectedSizeObj) {
-  //     item.size = item.selectedSizeObj.size; // keep string for backend
-  //     item.quantity=1;
-  //     item.price=item.selectedSizeObj.priceAfterDiscount;
-  //     item.sizeId=item.selectedSizeObj.id;
-  //     item.originalPrice=item.selectedSizeObj.price;
-  //     item.discount=item.selectedSizeObj.discountPercentage;
-  //     this.updateCartItem(item);
+  //     if (idx >= 0) {
+  //       // update quantity & total
+  //       guestCart[idx].quantity = item.quantity;
+  //       // keep price/discount etc as they are
+  //       this.saveGuestCartRaw(guestCart);
+  //       this.buildCartFromGuest();
+  //     } else {
+  //       // item not found — fallback: search by variant then update that
+  //       const byVariant = guestCart.find((ci: any) => (ci.variantId ?? ci.id ?? ci.productId) === (item.variantId ?? item.id));
+  //       if (byVariant) {
+  //         byVariant.quantity = item.quantity;
+  //         this.saveGuestCartRaw(guestCart);
+  //         this.buildCartFromGuest();
+  //       } else {
+  //         console.warn('Guest cart item to update not found', item);
+  //       }
+  //     }
   //   }
+  // }
+  updateCartItem(item: any, newQuantity: number) {
+
+  this.cartService
+    .updateCartItem(item.id, newQuantity, item.size, item.sizeId)
+    .subscribe({
+      next: () => {
+        this.cartService.getCart().subscribe();
+      },
+      error: (err) => console.error(err)
+    });
+}
 
   onSizeChange(item: any) {
     if (!item.selectedSizeObj) return;
@@ -563,59 +584,75 @@ remainingTime: number = 0;
     }
   }
 
+  // removeFromCart(item: any): void {
+  //   if (this.isLoggedIn) {
+  //     // Logged-in: remove from backend
+  //     this.cartService.removeItem(item.id).subscribe({
+  //       next: () => {
+  //         this.cart.items = this.cart.items.filter(i => i.id !== item.id);
+  //         this.messageService.add({
+  //           key: 'global',
+  //           severity: 'success',
+  //           summary: 'Removed',
+  //           icon: 'pi pi-trash',
+  //           detail: `${item.variantName} removed from cart.`
+  //         });
+  //       },
+  //       error: () => {
+  //         this.messageService.add({
+  //           key: 'global',
+  //           severity: 'danger',
+  //           summary: 'Failed to remove!',
+  //           icon: 'pi pi-times'
+  //         });
+  //       }
+  //     });
+  //   } else {
+  //     // Guest: remove from localStorage
+  //     const guestCart = this.getGuestCartRaw();
+
+  //     // Remove matching variant + sizeId (use size & sizeId both)
+  //     const updatedCart = guestCart.filter((ci: any) => {
+  //       const ciVariant = ci.variantId ?? ci.id ?? ci.productId;
+  //       const ciSizeId = ci.sizeId ?? ci.size?.sizeId ?? ci.sizeId;
+  //       const itemVariant = item.variantId ?? item.id ?? item.productId;
+  //       const itemSizeId = item.sizeId ?? item.selectedSizeObj?.sizeId ?? item.size;
+
+  //       // compare both variant and size (fallback to size string comparision)
+  //       const variantMatch = (ciVariant === itemVariant);
+  //       const sizeMatch = (ciSizeId != null && itemSizeId != null) ? (ciSizeId === itemSizeId) : (ci.size === item.size);
+  //       return !(variantMatch && sizeMatch);
+  //     });
+
+  //     // Save back and rebuild UI
+  //     this.saveGuestCartRaw(updatedCart);
+  //     this.buildCartFromGuest();
+  //     this.cartService.removeGuestItem(item.variantId, item.sizeId);
+  //     this.messageService.add({
+  //       key: 'global',
+  //       severity: 'success',
+  //       summary: 'Removed',
+  //       icon: 'pi pi-trash',
+  //       detail: `${item.variantName} removed from cart.`
+  //     });
+  //   }
+  // }
+
   removeFromCart(item: any): void {
-    if (this.isLoggedIn) {
-      // Logged-in: remove from backend
-      this.cartService.removeItem(item.id).subscribe({
-        next: () => {
-          this.cart.items = this.cart.items.filter(i => i.id !== item.id);
-          this.messageService.add({
-            key: 'global',
-            severity: 'success',
-            summary: 'Removed',
-            icon: 'pi pi-trash',
-            detail: `${item.variantName} removed from cart.`
-          });
-        },
-        error: () => {
-          this.messageService.add({
-            key: 'global',
-            severity: 'danger',
-            summary: 'Failed to remove!',
-            icon: 'pi pi-times'
-          });
-        }
-      });
-    } else {
-      // Guest: remove from localStorage
-      const guestCart = this.getGuestCartRaw();
 
-      // Remove matching variant + sizeId (use size & sizeId both)
-      const updatedCart = guestCart.filter((ci: any) => {
-        const ciVariant = ci.variantId ?? ci.id ?? ci.productId;
-        const ciSizeId = ci.sizeId ?? ci.size?.sizeId ?? ci.sizeId;
-        const itemVariant = item.variantId ?? item.id ?? item.productId;
-        const itemSizeId = item.sizeId ?? item.selectedSizeObj?.sizeId ?? item.size;
-
-        // compare both variant and size (fallback to size string comparision)
-        const variantMatch = (ciVariant === itemVariant);
-        const sizeMatch = (ciSizeId != null && itemSizeId != null) ? (ciSizeId === itemSizeId) : (ci.size === item.size);
-        return !(variantMatch && sizeMatch);
-      });
-
-      // Save back and rebuild UI
-      this.saveGuestCartRaw(updatedCart);
-      this.buildCartFromGuest();
+  this.cartService.removeItem(item.id).subscribe({
+    next: () => {
+      this.cartService.getCart().subscribe();
 
       this.messageService.add({
         key: 'global',
         severity: 'success',
         summary: 'Removed',
-        icon: 'pi pi-trash',
-        detail: `${item.variantName} removed from cart.`
+        detail: `${item.variantName} removed`
       });
     }
-  }
+  });
+}
   get hasCartItems(): boolean {
     return this.cart.items.length > 0;
   }
@@ -655,7 +692,13 @@ remainingTime: number = 0;
                 variantId: item.variantId,
                 sizeId: item.sizeId,
                 color: item.color,
-                quantity: item.quantity
+                quantity: item.quantity,
+                 variantName: item.variantName,
+  size: item.size,
+  price: item.price,
+  originalPrice: item.originalPrice,
+  discount: item.discountPercentage,
+  imageUrl: item.productImage?.[0]?.imageUrl || ''
               })
             );
           }

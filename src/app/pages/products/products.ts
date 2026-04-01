@@ -337,10 +337,17 @@ if (!this.selectedSize || !this.selectedVariant) return;
     variantId: variant.id,
     sizeId: this.selectedSize.id,
     color: variant.color,
-    quantity: 1
+    quantity: 1,
+     variantName: variant.variantName,
+  size: this.selectedSize.size,
+  price: calculatedPrice(this.selectedSize.price, this.selectedSize.discountPercentage),
+  originalPrice: this.selectedSize.price,
+  discount: this.selectedSize.discountPercentage,
+  imageUrl: variant.productImage?.[0]?.imageUrl || ''
   };
 
   this.cartService.addToCart(payload).subscribe({
+    
     next: () => {
       this.messageService.add({
         key: 'global',
@@ -894,3 +901,8 @@ setupObserver() {
   this.videos.forEach(v => observer.observe(v.nativeElement));
 }
 }
+function calculatedPrice(price: any, discountPercentage: any) {
+  const discount = discountPercentage || 0;
+  return price - (price * discount / 100);
+}
+

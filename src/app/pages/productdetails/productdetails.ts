@@ -323,101 +323,152 @@ handleLoginSuccess($event:any) {
   const img = event.target as HTMLImageElement;
   img.classList.add('loaded');
 }
+addToCart(variant: any, event: Event, navigateToCart: boolean = false): void {
+  event.stopPropagation();
 
+  if (!this.selectedSize || !this.selectedSize.id) {
+    this.isSizeSelected = false;
 
-   addToCart(variant: any,event: Event,navigateToCart: boolean = false): void {
-    event.stopPropagation();
-
-    if (!this.selectedSize || !this.selectedSize.id) {
-      this.isSizeSelected=false;
     this.messageService.add({
       key: 'global',
       severity: 'info',
       summary: 'Select a Size',
       detail: 'Please select a size before adding to bag.'
     });
+
     this.openSizeSelector();
     return;
   }
-  const payload: any = {
+
+  this.cartService.addToCart({
     variantId: variant.id,
     sizeId: this.selectedSize.id,
     color: variant.color,
-    quantity: 1
-  };
-    const sizeId = this.selectedSize.id;
-const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    quantity: 1,
 
-if (isLoggedIn) {
-  // Logged-in: use backend
-    this.cartService.addToCart({ variantId: variant.id,sizeId:sizeId,color:variant.color, quantity: 1 }).subscribe({
-      next: () => {
-        this.isSizeSelected=true;
-        this.messageService.add({
-          key: 'global',
-          severity: 'info',
-          summary: 'Added to your bag',
-          detail: `${variant.variantName} was added successfully.`
-        });
-        
-        //this.showStylePanel=true;
-        if (navigateToCart) {
-          this.router.navigate(['/cart']);
-        }
-      },
-      error: (err) => {
-        console.error(err);
-        this.messageService.add({
-          key: 'global',
-          severity: 'error',
-          summary: 'Add Failed',
-          detail: 'Could not add to cart. Please try again.'
-        });
+     variantName: variant.variantName,
+  size: this.selectedSize.size,
+  price: calculatedPrice(this.selectedSize.price, this.selectedSize.discountPercentage),
+  originalPrice: this.selectedSize.price,
+  discount: this.selectedSize.discountPercentage,
+  imageUrl: variant.productImage?.[0]?.imageUrl || ''
+  }).subscribe({
+    next: () => {
+      this.isSizeSelected = true;
+
+      this.messageService.add({
+        key: 'global',
+        severity: 'success',
+        summary: 'Added to Bag',
+        detail: `${variant.variantName} added successfully.`
+      });
+
+      if (navigateToCart) {
+        this.router.navigate(['/cart']);
       }
-    });
-  }
-    else {
-    // Guest: Save in localStorage
-    const guestCartKey = 'guestCart';
-    const guestCart = JSON.parse(localStorage.getItem(guestCartKey) || '[]');
-
-    const newItem = {
-      ...payload,
-      variantName: variant.variantName,
-      size: this.selectedSize.size,
-      price: this.selectedSize.price,
-      discountPercentage: this.selectedSize.discountPercentage,
-      imageUrl: variant.productImage?.[0]?.imageUrl || ''
-    };
-
-    // Check if already in guest cart
-    const existing = guestCart.find((item: any) =>
-      item.variantId === newItem.variantId &&
-      item.sizeId === newItem.sizeId
-    );
-
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      guestCart.push(newItem);
+    },
+    error: () => {
+      this.messageService.add({
+        key: 'global',
+        severity: 'error',
+        summary: 'Add Failed',
+        detail: 'Could not add to cart. Please try again.'
+      });
     }
-console.log("guestCart",guestCart);
-    localStorage.setItem(guestCartKey, JSON.stringify(guestCart));
+  });
+}
 
-    this.messageService.add({
-      key: 'global',
-      severity: 'success',
-      summary: 'Added to Bag',
-      detail: `${variant.variantName} added. Login to checkout.`
-    });
+//    addToCartBACK(variant: any,event: Event,navigateToCart: boolean = false): void {
+//     event.stopPropagation();
 
-    //this.showStylePanel = true;
-    if (navigateToCart) {
-      this.router.navigate(['/cart']);
-    }
-  }
+//     if (!this.selectedSize || !this.selectedSize.id) {
+//       this.isSizeSelected=false;
+//     this.messageService.add({
+//       key: 'global',
+//       severity: 'info',
+//       summary: 'Select a Size',
+//       detail: 'Please select a size before adding to bag.'
+//     });
+//     this.openSizeSelector();
+//     return;
+//   }
+//   const payload: any = {
+//     variantId: variant.id,
+//     sizeId: this.selectedSize.id,
+//     color: variant.color,
+//     quantity: 1
+//   };
+//     const sizeId = this.selectedSize.id;
+// const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+// if (isLoggedIn) {
+//     this.cartService.addToCart({ variantId: variant.id,sizeId:sizeId,color:variant.color, quantity: 1 }).subscribe({
+//       next: () => {
+//         this.isSizeSelected=true;
+//         this.messageService.add({
+//           key: 'global',
+//           severity: 'info',
+//           summary: 'Added to your bag',
+//           detail: `${variant.variantName} was added successfully.`
+//         });
+//         if (navigateToCart) {
+//           this.router.navigate(['/cart']);
+//         }
+//       },
+//       error: (err) => {
+//         console.error(err);
+//         this.messageService.add({
+//           key: 'global',
+//           severity: 'error',
+//           summary: 'Add Failed',
+//           detail: 'Could not add to cart. Please try again.'
+//         });
+//       }
+//     });
+//   }
+//     else {
+//     // Guest: Save in localStorage
+//     const guestCartKey = 'guestCart';
+//     const guestCart = JSON.parse(localStorage.getItem(guestCartKey) || '[]');
+
+//     const newItem = {
+//       ...payload,
+//       variantName: variant.variantName,
+//       size: this.selectedSize.size,
+//       price: this.selectedSize.price,
+//       discountPercentage: this.selectedSize.discountPercentage,
+//       imageUrl: variant.productImage?.[0]?.imageUrl || ''
+//     };
+
+//     // Check if already in guest cart
+//     const existing = guestCart.find((item: any) =>
+//       item.variantId === newItem.variantId &&
+//       item.sizeId === newItem.sizeId
+//     );
+
+//     if (existing) {
+//       existing.quantity += 1;
+//     } else {
+//       guestCart.push(newItem);
+//     }
+// console.log("guestCart",guestCart);
+//     localStorage.setItem(guestCartKey, JSON.stringify(guestCart));
+
+//     this.messageService.add({
+//       key: 'global',
+//       severity: 'success',
+//       summary: 'Added to Bag',
+//       detail: `${variant.variantName} added. Login to checkout.`
+//     });
+
+//     //this.showStylePanel = true;
+   
+//     if (navigateToCart) {
+//       this.router.navigate(['/cart']);
+//     }
+//   }
   
-  }
+//   }
 
   
 
@@ -608,3 +659,8 @@ get isGuestEmailValid(): boolean {
 
 
 }
+function calculatedPrice(price: any, discountPercentage: any): number {
+  const discount = discountPercentage || 0;
+  return Math.round(price - (price * discount / 100)); //round to max no decimal places
+}
+
