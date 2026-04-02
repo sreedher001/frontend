@@ -15,6 +15,8 @@
     <i class="pi pi-clone"></i> View Similar
   </p-button>
 
+  
+
   <!-- LEFT ARROW -->
   <p-button size="small" outlined  raised
     class="absolute left-3 top-1/2 -translate-y-1/2 z-30   p-2 "
@@ -41,13 +43,21 @@
       *ngFor="let item of images; let i = index"
       class="min-w-full snap-center flex items-center justify-center"
     >
-
-      <img
-        [src]="item.itemImageSrc"
-        (load)="onImageLoad($event)"
-        class="w-full h-auto object-cover cursor-zoom-in"
-        (click)="openFullscreen(i)"
-      />
+        <img
+          [src]="item.itemImageSrc"
+          (load)="onImageLoad($event)"
+          class="w-full h-auto object-cover cursor-zoom-in"
+          (click)="activeIndex = i;openFullscreen(activeIndex)"
+        />
+    
+       <!-- Icon overlay -->
+  <p-button
+    outlined
+    
+    class="absolute bottom-3 right-3 z-30 px-3 py-2 pointer-events-none"
+  >
+    <i class="pi pi-expand"></i>
+  </p-button>
 
     </div>
 

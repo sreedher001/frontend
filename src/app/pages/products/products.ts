@@ -92,6 +92,7 @@ activeIndex = 0;
 @ViewChildren('reelCard', { read: ElementRef }) reelCards!: QueryList<ElementRef>;
 @ViewChild('carousel') carousel!: ElementRef;
 @ViewChildren('previewVideo') videos!: QueryList<ElementRef<HTMLVideoElement>>;
+@ViewChildren('videoPlayer') fullVideos!: QueryList<ElementRef<HTMLVideoElement>>;
   constructor(private productService: ProductService,private router: Router,private jwtHelper: JwtHelper,
      private cartService: CartService, private reelService: ReelService,
     private messageService: MessageService,private route: ActivatedRoute
@@ -161,7 +162,11 @@ if(localStorage.getItem("isLoggedIn")==="true"){
   this.reelService.getAllReels().subscribe({
     next: (data) => {
 
-      this.reels = data;
+      this.reels =data.map((r: any) => ({
+  ...r,
+  liked: false
+}));
+
 
     },
     error: (err) => {
@@ -198,8 +203,8 @@ const userId = this.jwtHelper.getUserInfo()?.id || null;
   this.reelService.toggleLike(reel.id, userId, deviceId)
     .subscribe((res: any) => {
 
-      reel.likes = res.likes;
-      reel.liked = res.liked;
+      reel.likes = res.like;
+    reel.liked = res.liked;
 
     });
 }
@@ -862,27 +867,48 @@ goCategory() {
 }
 
 openReel(index: number) {
+
+  this.activeIndex = index;
   this.isViewerOpen = true;
 
-  // disable background scroll
-  document.body.style.overflow = 'hidden';
+  //  STOP preview videos (already correct logic)
+  this.videos.forEach(v => {
+    const video = v.nativeElement;
+    video.pause();
+  });
 
+  //  START ONLY SELECTED FULLSCREEN VIDEO WITH AUDIO
   setTimeout(() => {
-    const container = document.querySelector('.reel-container');
-    container?.scrollTo({
-      top: window.innerHeight * index,
-      behavior: 'instant'
-    });
+    this.fullVideos.forEach((v, i) => {
+      const video = v.nativeElement;
 
-    this.setupObserver();
-  }, 200);
+      if (i === index) {
+        video.muted = false; //  enable sound
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  }, 150);
 }
 
 closeReel() {
+
   this.isViewerOpen = false;
 
-  // restore scroll
-  document.body.style.overflow = 'auto';
+  //  STOP ALL FULLSCREEN VIDEOS
+  this.fullVideos?.forEach(v => {
+    const video = v.nativeElement;
+    video.pause();
+    video.currentTime = 0;
+    video.muted = true;
+  });
+
+  //  Resume preview logic (Amazon behavior)
+  setTimeout(() => {
+    this.controlVideos();
+  }, 100);
 }
 
 setupObserver() {

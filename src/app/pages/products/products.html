@@ -295,7 +295,7 @@
       }">
 
       <!-- VIDEO -->
-      <video #previewVideo [src]="reel.videoUrl" class="w-full h-full object-cover" muted playsinline preload="metadata"
+      <video #previewVideo [src]="reel.videoUrl" class="w-full h-full object-cover"  playsinline preload="metadata"
         loop>
       </video>
       <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -343,12 +343,12 @@
 <div *ngIf="isViewerOpen"
   class="reel-container fixed top-0 left-0 w-screen h-screen bg-black z-[9999] overflow-y-scroll snap-y snap-mandatory overscroll-none">
 
-  <!-- ❌ Close -->
+  <!--  Close -->
   <div class="fixed top-4 right-4 text-white text-2xl z-[10000] cursor-pointer" (click)="closeReel()">
     ✕
   </div>
 
-  <!-- 🎬 Reels -->
+  <!--  Reels -->
   <div *ngFor="let reel of reels" class="h-screen w-screen snap-start flex items-center justify-center">
 
     <video #videoPlayer [src]="reel.videoUrl" class="h-full w-full md:w-auto md:max-w-[500px] object-cover" autoplay
@@ -438,10 +438,16 @@
       <!-- SIZE OPTIONS -->
       <div class="flex justify-center gap-2 flex-wrap">
 
-       <button 
+      <button 
   *ngFor="let s of reel.productVariant.sizes"
   (click)="selectSize(s); $event.stopPropagation()"
   class="px-4 py-2 border rounded-md text-sm relative z-[9999] pointer-events-auto"
+  
+  [disabled]="s.availableQuantity <= 0"
+
+  [ngClass]="{
+    'line-through text-gray-400 opacity-60 cursor-not-allowed': s.availableQuantity <= 0
+  }"
 >
   {{ s.size }}
 </button>
