@@ -264,7 +264,10 @@ openRazorpayWidgetN(order: any) {
         detail: 'Verifying your payment...'
       });
 
-      this.route.navigate(['/order/order-history']);
+      this.route.navigate(
+  ['/order-placed'],
+  { queryParams: { orderNumber: order.orderNumber } }
+);
     },
     modal: {
       ondismiss: () => {
@@ -318,7 +321,7 @@ openRazorpayWidget(order: any) {
         detail: 'Your payment was successful. Order confirmation will be sent shortly to your registered mail id.'
       });
       // Optional: disable further payment attempts, redirect user, etc.
-      this.route.navigate(['/order/order-history']);
+      this.route.navigate(['/order-placed']);
     },
     modal: {
       ondismiss: () => {

@@ -41,6 +41,8 @@ import { ShippingRules } from '@/pages/admin/shipping-rules/shipping-rules';
 import { ShippingRuleFormComponent } from '@/pages/admin/shipping-rules/shipping-rule-form-component/shipping-rule-form-component';
 import { ReelComponent } from '@/pages/admin/reel-component/reel-component';
 import { Otpauth } from '@/pages/auth/otpauth/otpauth';
+import { LoginComponent } from '@/pages/auth/login';
+import { OrderSuccessComponent } from '@/pages/order-success-component/order-success-component';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -86,6 +88,8 @@ export const appRoutes: Routes = [
             { path: 'admin/shipping-rules/edit/:id', component: ShippingRuleFormComponent },
             { path: 'admin/reels', component: ReelComponent },
             { path: 'auth/login', component: Otpauth },
+            { path: 'auth/signin', component: LoginComponent },
+            { path: 'order-placed', component: OrderSuccessComponent,canActivate:[AuthGuard] },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             // { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

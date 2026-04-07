@@ -645,7 +645,7 @@ highlightSearch(product: any, query: string): SafeHtml {
     this.router.navigate(['/auth/signup']);
   }
   login() {
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/auth/signin']);
   }
 
 

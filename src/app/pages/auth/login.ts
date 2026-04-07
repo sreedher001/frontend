@@ -78,6 +78,12 @@ import { CartService } from '../cart/cart.service';
       styleClass="w-full"
       (click)="onLogin()"
     ></p-button>
+
+    <p-button outlined
+      label="Sign in with OTP"
+      styleClass="w-full mt-4"
+      (click)="onOTPSignin()"
+    ></p-button>
   </div>
 
 </div>}
@@ -307,6 +313,10 @@ confirmPassword = '';
       });
     }
   });
+}
+
+onOTPSignin(){
+  this.router.navigate(['/auth/login']);
 }
 
 sendOtp() {
