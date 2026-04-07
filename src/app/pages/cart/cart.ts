@@ -375,7 +375,9 @@ remainingTime: number = 0;
       this.router.navigate(['/checkout']);
     }
     else {
-      this.toggleSignupPanel();
+     // this.toggleSignupPanel();
+      this.router.navigate(['/auth/login']);
+      this.cartService.closeDrawer();
     }
   }
   removeItem(productId: number): void {

@@ -1,0 +1,110 @@
+<div class="min-h-screen flex items-top mt-10 justify-center ">
+
+  <!-- Card -->
+  <div class="w-full max-w-md bg-white shadow-lg rounded-2xl p-6 sm:p-8">
+
+    <!-- Title -->
+    <div class="text-center mb-6">
+      <h2 class="text-2xl font-semibold text-gray-900">Secure Checkout</h2> 
+      
+      <p class="text-gray-500 text-lg mt-1">
+        Continue with your mobile number
+      </p>
+    </div>
+
+    <!-- PHONE STEP -->
+    <div *ngIf="!otpSent" class="space-y-4">
+
+      <!-- Input -->
+      <div>
+        <p-floatlabel variant="on">
+  <div class="flex items-center border border-gray-300 rounded-md px-3 py-2 focus-within:ring-1 focus-within:ring-primary">
+    
+    <span class="text-gray-500 mr-2">+91</span>
+
+    <input
+      pInputText
+      type="tel"
+      [(ngModel)]="phoneNumber"
+      id="phoneNumber"
+      placeholder="Enter mobile number"
+      class="w-full border-0 outline-none"
+      style="border: none; box-shadow: none;"
+    />
+
+  </div>
+
+  <label for="phoneNumber">Mobile Number</label>
+</p-floatlabel>
+      </div>
+
+      <!-- Button -->
+      <button
+        pButton
+        label="Send OTP"
+        class="w-full" size="large" 
+        [loading]="loading"
+        (click)="sendOtp()"
+      ></button>
+
+    </div>
+
+    <!-- OTP STEP -->
+    <div *ngIf="otpSent" class="space-y-5">
+
+      <!-- Info -->
+      <div class="text-center">
+        <p class="text-sm text-gray-600">
+          OTP sent to
+        </p>
+        <p class="font-medium text-gray-900">
+          +91 {{ phoneNumber }}
+        </p>
+      </div>
+
+      <!-- OTP -->
+      <div class="flex justify-center">
+        <p-inputOtp
+          [(ngModel)]="otp"
+          [length]="6"
+          [integerOnly]="true"
+        ></p-inputOtp>
+      </div>
+
+      <!-- Verify -->
+      <button
+        pButton
+        label="Verify & Continue" size="large"
+        class="w-full"
+        [loading]="loading"
+        (click)="verifyOtp()"
+      ></button>
+
+      <!-- Footer -->
+      <div class="flex justify-between items-center text-sm">
+
+        <span *ngIf="countdown > 0" class="text-gray-500">
+          Resend in {{ countdown }}s
+        </span>
+
+        <button
+          *ngIf="countdown === 0"
+          (click)="resendOtp()"
+          class="text-primary font-medium"
+        >
+          Resend OTP
+        </button>
+
+        <button
+          (click)="otpSent = false"
+          class="text-gray-500"
+        >
+          Change
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

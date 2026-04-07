@@ -77,4 +77,28 @@ subscribeNewsletter(email: string): Observable<any> {
   return this.http.post(`${this.baseUrl}/newsletter/subscribe`,{}, { params });
     }
 
+
+    //  SEND OTP (PHONE)
+sendPhoneOtp(phoneNumber: string): Observable<any> {
+  return this.http.post(
+    this.baseUrl + "/auth/send-otp",
+    {
+      field: 'phone',
+      value: phoneNumber
+    }
+  );
+}
+
+//  VERIFY OTP + LOGIN
+verifyPhoneOtp(phoneNumber: string, otp: string): Observable<any> {
+  return this.http.post(
+    this.baseUrl + "/auth/verify-otp-login",
+    {
+      field: 'phone',
+      value: phoneNumber,
+      otp: otp
+    }
+  );
+}
+
 }

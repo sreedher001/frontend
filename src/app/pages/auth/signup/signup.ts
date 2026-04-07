@@ -141,8 +141,6 @@ if (signupForm.invalid) {
       this.loginService.signup(payload).subscribe({
         next: (res) => {
           this.loading = false; 
-          // const response = res;
-          console.log("response signup",res);
           this.messageService.add({
         key: 'global',
         severity: 'success',
