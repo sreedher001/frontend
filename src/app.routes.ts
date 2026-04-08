@@ -89,7 +89,7 @@ export const appRoutes: Routes = [
             { path: 'admin/reels', component: ReelComponent },
             { path: 'auth/login', component: Otpauth },
             { path: 'auth/signin', component: LoginComponent },
-            { path: 'order-placed', component: OrderSuccessComponent,canActivate:[AuthGuard] },
+            { path: 'order-placed', component: OrderSuccessComponent},
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             // { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
