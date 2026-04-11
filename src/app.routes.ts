@@ -50,7 +50,7 @@ export const appRoutes: Routes = [
         children: [
             { path: 'admin/dashboard', component: Dashboard, canActivate: [AuthGuard] },
             { path: '', component: Products },
-            { path: 'products', component: Products },
+           // { path: 'products', component: Products },
             { path: 'product-details/:id', component: Productdetails },
             { path: 'admin/products/edit', component: EditVariant, canActivate: [AuthGuard] },
             { path: 'admin/products/add', component: Addproduct, canActivate: [AuthGuard] },

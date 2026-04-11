@@ -148,12 +148,16 @@ if(localStorage.getItem("isLoggedIn")==="true"){
   console.log('Token expired:', isExpired);
 
 
-  if(isExpired){
-  localStorage.clear();
-    sessionStorage.clear();
-    this.jwtHelper.logout();
-    this.isLoggedIn = false;
-  }
+  if (isExpired) {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('isLoggedIn');
+  localStorage.removeItem('userName');
+
+  sessionStorage.clear(); // this is fine
+
+  this.jwtHelper.logout();
+  this.isLoggedIn = false;
+}
   this.loadReels();
 
   }

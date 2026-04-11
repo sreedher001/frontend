@@ -43,7 +43,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     }
 
     <!-- Logo -->
-    <a class="layout-topbar-logo ml-2" routerLink="/products">
+    <a class="layout-topbar-logo ml-2" routerLink="/">
       <!-- <img src="assets/images/logo.png" alt="ZFC" class="h-10" /> -->
       <span class="my-title">ZYRA</span>
     </a>

@@ -24,7 +24,7 @@ import lottie from 'lottie-web';
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [ButtonModule, CommonModule, FormsModule, BadgeModule, CardModule, DecimalPipe, TagModule, AutoCompleteModule, ButtonModule, MessageModule, LoginComponent, Signup],
+  imports: [ButtonModule, CommonModule, FormsModule, BadgeModule, CardModule, DecimalPipe, TagModule, AutoCompleteModule, ButtonModule, MessageModule],
   templateUrl: './cart.html',
   styleUrl: './cart.scss'
 })
