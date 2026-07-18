@@ -6,8 +6,8 @@ export interface ProductResponse {
   totalElements: number;
   size: number;
   number: number;
-  product:Product;
-  numberOfElements:number;
-  first:any;
-  last:any;
+  product: Product;
+  numberOfElements: number;
+  first: any;
+  last: any;
 }

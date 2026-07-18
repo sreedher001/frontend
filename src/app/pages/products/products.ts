@@ -336,27 +336,17 @@ selectSize(size: any) {
  this.addToCart();
 }
 addToCart() {
-
- 
-if (!this.selectedSize || !this.selectedVariant) return;
+  if (!this.selectedVariant) return;
 
   const variant = this.selectedVariant;
 
   const payload = {
     variantId: variant.id,
-    sizeId: this.selectedSize.id,
-    color: variant.color,
     quantity: 1,
-     variantName: variant.variantName,
-  size: this.selectedSize.size,
-  price: calculatedPrice(this.selectedSize.price, this.selectedSize.discountPercentage),
-  originalPrice: this.selectedSize.price,
-  discount: this.selectedSize.discountPercentage,
-  imageUrl: variant.productImage?.[0]?.imageUrl || ''
+    purchaseType: this.cartService.getPurchaseType(),
   };
 
   this.cartService.addToCart(payload).subscribe({
-    
     next: () => {
       this.messageService.add({
         key: 'global',
@@ -366,7 +356,6 @@ if (!this.selectedSize || !this.selectedVariant) return;
       });
 
       this.closeSizes();
-      this.selectedSize = null;
     },
     error: () => {
       this.messageService.add({
@@ -379,11 +368,10 @@ if (!this.selectedSize || !this.selectedVariant) return;
   });
 
   this.closeSizes();
-  this.selectedSize = null;
 }
 
-getStartingPrice(sizes: any[]): number {
-  return Math.min(...sizes.map(s => s.price));
+getStartingPrice(variant: any): number {
+  return variant?.retailPrice || 0;
 }
 
   getBanners() {
@@ -662,17 +650,8 @@ deleteProduct(variant: any,event: MouseEvent) {
   }
 
   getFinalPrice(product: any): number {
-  if (
-    product.variants &&
-    product.variants.length > 0 &&
-    product.variants[0].sizes &&
-    product.variants[0].sizes.length > 0
-  ) {
-    const size = product.variants[0].sizes[0];
-    if (size.discountPercentage > 0) {
-      return size.price - (size.price * size.discountPercentage) / 100;
-    }
-    return size.price;
+  if (product.variants && product.variants.length > 0) {
+    return product.variants[0].retailPrice || 0;
   }
   return 0;
 }
@@ -683,19 +662,14 @@ getDeliveryDate(): string {
 }
 
 getSavings(product: any): string {
-  const size = product.variants[0].sizes[0];
-  if (size.discountPercentage > 0) {
-    const savings = Math.round(size.price * size.discountPercentage / 100);
-    return `Save ₹${savings} (${size.discountPercentage}% OFF)`;
-  }
   return '';
 }
 getOriginalPrice(product: any): number {
-  return product.variants?.[0]?.sizes?.[0]?.price ?? 0;
+  return product.variants?.[0]?.retailPrice ?? 0;
 }
 
 hasDiscount(product: any): boolean {
-  return !!product.variants?.[0]?.sizes?.[0]?.discountPercentage;
+  return false;
 }
 
 
@@ -727,23 +701,15 @@ getVariantFrontImage(variant: any): string {
 }
 
 getVariantFinalPrice(variant: any): number {
-  const size = variant?.sizes?.[0];
-  if (!size) return 0;
-  return size.price - (size.price * (size.discountPercentage ?? 0)) / 100;
+  return variant?.retailPrice || 0;
 }
 
 getVariantSavings(variant: any): string {
-  const size = variant?.sizes?.[0];
-  if (!size || !size.discountPercentage) return '';
-  const discountAmount = (size.price * size.discountPercentage) / 100;
-  return `Save ₹${discountAmount.toFixed(0)}`;
+  return '';
 }
 
 getBestSize(variant: any) {
-  if (!variant?.sizes?.length) return null;
-  return variant.sizes.reduce((prev:any, curr:any) =>
-    curr.price < prev.price ? curr : prev
-  );
+  return null;
 }
 
 getRating(variant: any) {
@@ -822,37 +788,15 @@ autoGrow(event: Event) {
   this.chatMessages.push({ text: query, sender: 'user' });
   this.userInput = '';
 
-  // show "typing" indicator
   this.isTyping = true;
 
-  // Call backend
-  this.productService.getRecommendations(query).subscribe({
-    next: (response) => {
-      this.isTyping = false;
-
-      // Display AI message
-      this.chatMessages.push({
-        text: `Here are some outfit ideas perfect for "${query}":`,
-        sender: 'bot'
-      });
-
-      // You can show product info nicely
-      response.products.forEach((p) => {
-        this.chatMessages.push({
-          text: `${p.name} (${p.color})\nCategory: ${p.category} / ${p.subCategory}\nImage: ${p.images[0] ?? 'No image'}`,
-          sender: 'bot'
-        });
-      });
-    },
-    error: (err:any) => {
-      this.isTyping = false;
-      this.chatMessages.push({
-        text: `Sorry, could not get suggestions. Please try again.`,
-        sender: 'bot'
-      });
-      console.error(err);
-    }
-  });
+  setTimeout(() => {
+    this.isTyping = false;
+    this.chatMessages.push({
+      text: `Here are some suggestions for "${query}". Check our collections for the best picks!`,
+      sender: 'bot'
+    });
+  }, 1000);
 }
 
 selectSuggestion(text: string) {

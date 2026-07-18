@@ -1,225 +1,128 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { CommonService } from '@/layout/service/common';
 import { CartResponse } from './cart.model';
-import { of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { PurchaseType } from './cart.model';
+
+export type { PurchaseType };
 
 export interface AddToCartPayload {
     variantId: number;
-    sizeId: number;
-    color: string;
     quantity: number;
-
-     variantName: string;
-  size: string;
-  price: number;
-  originalPrice: number;
-  discount: number;
-  imageUrl: string;
+    purchaseType: PurchaseType;
 }
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
-   
-    commonService: CommonService = new CommonService;
+
+    commonService: CommonService = new CommonService();
     private baseUrl = this.commonService.baseUrl;
 
     private cartCountSubject = new BehaviorSubject<number>(0);
-  cartCount$ = this.cartCountSubject.asObservable();
+    cartCount$ = this.cartCountSubject.asObservable();
 
-  private cartRefreshSubject = new BehaviorSubject<boolean>(false);
-cartRefresh$ = this.cartRefreshSubject.asObservable();
-  private drawerVisibleSubject = new BehaviorSubject<boolean>(false);
-  drawerVisible$ = this.drawerVisibleSubject.asObservable();
+    private cartRefreshSubject = new BehaviorSubject<boolean>(false);
+    cartRefresh$ = this.cartRefreshSubject.asObservable();
 
-  private cartSubject = new BehaviorSubject<CartResponse | null>(null);
-cart$ = this.cartSubject.asObservable();
+    private drawerVisibleSubject = new BehaviorSubject<boolean>(false);
+    drawerVisible$ = this.drawerVisibleSubject.asObservable();
 
-private guestCartKey = 'guestCart';
-// private getGuestCart(): any[] {
-//   try {
-//     return JSON.parse(localStorage.getItem(this.guestCartKey) || '[]');
-//   } catch {
-//     return [];
-//   } 
-// }
+    private cartSubject = new BehaviorSubject<CartResponse | null>(null);
+    cart$ = this.cartSubject.asObservable();
 
-// private setGuestCart(cart: any[]) {
-//   localStorage.setItem(this.guestCartKey, JSON.stringify(cart));
-// }
+    private purchaseTypeSubject = new BehaviorSubject<PurchaseType>(
+        (localStorage.getItem('purchaseType') as PurchaseType) || 'RETAIL'
+    );
+    purchaseType$ = this.purchaseTypeSubject.asObservable();
 
+    openDrawer() {
+        this.drawerVisibleSubject.next(true);
+    }
 
-// refreshCartStateForGuest() {
-
-//   const guestCart = this.getGuestCart();
-
-//   const count = guestCart.reduce(
-//     (sum, item) => sum + (item.quantity || 1),
-//     0
-//   );
-
-//   //  update cart stream
-//   this.cartSubject.next({
-//     items: guestCart
-//   } as any);
-
-//   this.cartCountSubject.next(count);
-//   this.cartRefreshSubject.next(!this.cartRefreshSubject.value);
-// }
-
-
-  openDrawer() {
-  this.drawerVisibleSubject.next(true);
-}
-
-  closeDrawer() {
-    this.drawerVisibleSubject.next(false);
-  }
+    closeDrawer() {
+        this.drawerVisibleSubject.next(false);
+    }
 
     constructor(private http: HttpClient) { }
 
-  //   addToCart(payload: AddToCartPayload): Observable<any> {
+    getPurchaseType(): PurchaseType {
+        return this.purchaseTypeSubject.value;
+    }
 
-  //     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    setPurchaseType(type: PurchaseType) {
+        localStorage.setItem('purchaseType', type);
+        this.purchaseTypeSubject.next(type);
+    }
 
-  // if (!isLoggedIn) {
-  //   //  GUEST FLOW
-  //   const guestCart = this.getGuestCart();
+    switchPurchaseType(type: PurchaseType): Observable<CartResponse> {
+        return this.http.post<CartResponse>(`${this.baseUrl}/cart/switch-mode`, null, { params: { type } }).pipe(
+            tap((cart) => {
+                this.setPurchaseType(type);
+                this.cartSubject.next(cart);
+                const count = cart.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
+                this.cartCountSubject.next(count);
+            })
+        );
+    }
 
-  //   const existing = guestCart.find(
-  //     i => i.variantId === payload.variantId && i.sizeId === payload.sizeId
-  //   );
+    addToCart(payload: AddToCartPayload): Observable<any> {
+        return this.http.post(`${this.baseUrl}/cart/add`, payload).pipe(
+            tap(() => {
+                this.getCart().subscribe();
+                this.openDrawer();
+            })
+        );
+    }
 
-  //   if (existing) {
-  //     existing.quantity += payload.quantity;
-  //   } else {
-  //     guestCart.push(payload);
-  //   }
+    getCart(): Observable<CartResponse> {
+        return this.http.get<CartResponse>(`${this.baseUrl}/cart/get-cart`).pipe(
+            tap((cart) => {
+                this.cartSubject.next(cart);
+                const count = cart.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
+                this.cartCountSubject.next(count);
+            })
+        );
+    }
 
-  //   this.setGuestCart(guestCart);
+    removeItem(productId: number): Observable<CartResponse> {
+        const params = new HttpParams().set('productId', productId);
+        return this.http.post<CartResponse>(`${this.baseUrl}/cart/remove`, null, { params }).pipe(
+            tap(() => this.getCart().subscribe())
+        );
+    }
 
-    
-  // this.refreshCartStateForGuest();
-  // this.openDrawer();
+    updateCartItem(productId: number, quantity: number, size: string, sizeId: number) {
+        const params = new HttpParams()
+            .set('productId', productId)
+            .set('quantity', quantity)
+            .set('size', size)
+            .set('sizeId', sizeId);
 
-  // return of({ success: true });
-  
-  // }
+        return this.http.post<CartResponse>(`${this.baseUrl}/cart/update`, null, { params }).pipe(
+            tap(cart => this.cartSubject.next(cart))
+        );
+    }
 
-  //       return this.http.post(`${this.baseUrl}/cart/add`, payload).pipe(
-  //     tap(() => {
-  //       this.getCart().subscribe();
-  //       this.openDrawer();
-  //       this.refreshCartCount();
-  //     })
-  //   );
-  //   }
+    applyCoupon(code: string) {
+        return this.http.post<CartResponse>(`${this.baseUrl}/cart/apply-coupon`, { couponCode: code });
+    }
 
-  addToCart(payload: AddToCartPayload): Observable<any> {
-  return this.http.post(`${this.baseUrl}/cart/add`, payload).pipe(
-    tap(() => {
-      this.getCart().subscribe();
-      this.openDrawer();
-    })
-  );
-}
+    removeCoupon() {
+        return this.http.post<CartResponse>(`${this.baseUrl}/cart/remove-coupon`, {});
+    }
 
-    
+    refreshCartCount() {
+        this.getCart().subscribe({
+            next: (cart) => {
+                const count = cart.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
+                this.cartCountSubject.next(count);
+            },
+            error: () => this.cartCountSubject.next(0)
+        });
+    }
 
-getCart(): Observable<CartResponse> {
-  return this.http.get<CartResponse>(`${this.baseUrl}/cart/get-cart`).pipe(
-    tap((cart) => {
-      this.cartSubject.next(cart);
-
-      const count =
-        cart.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
-
-      this.cartCountSubject.next(count);
-    })
-  );
-}
-
-removeItem(productId: number): Observable<CartResponse> {
-  const params = new HttpParams().set('productId', productId);
-
-  return this.http.post<CartResponse>(
-    `${this.baseUrl}/cart/remove`,
-    null,
-    { params }
-  ).pipe(
-    tap(() => this.getCart().subscribe())
-  );
-}
-
-// removeItem(productId: number): Observable<CartResponse> {
-//   const params = new HttpParams().set('productId', productId);
-
-//   return this.http.post<CartResponse>(
-//     `${this.baseUrl}/cart/remove`,
-//     null,
-//     { params }
-//   ).pipe(
-//     tap(()=>{
-//       this.getCart().subscribe()
-//       //cart => this.cartSubject.next(cart)
-// })
-   
-//   );
-// }
-
-
-updateCartItem(productId: number, quantity: number, size: string, sizeId: number) {
-  const params = new HttpParams()
-    .set('productId', productId)
-    .set('quantity', quantity)
-    .set('size', size)
-    .set('sizeId', sizeId);
-
-  return this.http.post<CartResponse>(
-    `${this.baseUrl}/cart/update`,
-    null,
-    { params }
-  ).pipe(
-    tap(cart => this.cartSubject.next(cart))
-  );
-}
-
-applyCoupon(code:string){
-
-  return this.http.post<CartResponse>(`${this.baseUrl}/cart/apply-coupon`,{
-    couponCode: code
-  });
-
-}
-
-removeCoupon(){
-
-  return this.http.post<CartResponse>(`${this.baseUrl}/cart/remove-coupon`,{});
-
-}
-
-//   refreshCartCount() {
-//   this.getCart().subscribe({
-//     error: () => this.cartCountSubject.next(0)
-//   });
-// }
-refreshCartCount() {
-  this.getCart().subscribe({
-    next: (cart) => {
-      const count = cart.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
-      this.cartCountSubject.next(count);
-    },
-    error: () => this.cartCountSubject.next(0)
-  });
-}
-
-
-
-mergeCart() {
-  return this.http.post(`${this.baseUrl}/cart/merge`, null);
-}
-
-
+    mergeCart() {
+        return this.http.post(`${this.baseUrl}/cart/merge`, null);
+    }
 }

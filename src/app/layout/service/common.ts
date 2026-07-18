@@ -6,39 +6,13 @@ export class CommonService {
     const hostname = window.location.hostname;
     const origin = window.location.origin;
 
-    let stage = ''; // default fallback
-
-    // Detect environment based on known domains
+    // Detect environment
     if (hostname.includes('localhost') || hostname === '127.0.0.1') {
-      stage = 'local';
-    }
-    else if (hostname.includes('d12okeuel29ts0.cloudfront.net')) {
-      stage = 'dev';
-    } else if (hostname.includes('d2abc123xyz.cloudfront.net')) {
-      stage = 'qa';
-    } else if (hostname.includes('zfc-store.com')) {
-      stage = 'prod';
-    }
-
-    switch (stage) {
-        case 'local':
-            this.domain = 'http://localhost:8080/dev';
-            break;
-      case 'dev':
-        this.domain = 'https://yk0v8xiizl.execute-api.eu-north-1.amazonaws.com/dev';
-        break;
-      case 'qa':
-        this.domain = 'https://qa-api.example.com/qa';
-        break;
-      case 'stage':
-        this.domain = 'https://stage-api.example.com/stage';
-        break;
-      case 'prod':
-        this.domain = 'https://uld3hh3zn9.execute-api.ap-south-1.amazonaws.com/prod';
-        break;
-      default:
-        this.domain = 'https://o0y0tzrazj.execute-api.eu-north-1.amazonaws.com/dev';
-        break;
+      // Local development
+      this.domain = 'http://localhost:8080';
+    } else {
+      // Production - Hostinger VPS (Nginx reverse proxy)
+      this.domain = origin;
     }
 
     this.baseUrl = `${this.domain}/api`;

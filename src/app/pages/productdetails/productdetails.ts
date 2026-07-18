@@ -74,48 +74,53 @@ product: Product = {
   id: 0,
   productId: '',
   name: '',
-  description: '',
-  genderCategory: '',
-  category: '',
-  subCategory: '',
-  color: '',
-  rating: 0,
+  slug: '',
+  shortDescription: '',
+  longDescription: '',
+  categoryId: 0,
+  categoryName: '',
+  subCategoryId: 0,
+  subCategoryName: '',
+  brand: '',
+  sku: '',
+  barcode: '',
+  active: false,
   isFeatured: false,
+  thumbnail: '',
+  seoTitle: '',
+  seoDescription: '',
+  tags: '',
+  sortOrder: 0,
+  rating: 0,
   uploadedAt: null,
   variants: [],
   variant: {
     id: 0,
     variantName: '',
-    color: '',
-    styleCategory: '',
-    fit: '',
-    pattern: '',
-    season: '',
-    occasion: '',
+    weight: '',
+    unit: '',
+    sku: '',
+    barcode: '',
+    retailPrice: 0,
+    wholesalePrice: 0,
+    wholesaleEnabled: false,
+    minWholesaleQuantity: 0,
+    wholesaleDiscount: 0,
+    active: false,
+    sortOrder: 0,
+    imageUrl: '',
     isFeatured: false,
     rating: 0,
-    variantDescription: '',
+    totalReviews: 0,
     productImage: [],
-    sizes: [],
-
-    fabricType: '',
-    materialComposition: '',
-    liningMaterial: '',
-    transparencyLevel: '',
-    stretchability: '',
-    workType: '',
-    careInstructions: '',
-    madeBy: '',
-    sizeRecommendation: '',
-    modelInfo: ''
-
+    availableQuantity: 0,
+    inventoryStatus: ''
   },
-  sizes: []
+  productImages: []
 };
 
   images: any[] = [];
- selectedSize: any | null = null;
-isSizeSelected=false;
+
 //hasRelatedItems=true;
 loading=true;
 showSizeSelector: boolean = false;
@@ -269,19 +274,6 @@ goToProductDetails(id: string) {
 }
 
 
-hasUniformPrice(sizes: any[]): boolean {
-  if (!sizes || sizes.length === 0) return true;
-  const firstPrice = sizes[0].price;
-  const firstDiscount = sizes[0].discountPercentage;
-  return sizes.every(s =>
-    s.price === firstPrice && s.discountPercentage === firstDiscount
-  );
-}
-
-getDiscountedPrice(size: any): number {
-  if (!size || size.discountPercentage === 0) return size.price;
-  return Math.round(size.price - (size.price * size.discountPercentage / 100));
-}
 
 
 
@@ -296,7 +288,6 @@ getDiscountedPrice(size: any): number {
       this.product = data;
       this.product.variant =data.variant;
       this.product.variant.variantName=data.variant.variantName;
-      this.product.variant.sizes =data.variant.sizes?? [];
       this.product.variant.productImage=data.variant.productImage ?? [];
         this.images = this.product.variant.productImage.map((img: any) => ({
           itemImageSrc: img.imageUrl,
@@ -326,36 +317,12 @@ handleLoginSuccess($event:any) {
 addToCart(variant: any, event: Event, navigateToCart: boolean = false): void {
   event.stopPropagation();
 
-  if (!this.selectedSize || !this.selectedSize.id) {
-    this.isSizeSelected = false;
-
-    this.messageService.add({
-      key: 'global',
-      severity: 'info',
-      summary: 'Select a Size',
-      detail: 'Please select a size before adding to bag.'
-    });
-
-    this.openSizeSelector();
-    return;
-  }
-
   this.cartService.addToCart({
     variantId: variant.id,
-    sizeId: this.selectedSize.id,
-    color: variant.color,
     quantity: 1,
-
-     variantName: variant.variantName,
-  size: this.selectedSize.size,
-  price: calculatedPrice(this.selectedSize.price, this.selectedSize.discountPercentage),
-  originalPrice: this.selectedSize.price,
-  discount: this.selectedSize.discountPercentage,
-  imageUrl: variant.productImage?.[0]?.imageUrl || ''
+    purchaseType: this.cartService.getPurchaseType(),
   }).subscribe({
     next: () => {
-      this.isSizeSelected = true;
-
       this.messageService.add({
         key: 'global',
         severity: 'success',
@@ -602,20 +569,6 @@ prepareRatingBreakdown() {
     ...r,
     percentage: (r.count / total) * 100
   }));
-}
-selectSize(size: any) {
-  if (size.availableQuantity > 0) {
-    this.selectedSize = size;
-  }
-}
-handleSizeClick(size: any) {
-
-  if (size.availableQuantity === 0) {
-    this.openNotifyModal(size);
-    return;
-  }
-
-  this.selectSize(size);
 }
 openNotifyModal(size: any) {
   this.selectedOutOfStockSize = size;

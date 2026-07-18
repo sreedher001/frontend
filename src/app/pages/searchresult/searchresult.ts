@@ -356,33 +356,6 @@ getFilterSummary(): string {
 
 
   }
-  getWearType(style: string | null, append: boolean = false) {
-  if (this.loading || this.lastPage) return;
-  this.loading = true;
-
-  this.productService.getWearType(style, this.page, this.size).subscribe({
-    next: (res) => {
-      this.productResponseDto = res;
-
-      // only reset when it's the first page (fresh load)
-      if (!append) {
-        this.products = [];
-      }
-
-      this.products.push(...res.content);
-      console.log('products===', this.products);
-
-      this.lastPage = res.last;
-      this.page++; // prepare for next page
-      this.loading = false;
-    },
-    error: (err) => {
-      console.error('Failed to fetch products', err);
-      this.loading = false;
-    }
-  });
-}
-
   onCardClick(item:any){
   this.router.navigate(['/product-details', item.variantId]);
 }

@@ -11,7 +11,6 @@ import { EditVariant } from '@/pages/edit-variant/edit-variant';
 import { Addproduct } from '@/pages/admin/addproduct/addproduct';
 import { Signup } from '@/pages/auth/signup/signup';
 import { Manageproducts } from '@/pages/admin/manageproducts/manageproducts';
-import { Addvariant } from '@/pages/admin/addvariant/addvariant';
 import { Checkout } from '@/pages/checkout/checkout';
 import { Orderhistory } from '@/pages/orderhistory/orderhistory';
 import { Wishlist } from '@/pages/wishlist/wishlist';
@@ -54,7 +53,6 @@ export const appRoutes: Routes = [
             { path: 'product-details/:id', component: Productdetails },
             { path: 'admin/products/edit', component: EditVariant, canActivate: [AuthGuard] },
             { path: 'admin/products/add', component: Addproduct, canActivate: [AuthGuard] },
-            { path: 'admin/products/addvariant', component: Addvariant, canActivate: [AuthGuard] },
             { path: 'admin/products/manageproducts', component: Manageproducts, canActivate: [AuthGuard] },
             { path: 'cart', component: Cart },
             { path: 'order/order-history', component: Orderhistory },

@@ -6,7 +6,7 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { BadgeModule } from 'primeng/badge';
-import { CartService } from '@/pages/cart/cart.service';
+import { CartService, PurchaseType } from '@/pages/cart/cart.service';
 import { Cart } from '@/pages/cart/cart';
 import { CartResponse } from '@/pages/cart/cart.model';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
@@ -44,9 +44,24 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
     <!-- Logo -->
     <a class="layout-topbar-logo ml-2" routerLink="/">
-      <!-- <img src="assets/images/logo.png" alt="ZFC" class="h-10" /> -->
-      <span class="my-title">ZYRA</span>
+      <span class="my-title">SPICE STORE</span>
     </a>
+
+    <!-- Retail / Wholesale Mode Switcher -->
+    @if(!isAdmin){
+    <div class="ml-3 hidden sm:flex items-center border border-gray-300 rounded-full overflow-hidden text-xs font-semibold">
+      <button
+        class="px-3 py-1 transition-all duration-200"
+        [class]="currentPurchaseType === 'RETAIL' ? 'bg-[#8a5c1d] text-white' : 'bg-white text-gray-600 hover:bg-gray-100'"
+        (click)="switchMode('RETAIL')"
+      >Retail</button>
+      <button
+        class="px-3 py-1 transition-all duration-200"
+        [class]="currentPurchaseType === 'WHOLESALE' ? 'bg-[#8a5c1d] text-white' : 'bg-white text-gray-600 hover:bg-gray-100'"
+        (click)="switchMode('WHOLESALE')"
+      >Wholesale</button>
+    </div>
+    }
   </div>
 
   <div class="layout-topbar-actions flex-1 ">
@@ -356,7 +371,8 @@ export class AppTopbar implements OnInit {
     appliedPromotions: [],
       availableCoupons: [],
       lockedCoupons: [],
-    items: []
+    items: [],
+    purchaseType: 'RETAIL' as PurchaseType
 
   };
 
@@ -368,6 +384,7 @@ export class AppTopbar implements OnInit {
   visibleCartDrawer=false;
   drawerWidth = '400px';
   cartItems: any[] = [];
+  currentPurchaseType: PurchaseType = 'RETAIL';
 
    remainingTime: number = 0;
   displayTime: string = '';
@@ -408,8 +425,9 @@ export class AppTopbar implements OnInit {
     this.cartItems = cart?.items || [];
     this.cd.detectChanges();
   });
-  
-  
+
+  this.currentPurchaseType = this.cartService.getPurchaseType();
+
     this.setUserMenuItem();
 this.setDrawerWidth();
     if (localStorage.getItem("isLoggedIn") === "true") {
@@ -436,6 +454,7 @@ this.setDrawerWidth();
 
       if (roles && roles.includes("ROLE_ADMIN")) {
         this.isAdmin = true;
+        this.layoutService.layoutState.update((prev) => ({ ...prev, staticMenuDesktopInactive: false }));
       }
     }
 
@@ -501,47 +520,15 @@ setDrawerWidth() {
 // }
 
 formatProduct(product: any): string {
-  const genderPart = product.genderCategory
-    ? `for ${product.genderCategory.toLowerCase()}`
-    : '';
+  const category = product.category || '';
+  const variant = product.variantName || '';
+  const weight = product.weight ? `${product.weight}${product.unit || ''}` : '';
+  const brand = product.brand || '';
 
-  const base =
-    product.variantName ||
-    product.subCategory ||
-    product.productName ||
-    'Product';
-
-  const colorPart = product.color ? product.color.toLowerCase() : '';
-  const fitPart = product.fit ? `${product.fit.toLowerCase()} fit` : '';
-  const patternPart = product.pattern ? product.pattern.toLowerCase() : '';
-  const stylePart = product.styleCategory
-    ? `${product.styleCategory.toLowerCase()} style`
-    : '';
-  const occasionPart = product.occasion
-    ? `${product.occasion.toLowerCase()} wear`
-    : '';
-  const seasonPart = product.season
-    ? `${product.season.toLowerCase()} collection`
-    : '';
-
-  // Assemble the descriptive sentence
-  const description = [
-    colorPart,
-    fitPart,
-    patternPart,
-    base.toLowerCase(),
-    genderPart,
-     stylePart
-    // occasionPart,
-    // seasonPart,
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  // Capitalize first letter for clean UI
-  return description.charAt(0).toUpperCase() + description.slice(1);
+  const parts = [category, variant, weight, brand].filter(Boolean);
+  if (parts.length === 0) return 'Product';
+  const desc = parts.join(' - ');
+  return desc.charAt(0).toUpperCase() + desc.slice(1);
 } 
 
 highlightSearch(product: any, query: string): SafeHtml {
@@ -633,6 +620,26 @@ highlightSearch(product: any, query: string): SafeHtml {
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
   }
+
+  switchMode(type: PurchaseType) {
+    if (type === this.currentPurchaseType) return;
+    this.cartService.switchPurchaseType(type).subscribe({
+      next: () => {
+        this.currentPurchaseType = type;
+        this.messageService.add({
+          key: 'global', severity: 'info', summary: 'Mode Switched',
+          detail: `Switched to ${type.toLowerCase()} mode`
+        });
+      },
+      error: (err: any) => {
+        this.messageService.add({
+          key: 'global', severity: 'error', summary: 'Switch Failed',
+          detail: err.error?.message || 'Cannot switch mode with items in cart. Please clear your cart first.'
+        });
+      }
+    });
+  }
+
   viewCart() {
     // this.router.navigate(['/cart']);
     this.cartService.openDrawer();

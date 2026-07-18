@@ -1,6 +1,5 @@
 
   <div class="card flex flex-wrap items-center justify-between w-full">
-    <!-- Interactive heading -->
     <div class="flex-1 min-w-[150px]">
       <h2 class="font-bold text-2xl text-orange-500 flex items-center gap-2">
         Create Your Account
@@ -13,7 +12,6 @@
 
 <form #formRef="ngForm" id="signupForm" (ngSubmit)="onSubmit(formRef)" novalidate>
   <p-fluid class="flex">
-    
     <div class="card flex flex-col gap-2 w-full">
 
       <div class="flex flex-wrap w-full">
@@ -41,60 +39,6 @@
 
         <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
           <p-floatlabel variant="on">
-            <input pInputText pInputMask id="phone" name="phone" [(ngModel)]="user.phoneNumber" #phone="ngModel" required
-              class="w-full" />
-            <label for="phone">Phone Number</label>
-          </p-floatlabel>
-          @if(phone.invalid && phone.touched){
-          <small class="p-error text-red-800">Phone number is required</small>
-          }
-        </div>
-
-        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
-          <p-floatlabel variant="on">
-            <input pInputText id="country" name="country" [(ngModel)]="user.country" #country="ngModel" required
-              class="w-full" />
-            <label for="country">Country</label>
-          </p-floatlabel>
-          @if(country.invalid && country.touched){
-          <small class="p-error text-red-800">Country is required</small>
-          }
-        </div>
-
-        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
-          <p-floatlabel variant="on">
-            <input pInputText id="state" name="state" [(ngModel)]="user.state" #state="ngModel" required
-              class="w-full" />
-            <label for="state">State</label>
-          </p-floatlabel>
-          @if(state.invalid && state.touched){
-          <small class="p-error text-red-800">State is required</small>
-          }
-        </div>
-        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
-          <p-floatlabel variant="on">
-            <input pInputText pInputMask id="pinCode" name="pinCode" [(ngModel)]="user.pinCode" #pinCode="ngModel"
-              required class="w-full" />
-            <label for="pinCode">Pin Code</label>
-          </p-floatlabel>
-          @if(pinCode.invalid && pinCode.touched){
-          <small class="p-error text-red-800">Pin code is required</small>
-          }
-        </div>
-
-        <div class="w-full px-2 mb-4">
-          <p-floatlabel variant="on">
-            <textarea pTextarea id="address" name="address" [(ngModel)]="user.address" #address="ngModel" required
-              rows="3" class="w-full"></textarea>
-            <label for="address">Address</label>
-          </p-floatlabel>
-          @if(address.invalid && address.touched){
-          <small class="p-error text-red-800">Address is required</small>
-          }
-        </div>
-
-        <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
-          <p-floatlabel variant="on">
             <p-password [(ngModel)]="user.password" name="password" #password="ngModel" required inputId="password"
               [toggleMask]="true" class="w-full">
               <ng-template #header>
@@ -116,7 +60,7 @@
           <small class="p-error text-red-800">Password is required</small>
           }
         </div>
-        <!-- Confirm Password -->
+
         <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
           <p-floatlabel variant="on">
             <p-password [(ngModel)]="user.confirmPassword" name="confirmPassword" #confirmPassword="ngModel" required
@@ -149,9 +93,8 @@
 <div class="w-full px-2 mb-4">
 
   <div class="flex items-start gap-2">
-    
-    <!-- Checkbox -->
-    <p-checkbox 
+
+    <p-checkbox
       name="terms"
       [(ngModel)]="acceptedTerms"
       #terms="ngModel"
@@ -159,10 +102,9 @@
       required>
     </p-checkbox>
 
-    <!-- Label with clickable link -->
     <label class="text-sm leading-5">
-      I agree to the 
-      <a 
+      I agree to the
+      <a
         (click)="navigateToTandC()"
         class="text-black font-semibold underline hover:text-gray-700 cursor-pointer">
         Terms & Conditions
@@ -171,7 +113,6 @@
 
   </div>
 
-  <!-- Validation Error -->
   @if(terms.invalid && terms.touched){
     <small class="text-red-600 block mt-1">
       You must accept the Terms & Conditions
@@ -181,7 +122,7 @@
 </div>
 
 <div class=" w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
-    
+
       <p-button pTooltip="Create Account" tooltipPosition="left" label="Create My Account" icon="pi pi-check" raised
         type="submit"   size="large" [disabled]="loading || !acceptedTerms">
       </p-button>
@@ -189,11 +130,9 @@
 
       </div>
     </div>
-    
 
   </p-fluid>
 
-  
 </form>
 
 <p-dialog
@@ -237,4 +176,3 @@
 
   </div>
 </p-dialog>
-

@@ -1,7 +1,11 @@
-interface ProductAutocompleteDTO {
-  id: number;
-  name: string;
-  category: string;
-  subCategory: string;
-  genderCategory: string;
+export interface ProductAutocompleteDTO {
+    id: number;
+    productName: string;
+    category: string;
+    subCategory: string;
+    brand: string;
+    variantName: string;
+    weight: string;
+    unit: string;
+    slug: string;
 }

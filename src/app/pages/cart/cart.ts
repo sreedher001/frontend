@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { CartService } from './cart.service';
 import { CardModule } from 'primeng/card';
 import { BehaviorSubject } from 'rxjs';
-import { CartItemDto, CartResponse } from './cart.model';
+import { CartItemDto, CartResponse, PurchaseType } from './cart.model';
 import { CommonModule, DecimalPipe, NgClass } from '@angular/common';
 import { Product } from '@/models/product.model';
 import { Products } from '../products/products';
@@ -48,7 +48,8 @@ showCouponStamp = false;
     appliedPromotions: [],
     availableCoupons: [],
     lockedCoupons: [],
-    items: []
+    items: [],
+    purchaseType: 'RETAIL' as PurchaseType
   };
   isLoggedIn: boolean = false;
   sizeOptions: any[] = [];
@@ -214,17 +215,16 @@ remainingTime: number = 0;
       lockedCoupons: [],
 
       items: raw.map(r => ({
-        ...this.normalizeGuestItem(r),
-        availableSizes: r.availableSizes || [],
-        filteredSizeOptions: r.filteredSizeOptions || []
-      }))
+        ...this.normalizeGuestItem(r)
+      })),
+      purchaseType: (localStorage.getItem('purchaseType') as PurchaseType) || 'RETAIL'
     };
   }
 
 
 
   getItemLength(item: CartItemDto) {
-    return item?.availableSizes?.length;
+    return 1;
   }
 
 
@@ -281,12 +281,6 @@ remainingTime: number = 0;
       if (!res) return;
 
       this.cart = res;
-
-      this.cart.items.forEach((item) => {
-        item.sizeOptions = item.availableSizes;
-        item.selectedSizeObj =
-          item.sizeOptions.find((opt: any) => opt.size === item.size);
-      });
     }
   });
 
@@ -692,15 +686,8 @@ remainingTime: number = 0;
             await firstValueFrom(
               this.cartService.addToCart({
                 variantId: item.variantId,
-                sizeId: item.sizeId,
-                color: item.color,
                 quantity: item.quantity,
-                 variantName: item.variantName,
-  size: item.size,
-  price: item.price,
-  originalPrice: item.originalPrice,
-  discount: item.discountPercentage,
-  imageUrl: item.productImage?.[0]?.imageUrl || ''
+                purchaseType: 'RETAIL' as PurchaseType
               })
             );
           }

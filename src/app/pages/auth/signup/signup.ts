@@ -82,11 +82,6 @@ displayConfirmation: boolean = false;
   user = {
     username: '',
     email: '',
-    phoneNumber: '',
-    country: '',
-    state: '',
-    pinCode: '',
-    address: '',
     password: '',
     confirmPassword: '',
     roles:[]=[]
@@ -144,10 +139,12 @@ if (signupForm.invalid) {
           this.messageService.add({
         key: 'global',
         severity: 'success',
-        summary: 'Verify your mail!',
-        detail: `Enter the OTP sent to your email -${this.user.email} and verify`,
-        sticky:true
-      }); this.displayOtpDialog = true;
+        summary: 'Account Created!',
+        detail: res.message || 'Account created successfully. Please check your email to verify.',
+      });
+      this.router.navigate(['/auth/login'], {
+        queryParams: { email: this.user.email }
+      });
         },
         error: (err) => {
           this.loading = false;

@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ProductResponse } from '@/models/product-response.model';
 import { Product } from '@/models/product.model';
 import { CommonService } from '@/layout/service/common';
+
 export interface Banner {
   id: number;
   imageUrl: string;
@@ -13,220 +14,195 @@ export interface Banner {
   uploadedAt: string;
   uploadedBy: number;
 }
-// AI
-export interface AiUserPromptRequest {
-  prompt: string;
-}
-//AI
-export interface ProductDto {
-  name: string;
-  productId: string;
-  category: string;
-  subCategory: string;
-  color: string;
-  images: string[]; // list of image URLs (we take the first one for display)
-  rating: number;
-  isFeatured: boolean;
-}
-//AI
-export interface AiSuggestionResponse {
-  products: ProductDto[];
-}
 
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  sortOrder: number;
+  active: boolean;
+  parentId: number;
+  children: Category[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
-  
-  
-  
 
-  commonService:CommonService = new CommonService;
-      private apiUrl = this.commonService.baseUrl;
+  commonService: CommonService = new CommonService();
+  private apiUrl = this.commonService.baseUrl;
 
-      private wishlistCountSubject = new BehaviorSubject<number>(0);
-wishlistCount$ = this.wishlistCountSubject.asObservable();
+  private wishlistCountSubject = new BehaviorSubject<number>(0);
+  wishlistCount$ = this.wishlistCountSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
-  getAllProducts(page:any, size :any): Observable<ProductResponse> {
+  getAllProducts(page: any, size: any): Observable<ProductResponse> {
     const params = new HttpParams()
       .set('page', page)
       .set('size', size);
 
     return this.http.get<ProductResponse>(`${this.apiUrl}/products/all-products`, { params });
-
   }
 
-//   getProductById(id: number): Observable<Product> {
-//   return this.http.get<Product>(`${this.apiUrl}/products/search/${id}` );
-// }
+  getRelatedProductsByCategory(categoryId: number, page = 0, size = 10): Observable<ProductResponse> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
 
-getRelatedProductsByCategory(category: string, page = 0, size = 10): Observable<ProductResponse> {
-  const params = new HttpParams()
-    .set('page', page)
-    .set('size', size);
+    return this.http.get<ProductResponse>(
+      `${this.apiUrl}/products/search/category/${categoryId}`,
+      { params }
+    );
+  }
 
-  return this.http.get<ProductResponse>(
-    `${this.apiUrl}/products/search/category/${category}`, 
-    { params }
-  );
-}
-searchProducts(searchPayload: any): Observable<any> {
+  searchProducts(searchPayload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/products/category/search`, searchPayload);
+  }
 
-  return this.http.post<any>(
-    `${this.apiUrl}/products/category/search`,
-    searchPayload
-  );
-
-}
-
-getProductByVariantId(variantId: number): Observable<Product> {
+  getProductByVariantId(variantId: number): Observable<Product> {
     return this.http.get<Product>(`${this.apiUrl}/products/variants/${variantId}`);
   }
 
+  getProductById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/products/${id}`);
+  }
+
+  getProductBySlug(slug: string): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/products/slug/${slug}`);
+  }
+
   getSimilarProducts(variantId: number): Observable<Product> {
-    return this.http.post<Product>(`${this.apiUrl}/products/variants/${variantId}/similar`,{});
+    return this.http.post<Product>(`${this.apiUrl}/products/variants/${variantId}/similar`, {});
   }
+
   updateVariant(variantId: number, formData: FormData) {
-  return this.http.post<any>(
-    `${this.apiUrl}/admin/products/variants/${variantId}`,  
-    formData
-  );
-}
-
-upload(formData: FormData) {
-  return this.http.post<any>(
-    `${this.apiUrl}/admin/products/images/upload`,  
-    formData
-  );
-}
-
-addVariant(productParentId:any,formData: FormData) {
-  return this.http.post<any>(
-    `${this.apiUrl}/admin/products/${productParentId}/variants`,  
-    formData
-  );
-}
-
-notifyStock(
-  variantId: number,
-  isLoggedIn: boolean,
-  sizeId: number,
-  email: string | null
-) {
-
-  let options = {};
-
-  if (isLoggedIn) {
-    const token = localStorage.getItem('token');
-
-    options = {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${token}`
-      })
-    };
+    return this.http.post<any>(`${this.apiUrl}/admin/products/variants/${variantId}`, formData);
   }
 
-  return this.http.post<any>(
-    `${this.apiUrl}/interest/variants/${variantId}/sizes/${sizeId}/stock-interest`,
-    { email },
-    options
-  );
-}
+  upload(formData: FormData) {
+    return this.http.post<any>(`${this.apiUrl}/admin/products/images/upload`, formData);
+  }
 
+  addVariant(productParentId: any, formData: FormData) {
+    return this.http.post<any>(`${this.apiUrl}/admin/products/${productParentId}/variants`, formData);
+  }
 
-checkParentProduct(params: {
-  name: string,
-  category: string,
-  genderCategory: string,
-  subCategory: string
-}) {
-  const queryParams = new HttpParams()
-    .set('name', params.name)
-    .set('category', params.category)
-    .set('genderCategory', params.genderCategory)
-    .set('subCategory', params.subCategory);
+  updateProduct(productId: number, request: any) {
+    return this.http.put<any>(`${this.apiUrl}/admin/products/${productId}`, request);
+  }
 
-  return this.http.post<any>(
-    `${this.apiUrl}/admin/products/check-parent`,
-    {}, // empty body
-    { params: queryParams }
-  );
-}
+  deleteProduct(productId: number) {
+    return this.http.delete<any>(`${this.apiUrl}/admin/products/${productId}`);
+  }
 
-// product.service.ts
-getAutocompleteSuggestions(query: string) {
-  return this.http.get<any>(`${this.apiUrl}/products/search/autocomplete?query=${encodeURIComponent(query)}`);
-}
+  deleteVariant(variantId: number) {
+    return this.http.delete<any>(`${this.apiUrl}/admin/products/variants/${variantId}`);
+  }
 
-getSearchedProducts(query: string,page: number = 0, size: number = 10){
+  notifyStock(variantId: number, isLoggedIn: boolean, sizeId: number, email: string | null) {
+    let options = {};
+    if (isLoggedIn) {
+      const token = localStorage.getItem('token');
+      options = {
+        headers: new HttpHeaders({
+          Authorization: `Bearer ${token}`
+        })
+      };
+    }
+    return this.http.post<any>(
+      `${this.apiUrl}/interest/variants/${variantId}/sizes/${sizeId}/stock-interest`,
+      { email },
+      options
+    );
+  }
 
-  const params = new HttpParams()
-    .set('query', query)
-    .set('page', page)
-    .set('size', size);
-  return this.http.get<any>(`${this.apiUrl}/products/search`,{params });
-}
+  checkParentProduct(params: { name: string, category: string, subCategory: string }) {
+    const queryParams = new HttpParams()
+      .set('name', params.name)
+      .set('category', params.category)
+      .set('subCategory', params.subCategory);
 
-getWishlist(): Observable<any[]> {
+    return this.http.post<any>(
+      `${this.apiUrl}/admin/products/check-parent`,
+      {},
+      { params: queryParams }
+    );
+  }
+
+  getAutocompleteSuggestions(query: string) {
+    return this.http.get<any>(`${this.apiUrl}/products/search/autocomplete?query=${encodeURIComponent(query)}`);
+  }
+
+  getSearchedProducts(query: string, page: number = 0, size: number = 10) {
+    const params = new HttpParams()
+      .set('query', query)
+      .set('page', page)
+      .set('size', size);
+    return this.http.get<any>(`${this.apiUrl}/products/search`, { params });
+  }
+
+  getWishlist(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/wishlist/get-wishlist`).pipe(
       tap((res) => {
-        //update BehaviorSubject with new count
         this.wishlistCountSubject.next(res?.length || 0);
       })
     );
   }
 
-// addToWishlist(variantId: number): Observable<any> {
-//     return this.http.post(`${this.apiUrl}/wishlist/add/${variantId}`, {});
-//   }
-
-//   removeFromWishlist(variantId: number): Observable<any> {
-//     return this.http.post(`${this.apiUrl}/wishlist/remove/${variantId}`, {});
-//   }
-addToWishlist(variantId: number): Observable<any> {
-  return this.http.post(`${this.apiUrl}/wishlist/add/${variantId}`, {}).pipe(
-    tap(() => this.refreshWishlistCount()) //  update count after add
-  );
-}
-
-removeFromWishlist(variantId: number): Observable<any> {
-  return this.http.post(`${this.apiUrl}/wishlist/remove/${variantId}`, {}).pipe(
-    tap(() => this.refreshWishlistCount()) //  update count after remove
-  );
-}
-
-refreshWishlistCount() {
-  this.getWishlist().subscribe({
-    next: (items) => {
-      const count = items?.length || 0;
-      this.wishlistCountSubject.next(count);
-    },
-    error: () => this.wishlistCountSubject.next(0)
-  });
-}
-
-
-  getWearType(wearType: any,page: number = 0, size: number = 10){
-
-  const params = new HttpParams()
-    .set('query', wearType)
-    .set('page', page)
-    .set('size', size);
-  return this.http.get<any>(`${this.apiUrl}/products/search/weartype`,{params });
-}
-
-
-
-//==================AI API===============
-getRecommendations(prompt: string): Observable<AiSuggestionResponse> {
-    const request: AiUserPromptRequest = { prompt };
-    return this.http.post<AiSuggestionResponse>(`${this.apiUrl}/ai/suggestions`, request);
+  addToWishlist(variantId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/wishlist/add/${variantId}`, {}).pipe(
+      tap(() => this.refreshWishlistCount())
+    );
   }
 
+  removeFromWishlist(variantId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/wishlist/remove/${variantId}`, {}).pipe(
+      tap(() => this.refreshWishlistCount())
+    );
+  }
+
+  refreshWishlistCount() {
+    this.getWishlist().subscribe({
+      next: (items) => {
+        const count = items?.length || 0;
+        this.wishlistCountSubject.next(count);
+      },
+      error: () => this.wishlistCountSubject.next(0)
+    });
+  }
+
+  // Category methods
+  getRootCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.apiUrl}/categories/root`);
+  }
+
+  getSubCategories(parentId: number): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.apiUrl}/categories/${parentId}/subcategories`);
+  }
+
+  getAllCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.apiUrl}/categories`);
+  }
+
+  // Banner methods
   getAllBanners(): Observable<Banner[]> {
     return this.http.get<Banner[]>(`${this.apiUrl}/banners/all-banners`);
+  }
+
+  // Multi-variant product methods
+  createProductWithVariants(formData: FormData) {
+    return this.http.post<any>(`${this.apiUrl}/admin/products/create-with-variants`, formData);
+  }
+
+  updateProductWithVariants(productId: number, formData: FormData) {
+    return this.http.post<any>(`${this.apiUrl}/admin/products/${productId}/update-with-variants`, formData);
+  }
+
+  importExcel(formData: FormData): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/admin/products/import-excel`, formData);
   }
 }

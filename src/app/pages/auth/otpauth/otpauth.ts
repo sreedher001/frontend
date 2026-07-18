@@ -2,18 +2,19 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { InputOtpModule } from 'primeng/inputotp';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { LoginService } from '../login.service';
 import { CartService } from '@/pages/cart/cart.service';
 import { JwtHelper } from '@/jwt/jwt-helper';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { MessageService } from 'primeng/api';
 @Component({
   selector: 'app-otpauth',
   imports: [
-    CommonModule,     
-    FormsModule,  
+    CommonModule,
+    FormsModule,
     InputTextModule,
     ButtonModule,
     InputOtpModule,FloatLabelModule
@@ -33,7 +34,8 @@ export class Otpauth {
   countdown: number = 0;
   timer: any;
 
-  constructor(private loginService: LoginService, private cartService: CartService,private jwtHelper: JwtHelper ) {}
+  constructor(private loginService: LoginService, private cartService: CartService,
+    private jwtHelper: JwtHelper, private router: Router, private messageService: MessageService) {}
 
   sendOtp() {
     if (!this.phoneNumber) return;
@@ -69,8 +71,18 @@ export class Otpauth {
         localStorage.setItem('userName', userInfo?.name);
       }
 
-        // MERGE CART
-        this.mergeCart();
+        this.cartService.mergeCart().subscribe({
+          next: () => this.cartService.getCart().subscribe(),
+          error: () => {}
+        });
+
+        const roles: string[] = res?.roles || this.jwtHelper.getUserRoles();
+        if (roles.includes('ROLE_ADMIN')) {
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          this.router.navigate(['/']);
+        }
+
         this.loginSuccess.emit(res);
       },
       error: () => {
@@ -93,13 +105,5 @@ export class Otpauth {
         clearInterval(this.timer);
       }
     }, 1000);
-  }
-
-  mergeCart() {
-    const guestId = localStorage.getItem('guestId');
-
-    this.cartService.mergeCart().subscribe(() => {
-      window.location.href = '/checkout';
-    });
   }
 }

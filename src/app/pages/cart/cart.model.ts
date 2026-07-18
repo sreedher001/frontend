@@ -1,21 +1,24 @@
+export type PurchaseType = 'RETAIL' | 'WHOLESALE';
+
 export interface CartItemDto {
   id: number;
-  variantId:number;
+  variantId: number;
   variantName: string;
-  size:any;
-  sizeId:number;
-  color:string;
+  weight?: string;
+  unit?: string;
   price: number;
-  originalPrice:number;
-  discount:number;
+  originalPrice?: number;
+  wholesalePrice?: number;
+  discount?: number;
   quantity: number;
-  imageUrl:String;
+  imageUrl?: string;
   total: number;
-  availableSizes:any[];
-  availableQuantity:number;
-  sizeOptions: any[];       
-  selectedSizeObj:any;    // All sizes for autocomplete
-  filteredSizeOptions: any[];   // Filtered for search
+  availableQuantity?: number;
+  availableSizes?: any[];
+  sizeOptions?: any[];
+  selectedSizeObj?: any;
+  filteredSizeOptions?: any[];
+  purchaseType?: PurchaseType;
 }
 
 export interface CartResponse {
@@ -24,9 +27,12 @@ export interface CartResponse {
   shippingFee: number;
   subtotal?: number;
   totalAmount: number;
-discount?: number;
+  discount?: number;
+  cgst?: number;
+  sgst?: number;
   items: CartItemDto[];
-  appliedPromotions:any[];
-  availableCoupons:any[];
-  lockedCoupons:any[];
+  appliedPromotions: any[];
+  availableCoupons: any[];
+  lockedCoupons: any[];
+  purchaseType: PurchaseType;
 }

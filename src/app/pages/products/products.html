@@ -64,8 +64,8 @@
   </div>
 </div> -->
 @if(showWearSections){<h4 class="text-center mb-4">
-  <span class="dune-font-large text-red-800 ">
-    ZYRA
+  <span class="dune-font-large ">
+    SPICE STORE
   </span>
   <span class="text-gray-700 text-xxl ml-3">
     SPECIALS
@@ -75,7 +75,7 @@
   <div class="flex space-x-4 px-4 pb-2 min-w-max">
     @for (product of products; track product.id) {
     @for (variant of product.variants; track variant.id) {
-    @if (variant.styleCategory === 'Ethnic Wear' && variant.isFeatured) {
+    @if (variant.isFeatured) {
     <div (click)="onCardClick(product, variant)"
       class="bg-red-100 relative min-w-[140px] sm:min-w-[40px] h-[520px]  overflow-hidden shadow-md border border-gray-100 bg-white cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl group">
 
@@ -119,7 +119,7 @@
   <button class="px-16 py-4 border border-gray-500 text-black 
          text-lg font-medium tracking-widest
          flex items-center gap-3
-         hover:bg-blue-50 transition-all duration-200" (click)="getWearType('Ethnic Wear')">
+         hover:bg-blue-50 transition-all duration-200" (click)="fetchProducts()">
     Shop All Specials
     <i class="pi pi-arrow-right"></i>
   </button>
@@ -163,20 +163,20 @@
 
 <!-- Casuals Section -->
 @if(showWearSections){<h4 class="text-center mb-4">
-  <span class="dune-font-large text-red-800 ">
-    ZYRA
+  <span class="dune-font-large  ">
+    SPICE STORE
   </span>
   <span class="text-gray-700 text-xxl ml-3">
     Picks For You
   </span>
 </h4>
-<span class="text-center text-gray-500 mb-4 block text-lg">Zyra's handpicked collection</span>
+<span class="text-center text-gray-500 mb-4 block text-lg">Our handpicked collection</span>
 <div class="w-full overflow-x-auto scrollbar-hide">
   <div class="flex space-x-1 px-4 pb-2 min-w-max">
     @for (product of products; track product.id) {
     @for (variant of product.variants; track variant.id) {
 
-    @if((!(variant.styleCategory==='Ethnic Wear'))&& (!(variant.styleCategory==='Zfc Special')) && variant.isFeatured){
+    @if(variant.isFeatured){
     <div (click)="onCardClick(product, variant)"
       class="bg-red-100 relative min-w-[140px] sm:min-w-[160px] h-[500px]  overflow-hidden shadow-md border border-gray-100 bg-white cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl group">
 
@@ -214,7 +214,7 @@
 <div class="flex justify-center mt-8">
   <button class="px-16 py-4 border border-gray-500 text-black font-bold tracking-wide
            text-lg font-medium tracking-widest 
-           hover:bg-blue-50 transition-all duration-200" (click)="getWearType('Casual Wear')">
+           hover:bg-blue-50 transition-all duration-200" (click)="fetchProducts()">
     Shop All Handpics
     <i class="pi pi-arrow-right"></i>
   </button>
@@ -229,7 +229,7 @@
   <div class="flex space-x-1 px-4 pb-2 min-w-max">
     @for (product of products; track product.id) {
     @for (variant of product.variants; track variant.id) {
-    @if (variant.styleCategory === 'Kids Wear' && variant.isFeatured) {
+    @if (variant.isFeatured) {
     <div (click)="onCardClick(product, variant)"
       class="bg-red-100 relative min-w-[140px] sm:min-w-[160px] h-[600px] rounded-xl overflow-hidden shadow-md border border-gray-100 bg-white cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl group">
 
@@ -307,9 +307,9 @@
       </div>
 
       <!-- VIEWS -->
-      <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+      <!-- <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
         {{reel.views}} views
-      </div>
+      </div> -->
 
       <!-- PLAY ICON -->
       <div *ngIf="i !== activeIndex" class="absolute inset-0 flex items-center justify-center 
@@ -414,7 +414,7 @@
         </div>
 
         <div class="text-sm font-semibold text-black mt-1">
-          ₹ {{ getStartingPrice(reel.productVariant.sizes) }}
+          ₹ {{ getStartingPrice(reel.productVariant) }}
         </div>
       </div>
 
@@ -428,50 +428,9 @@
       ADD TO CART
     </button>
 
-    <!-- SIZE SELECTOR (EXPANDS SAME CARD) -->
-    <div *ngIf="showSizes" class="mt-5">
-
-      <div class="text-center text-sm font-medium text-gray-700 mb-3">
-        Size
-      </div>
-
-      <!-- SIZE OPTIONS -->
-      <div class="flex justify-center gap-2 flex-wrap">
-
-      <button 
-  *ngFor="let s of reel.productVariant.sizes"
-  (click)="selectSize(s); $event.stopPropagation()"
-  class="px-4 py-2 border rounded-md text-sm relative z-[9999] pointer-events-auto"
-  
-  [disabled]="s.availableQuantity <= 0"
-
-  [ngClass]="{
-    'line-through text-gray-400 opacity-60 cursor-not-allowed': s.availableQuantity <= 0
-  }"
->
-  {{ s.size }}
-</button>
-
-      </div>
-
-      <!-- ACTION BUTTONS -->
-      <div class="flex justify-between mt-5 gap-3">
-
-        <div 
-  *ngIf="showSizes"
-  class="fixed inset-0  z-[1000]"
-  (click)="closeSizes()">
-</div>
-
-        <button 
-          class="flex-1 py-3 rounded-xl bg-gray-800 text-white font-semibold"
-          [disabled]="!selectedSize"
-          (click)="addToCart()">
-          Done
-        </button>
-
-      </div>
-
+    <!-- VARIANT NAME -->
+    <div class="mt-3 text-sm text-gray-600">
+      {{ reel.productVariant.variantName }}
     </div>
 
   </div>

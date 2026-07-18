@@ -6,6 +6,7 @@ import { AppTopbar } from './app.topbar';
 import { AppSidebar } from './app.sidebar';
 import { AppFooter } from './app.footer';
 import { LayoutService } from '../service/layout.service';
+import { JwtHelper } from '@/jwt/jwt-helper';
 
 @Component({
     selector: 'app-layout',
@@ -35,9 +36,14 @@ export class AppLayout {
     constructor(
         public layoutService: LayoutService,
         public renderer: Renderer2,
-        public router: Router
+        public router: Router,
+        private jwtHelper: JwtHelper
     ) {
         this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {
+            const roles = this.jwtHelper.getUserRoles();
+            const isAdmin = roles && roles.includes('ROLE_ADMIN');
+            if (isAdmin) return;
+
             if (!this.menuOutsideClickListener) {
                 this.menuOutsideClickListener = this.renderer.listen('document', 'click', (event) => {
                     if (this.isOutsideClicked(event)) {
@@ -52,7 +58,11 @@ export class AppLayout {
         });
 
         this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-            this.hideMenu();
+            const roles = this.jwtHelper.getUserRoles();
+            const isAdmin = roles && roles.includes('ROLE_ADMIN');
+            if (!isAdmin) {
+                this.hideMenu();
+            }
         });
     }
 

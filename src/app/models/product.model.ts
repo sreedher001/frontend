@@ -1,22 +1,30 @@
 import { ProductVariantResponseDto } from "./productVariantResponseDto";
-import { sizeDto } from "./size";
-
+import { ProductImage } from "./productImage";
 
 export interface Product {
   id: number;
   productId: string;
   name: string;
-  description: any;
-  genderCategory:string;
-  category:string;
-  subCategory:string;
-  color:string;
+  slug: string;
+  shortDescription: string;
+  longDescription: string;
+  categoryId: number;
+  categoryName: string;
+  subCategoryId: number;
+  subCategoryName: string;
+  brand: string;
+  sku: string;
+  barcode: string;
+  active: boolean;
+  isFeatured: boolean;
+  thumbnail: string;
+  seoTitle: string;
+  seoDescription: string;
+  tags: string;
+  sortOrder: number;
   rating: number;
-  isFeatured:boolean;
   uploadedAt: any;
   variants: ProductVariantResponseDto[];
-  variant:ProductVariantResponseDto;
-  sizes:sizeDto[];
-
-  
+  variant: ProductVariantResponseDto;
+  productImages: ProductImage[];
 }

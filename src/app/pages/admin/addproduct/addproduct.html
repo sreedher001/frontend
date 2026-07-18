@@ -3,606 +3,208 @@
     <div class="flex-1 min-w-[150px]">
       <h4 class="font-bold">Add New Product</h4>
     </div>
-
-    <div class="flex justify-end">
-      <p-button pTooltip="save" tooltipPosition="left" label="Save Product" icon="pi pi-save" raised type="button"
-        (click)="onSubmit(formRef)"  size="large">
-      </p-button>
-
-      <!-- Confirmation Dialog -->
-      <p-dialog header="Confirmation" [(visible)]="displayConfirmation" [style]="{ width: '350px' }" [modal]="true">
-        <div class="flex items-center justify-center">
-          <i class="pi pi-info-circle mr-4" style="font-size: 3rem"> </i>
-          <span>Are you sure you want to save this product?</span>
-        </div>
-        <ng-template #footer>
-          <p-button label="No" icon="pi pi-times" (click)="closeConfirmation()" text severity="secondary" raised />
-          <p-button label="Yes" icon="pi pi-check" (click)="saveProduct()"  raised autofocus />
-        </ng-template>
-      </p-dialog>
+    <div class="flex justify-end gap-2">
+      <p-button label="Back" icon="pi pi-arrow-left" severity="secondary" outlined (onClick)="router.navigate(['/admin/products/manageproducts'])" />
+      <p-button label="Save Product" icon="pi pi-save" raised type="button" (click)="onSubmit(formRef)" size="large" [loading]="loading" />
     </div>
   </div>
 </p-fluid>
+
 <form #formRef="ngForm" id="productForm" (ngSubmit)="onSubmit(formRef)" novalidate>
+
   <!-- Product Details -->
   <p-fluid class="flex mt-5">
     <div class="card flex flex-col gap-6 w-full">
-      <div class="font-semibold text-xl">Enter Product Level Details
-        @if(showeErrorSuggestion){<span class="p-error text-red-800 ">(NOTE : All fields are mandatory to be
-          filled)</span>}
+      <div class="font-semibold text-xl">Product Details
+        @if(showError){<span class="p-error text-red-800 text-sm ml-2">(All required fields must be filled)</span>}
       </div>
-
       <div class="flex flex-wrap w-full">
-        <!-- Name -->
         <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
           <p-floatlabel variant="on">
-            <input pInputText id="name" name="productName" type="text" [(ngModel)]="product.name" #name="ngModel"
-              required class="w-full" />
-            <label for="name">Product Name</label>
+            <input pInputText id="name" name="productName" type="text" [(ngModel)]="product.name" #name="ngModel" required class="w-full" />
+            <label for="name">Product Name *</label>
           </p-floatlabel>
-          @if(name.invalid && name.touched){<small class="p-error text-red-800">Product name is required</small>}
+          @if(name.invalid && name.touched){<small class="p-error text-red-800 ml-2">Required</small>}
         </div>
-
-        <!-- Category -->
         <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
           <p-floatlabel variant="on">
-            <p-autocomplete [(ngModel)]="product.category" name="category" #category="ngModel" required
-              [suggestions]="autoFilteredCategoryValue" optionLabel="category" field="category" dropdown
-              (completeMethod)="filterCategory($event)" (onSelect)="onCategorySelect($event)" inputId="category"
-              class="w-full">
-            </p-autocomplete>
-            <label for="Category">Category</label>
+            <input pInputText id="brand" name="brand" type="text" [(ngModel)]="product.brand" class="w-full" />
+            <label for="brand">Brand</label>
           </p-floatlabel>
-          @if(category.invalid && category.touched){<small class="p-error text-red-800">Product category is
-            required</small>}
         </div>
-
-        <!-- Gender -->
         <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-          <p-floatlabel variant="on">
-            <p-autocomplete [(ngModel)]="product.genderCategory" name="genderCategory" #genderCategory="ngModel"
-              required [suggestions]="autoFilteredGenderCategoryValue" optionLabel="genderCategory"
-              field="genderCategory" dropdown (completeMethod)="filterGenderCategory($event)"
-              (onSelect)="onGenderCategorySelect($event)" [disabled]="!hasGenderCategory" inputId="genderCategory"
-              class="w-full">
-            </p-autocomplete>
-            <label for="genderCategory">Gender Category</label>
-          </p-floatlabel>
-          @if(genderCategory.invalid && genderCategory.touched){<small class="p-error text-red-800">Product gender
-            category is required</small>}
+          <label for="category" class="block mb-1 text-sm text-gray-600">Category *</label>
+          <p-treeselect
+            [(ngModel)]="selectedCategoryKey" name="category"
+            [options]="categories" placeholder="Select category"
+            optionLabel="label" optionValue="data" class="w-full" selectionMode="single"
+          ></p-treeselect>
         </div>
-
-        <!-- Sub Category -->
         <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
           <p-floatlabel variant="on">
-            <p-autocomplete [(ngModel)]="product.subCategory" name="subcategory" #subCategory="ngModel" required
-              [suggestions]="autoFilteredSubCategoryValue" optionLabel="subCategory" field="subCategory" dropdown
-              (completeMethod)="filterSubCategory($event)" [disabled]="!hasSubCategory" inputId="subCategory"
-              class="w-full">
-            </p-autocomplete>
-            <label for="subCategory">Sub Category</label>
+            <input pInputText id="sku" name="sku" type="text" [(ngModel)]="product.sku" class="w-full" />
+            <label for="sku">Product SKU</label>
           </p-floatlabel>
-          @if(subCategory.invalid && subCategory.touched){<small class="p-error text-red-800">Product sub category is
-            required</small>}
+        </div>
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <input pInputText id="tags" name="tags" type="text" [(ngModel)]="product.tags" class="w-full" />
+            <label for="tags">Tags (comma separated)</label>
+          </p-floatlabel>
+        </div>
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 flex items-center">
+          <p-checkbox [(ngModel)]="product.isFeatured" name="isFeatured" binary="true" inputId="isFeatured"></p-checkbox>
+          <label for="isFeatured" class="ml-2">Featured</label>
         </div>
       </div>
-
-
-      <!-- Description -->
-      <div class="flex w-full">
-        <div class="basis-4/4 px-2">
+      <div class="flex flex-wrap w-full">
+        <div class="w-full sm:w-1/2 px-2 mb-4">
           <p-floatlabel variant="on">
-            <textarea pTextarea id="description" name="description" [(ngModel)]="product.description"
-              #description="ngModel" required [autoResize]="true" rows="3" class="w-full"></textarea>
-            <label for="description">Description of the product</label>
+            <textarea pTextarea id="shortDescription" name="shortDescription" [(ngModel)]="product.shortDescription" [autoResize]="true" rows="2" class="w-full"></textarea>
+            <label for="shortDescription">Short Description</label>
           </p-floatlabel>
-          @if(description.invalid && description.touched){<small class="p-error text-red-800">Product description is
-            required</small>}
+        </div>
+        <div class="w-full sm:w-1/2 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <textarea pTextarea id="longDescription" name="longDescription" [(ngModel)]="product.longDescription" [autoResize]="true" rows="3" class="w-full"></textarea>
+            <label for="longDescription">Long Description</label>
+          </p-floatlabel>
         </div>
       </div>
     </div>
   </p-fluid>
 
-<!-- Variant level details-->
+  <!-- Variants Section -->
   <p-fluid class="flex mt-5">
-    <div class="card flex flex-col gap-6 w-full">
-      <div class="font-semibold text-xl">Enter Variant Level Details
-        @if(showeErrorSuggestion){<span class="p-error text-red-800 ">(NOTE : All fields are mandatory to be
-          filled)</span>}
+    <div class="card flex flex-col gap-4 w-full">
+      <div class="flex items-center justify-between">
+        <div class="font-semibold text-xl">Variants</div>
+        <p-button label="Add Variant" icon="pi pi-plus" severity="success" (onClick)="addVariant()" />
       </div>
+      <p class="text-sm text-gray-500 -mt-2">Add one or more weight/size variants. Each variant needs at least one image.</p>
 
-      <div class="flex flex-wrap w-full">
-        <!-- Variant Name -->
-        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-          <p-floatlabel variant="on">
-            <input pInputText id="variantname" name="variantName" type="text" [(ngModel)]="product.variantName" #variantName="ngModel"
-              required class="w-full" />
-            <label for="variantname">Variant Name</label>
-          </p-floatlabel>
-          @if(variantName.invalid && variantName.touched){<small class="p-error text-red-800">Variant name is required</small>}
+      @for(v of variants; track $index; let i = $index) {
+        <div class="border rounded-lg p-4 bg-gray-50 relative">
+          <div class="flex items-center justify-between mb-3">
+            <span class="font-semibold text-sm text-gray-700">Variant {{ i + 1 }}</span>
+            <div class="flex gap-1">
+              <p-button icon="pi pi-copy" severity="info" [text]="true" size="small" pTooltip="Duplicate" (onClick)="duplicateVariant(i)" />
+              <p-button icon="pi pi-trash" severity="danger" [text]="true" size="small" pTooltip="Remove" (onClick)="removeVariant(i)" [disabled]="variants.length <= 1" />
+            </div>
+          </div>
+
+          <div class="flex flex-wrap w-full">
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3">
+              <p-floatlabel variant="on">
+                <input pInputText [id]="'vname_'+i" [name]="'vname_'+i" type="text" [(ngModel)]="v.variantName" class="w-full" required />
+                <label [for]="'vname_'+i">Variant Name *</label>
+              </p-floatlabel>
+            </div>
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3">
+              <p-floatlabel variant="on">
+                <input pInputText [id]="'vweight_'+i" [name]="'vweight_'+i" type="text" [(ngModel)]="v.weight" class="w-full" placeholder="e.g. 100, 250, 1" />
+                <label [for]="'vweight_'+i">Weight</label>
+              </p-floatlabel>
+            </div>
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3">
+              <label class="block mb-1 text-xs text-gray-500">Unit</label>
+              <p-select [(ngModel)]="v.unit" [name]="'vunit_'+i" [options]="unitOptions" optionLabel="label" optionValue="value" placeholder="Select unit" class="w-full"></p-select>
+            </div>
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3">
+              <p-floatlabel variant="on">
+                <input pInputText [id]="'vsku_'+i" [name]="'vsku_'+i" type="text" [(ngModel)]="v.sku" class="w-full" />
+                <label [for]="'vsku_'+i">SKU</label>
+              </p-floatlabel>
+            </div>
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3">
+              <p-floatlabel variant="on">
+                <input pInputText [id]="'vbarcode_'+i" [name]="'vbarcode_'+i" type="text" [(ngModel)]="v.barcode" class="w-full" />
+                <label [for]="'vbarcode_'+i">Barcode</label>
+              </p-floatlabel>
+            </div>
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3">
+              <p-floatlabel variant="on">
+                <p-inputnumber [(ngModel)]="v.retailPrice" [name]="'vretail_'+i" mode="decimal" [minFractionDigits]="2" [min]="0" class="w-full" />
+                <label [for]="'vretail_'+i">Retail Price *</label>
+              </p-floatlabel>
+            </div>
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3">
+              <p-floatlabel variant="on">
+                <p-inputnumber [(ngModel)]="v.wholesalePrice" [name]="'vwholesale_'+i" mode="decimal" [minFractionDigits]="2" [min]="0" class="w-full" />
+                <label [for]="'vwholesale_'+i">Wholesale Price</label>
+              </p-floatlabel>
+            </div>
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3 flex items-center">
+              <p-checkbox [(ngModel)]="v.wholesaleEnabled" [name]="'vwholeenabled_'+i" binary="true" [inputId]="'vwholeenabled_'+i"></p-checkbox>
+              <label class="ml-2 text-sm">Wholesale Enabled</label>
+            </div>
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3">
+              <p-floatlabel variant="on">
+                <p-inputnumber [(ngModel)]="v.minWholesaleQuantity" [name]="'vminwhole_'+i" [min]="1" class="w-full" />
+                <label>Min Wholesale Qty</label>
+              </p-floatlabel>
+            </div>
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3">
+              <p-floatlabel variant="on">
+                <p-inputnumber [(ngModel)]="v.wholesaleDiscount" [name]="'vwholedisc_'+i" [min]="0" [max]="100" class="w-full" />
+                <label>Wholesale Discount %</label>
+              </p-floatlabel>
+            </div>
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3">
+              <p-floatlabel variant="on">
+                <p-inputnumber [(ngModel)]="v.availableQuantity" [name]="'vstock_'+i" [min]="0" class="w-full" />
+                <label>Stock Quantity</label>
+              </p-floatlabel>
+            </div>
+            <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-3">
+              <p-floatlabel variant="on">
+                <p-inputnumber [(ngModel)]="v.lowStockThreshold" [name]="'vlows_'+i" [min]="0" class="w-full" />
+                <label>Low Stock Threshold</label>
+              </p-floatlabel>
+            </div>
+          </div>
+
+          <!-- Variant Images -->
+          <div class="mt-3">
+            <label class="block mb-2 text-sm font-medium text-gray-700">Images *</label>
+            <div class="flex flex-wrap gap-3">
+              @for(preview of v.previews; track $index; let fi = $index) {
+                <div class="relative group w-20 h-20">
+                  <img [src]="preview" class="w-20 h-20 object-cover rounded-lg border" />
+                  @if(fi === 0) {
+                    <span class="absolute top-0 left-0 bg-black/80 text-white text-[9px] px-1 py-0.5 rounded-br rounded-tl">Front</span>
+                  }
+                  <button type="button" class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                    (click)="removeVariantFile(i, fi)">x</button>
+                </div>
+              }
+              <label class="w-20 h-20 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer text-gray-400 hover:border-blue-500 hover:text-blue-500 transition">
+                <i class="pi pi-plus text-lg"></i>
+                <span class="text-[10px]">Add</span>
+                <input type="file" accept="image/*" multiple class="hidden" (change)="onVariantFileSelect({files: $any($event.target.files)}, i)" />
+              </label>
+            </div>
+          </div>
         </div>
-
-        <!-- Color -->
-        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-          <p-floatlabel variant="on">
-            <p-autocomplete [(ngModel)]="product.color" name="color" #color="ngModel" required
-              [suggestions]="autoFilteredValue" optionLabel="name" field="name" dropdown
-              (completeMethod)="filterItem($event)" inputId="variantColor" class="w-full">
-            </p-autocomplete>
-            <label for="variantColor">Color</label>
-          </p-floatlabel>
-          @if(color.invalid && color.touched){<small class="p-error text-red-800">Product color is required</small>}
-        </div>
-
-        <!-- Style Category -->
-        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-          <p-floatlabel variant="on">
-            <p-autocomplete [(ngModel)]="product.styleCategory" name="styleCategory" #styleCategory="ngModel" required
-              [suggestions]="autoFilteredStyleCategoryValue" optionLabel="styleCategory" field="styleCategory" dropdown
-              (completeMethod)="filterStyleCategory($event)" inputId="styleCategory"
-              class="w-full">
-            </p-autocomplete>
-            <label for="styleCategory">Style Category</label>
-          </p-floatlabel>
-          @if(styleCategory.invalid && styleCategory.touched){<small class="p-error text-red-800">Style category is
-            required</small>}
-        </div>
-
-        <!-- fit -->
-        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-          <p-floatlabel variant="on">
-            <p-autocomplete [(ngModel)]="product.fit" name="fit" #fit="ngModel" required
-              [suggestions]="autoFilteredFitValue" optionLabel="name" field="fit" dropdown
-              (completeMethod)="filterFitItem($event)" inputId="fit" class="w-full">
-            </p-autocomplete>
-            <label for="fit">Fit</label>
-          </p-floatlabel>
-          @if(fit.invalid && fit.touched){<small class="p-error text-red-800">fit is required</small>}
-        </div>
-
-        <!-- pattern -->
-        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-          <p-floatlabel variant="on">
-            <p-autocomplete [(ngModel)]="product.pattern" name="pattern" #pattern="ngModel" required
-              [suggestions]="autoFilteredPatternValue" optionLabel="name" field="pattern" dropdown
-              (completeMethod)="filterPatternItem($event)" inputId="pattern" class="w-full">
-            </p-autocomplete>
-            <label for="pattern">Pattern</label>
-          </p-floatlabel>
-          @if(pattern.invalid && pattern.touched){<small class="p-error text-red-800">Pattern is required</small>}
-        </div>
-<!-- season-->
-        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <p-multiSelect 
-      [(ngModel)]="product.season" 
-      name="seasons" 
-      #seasons="ngModel"
-      [options]="autoFilteredSeasonValue" 
-      optionLabel="name" 
-      display="chip"
-      inputId="season" 
-      class="w-full" 
-      required>
-    </p-multiSelect>
-    <label for="season">Season of Wearing</label>
-  </p-floatlabel>
-  @if(seasons.invalid && seasons.touched){
-    <small class="p-error text-red-800">At least one season is required</small>
-  }
-</div>
-
-        
-
-        <!-- occasion -->
-        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <p-multiSelect 
-      [(ngModel)]="product.occasion" 
-      name="occasions" 
-      #occasions="ngModel"
-      [options]="autoFilteredOccasionValue" 
-      optionLabel="name" 
-      display="chip"
-      inputId="occasion" 
-      class="w-full" 
-      required>
-    </p-multiSelect>
-    <label for="occasion">Occasions</label>
-  </p-floatlabel>
-  @if(occasions.invalid && occasions.touched){
-    <small class="p-error text-red-800">At least one occasion is required</small>
-  }
-</div>
-
-<!-- new start-->
-
-<!-- ============ FABRIC & PRODUCT DETAILS SECTION ============ -->
-
-<!-- Fabric Type -->
-<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <input pInputText [(ngModel)]="product.fabricType" name="fabricType" id="fabricType"
-      placeholder="e.g. Cotton, Silk, Georgette" class="w-full" required />
-    <label for="fabricType">Fabric Type</label>
-  </p-floatlabel>
-</div>
-
-<!-- Material Composition -->
-<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <input pInputText [(ngModel)]="product.materialComposition" name="materialComposition"
-      id="materialComposition" placeholder="e.g. 80% Cotton, 20% Polyester" class="w-full" required />
-    <label for="materialComposition">Material Composition</label>
-  </p-floatlabel>
-</div>
-
-<!-- Lining Material -->
-<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <input pInputText [(ngModel)]="product.liningMaterial" name="liningMaterial"
-      id="liningMaterial" placeholder="e.g. Cotton Lining / No Lining" class="w-full" />
-    <label for="liningMaterial">Lining Material</label>
-  </p-floatlabel>
-</div>
-
-<!-- Transparency Level -->
-<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <input pInputText [(ngModel)]="product.transparencyLevel" name="transparencyLevel"
-      id="transparencyLevel" placeholder="e.g. Opaque / Semi Transparent / Transparent" class="w-full" />
-    <label for="transparencyLevel">Transparency Level</label>
-  </p-floatlabel>
-</div>
-
-<!-- Stretchability -->
-<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <input pInputText [(ngModel)]="product.stretchability" name="stretchability"
-      id="stretchability" placeholder="e.g. Non-Stretchable / Slight Stretch / High Stretch" class="w-full" />
-    <label for="stretchability">Stretchability</label>
-  </p-floatlabel>
-</div>
-
-<!-- Work Type -->
-<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <input pInputText [(ngModel)]="product.workType" name="workType" id="workType"
-      placeholder="e.g. Embroidery, Zari, Mirror Work" class="w-full" />
-    <label for="workType">Work Type</label>
-  </p-floatlabel>
-</div>
-
-<!-- Care Instructions -->
-<div class="w-full sm:w-1/2 lg:w-1/2 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <textarea pInputTextarea [(ngModel)]="product.careInstructions" name="careInstructions"
-      id="careInstructions" rows="2" placeholder="e.g. Hand wash cold, Do not bleach" class="w-full"></textarea>
-    <label for="careInstructions">Care Instructions</label>
-  </p-floatlabel>
-</div>
-
-<!-- Made By -->
-<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <input pInputText [(ngModel)]="product.madeBy" name="madeBy" id="madeBy"
-      placeholder="e.g. ZFC Studio / Local Artisans" class="w-full" />
-    <label for="madeBy">Made By</label>
-  </p-floatlabel>
-</div>
-
-<!-- Size Recommendation -->
-<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <input pInputText [(ngModel)]="product.sizeRecommendation" name="sizeRecommendation"
-      id="sizeRecommendation" placeholder="e.g. True to Size / Order One Size Up" class="w-full" />
-    <label for="sizeRecommendation">Size Recommendation</label>
-  </p-floatlabel>
-</div>
-
-<!-- Model Info -->
-<div class="w-full sm:w-full lg:w-1/2 px-2 mb-4">
-  <p-floatlabel variant="on">
-    <textarea pInputTextarea [(ngModel)]="product.modelInfo" name="modelInfo" id="modelInfo"
-      rows="2" placeholder="e.g. Model is 5’7” and wearing size S" class="w-full"></textarea>
-    <label for="modelInfo">Model Info</label>
-  </p-floatlabel>
-</div>
-
-
-<!-- new end -->
-
-
-
-        <!-- rating -->
-<div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
-  <label for="rating" class="block mb-1 font-medium text-gray-700">Rating</label>
-  <p-rating [(ngModel)]="product.rating" name="rating" [stars]="5" inputId="rating"></p-rating>
-  @if(!product.rating){
-    <small class="p-error text-red-800">Rating is required</small>
-  }
-</div>
-
-        <!-- Featured Checkbox -->
-        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 flex items-center">
-          <p-checkbox [(ngModel)]="product.isFeatured" name="Featured" binary="true" inputId="isFeatured"></p-checkbox>
-          <label for="isFeatured" class="ml-2">Featured?</label>
-        </div>
-      </div>
-
-
-      <!--Variant Description -->
-      <div class="flex w-full ">
-        <div class="basis-4/4 px-2">
-          <p-floatlabel variant="on">
-            <textarea pTextarea id="variantDscription" name="variantDscription" [(ngModel)]="product.variantDscription"
-              #variantDscription="ngModel" required [autoResize]="true" rows="3" class="w-full"></textarea>
-            <label for="variantDscription">Description of the variant</label>
-          </p-floatlabel>
-          @if(variantDscription.invalid && variantDscription.touched){<small class="p-error text-red-800">variant description is
-            required</small>}
-        </div>
-      </div>
+      }
     </div>
   </p-fluid>
 </form>
-<!-- Sizes Table -->
-<p-fluid class="flex flex-col md:flex-row gap-8 mt-5">
-  <div class="md:w-2/2">
-    <div class="card flex flex-col gap-4">
-      <div class="flex justify-between items-center">
-        <div class="font-semibold text-xl">Product Sizes</div>
-        @if(showeErrorSuggestionSize){<span class="p-error text-red-800 ">(NOTE : All fields are mandatory to be
-          filled)</span>}
-        <div>
-          <p-button label="Add Size" icon="pi pi-plus"  raised (click)="addSize()"
-            pTooltip="Add new size" tooltipPosition="left"></p-button>
-        </div>
-      </div>
 
-      <p-table [value]="product.sizes" dataKey="sku" editMode="row" [responsiveLayout]="'scroll'" class="w-full">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Size</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Discount %</th>
-            <th>SKU</th>
-            <th>HSN</th>
-            <th>Actions</th>
-          </tr>
-        </ng-template>
-
-        <ng-template pTemplate="body" let-size let-editing="editing">
-          <tr [pEditableRow]="size">
-            <td pEditableColumn>
-              <p-cellEditor>
-                <ng-template pTemplate="input"><input pInputText [(ngModel)]="size.size" /></ng-template>
-                <ng-template pTemplate="output">{{ size.size }}</ng-template>
-              </p-cellEditor>
-            </td>
-            <td pEditableColumn>
-              <p-cellEditor>
-                <ng-template pTemplate="input"><p-inputnumber [(ngModel)]="size.price" mode="decimal" /></ng-template>
-                <ng-template pTemplate="output">{{ size.price }}</ng-template>
-              </p-cellEditor>
-            </td>
-            <td pEditableColumn>
-              <p-cellEditor>
-                <ng-template pTemplate="input"><p-inputnumber [(ngModel)]="size.quantity" /></ng-template>
-                <ng-template pTemplate="output">{{ size.quantity }}</ng-template>
-              </p-cellEditor>
-            </td>
-            <td pEditableColumn>
-              <p-cellEditor>
-                <ng-template pTemplate="input"><p-inputnumber [(ngModel)]="size.discountPercentage"
-                    suffix="%" /></ng-template>
-                <ng-template pTemplate="output">{{ size.discountPercentage }}%</ng-template>
-              </p-cellEditor>
-            </td>
-            <td pEditableColumn>
-              <p-cellEditor>
-                <ng-template pTemplate="input"><input pInputText [(ngModel)]="size.sku" /></ng-template>
-                <ng-template pTemplate="output">{{ size.sku }}</ng-template>
-              </p-cellEditor>
-            </td>
-            <td pEditableColumn>
-              <p-cellEditor>
-                <ng-template pTemplate="input"><input pInputText [(ngModel)]="size.hsnCode" /></ng-template>
-                <ng-template pTemplate="output">{{ size.hsnCode }}</ng-template>
-              </p-cellEditor>
-            </td>
-
-            <td>
-              <div class="flex gap-2">
-                @if(!editing){<p-button icon="pi pi-pencil" severity="info" outlined rounded raised
-                  pInitEditableRow></p-button>}
-                @if(editing){<p-button icon="pi pi-check" severity="success" outlined rounded raised
-                  pSaveEditableRow></p-button>}
-                @if(editing){<p-button icon="pi pi-times" severity="secondary" outlined rounded raised
-                  pCancelEditableRow></p-button>}
-                <p-button icon="pi pi-trash" severity="danger" outlined rounded raised
-                  (click)="removeSize(size)"></p-button>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
+<!-- Bottom Save -->
+<p-fluid class="flex flex-col md:flex-row gap-6 mt-5 mb-5">
+  <div class="w-full flex justify-end">
+    <p-button label="Save Product" icon="pi pi-save" raised type="button" (click)="onSubmit(formRef)" size="large" [loading]="loading" />
   </div>
 </p-fluid>
 
-<!-- <p-fluid class="w-full mt-5">
-  <div class="w-full">
-    <div class="card flex flex-col gap-4 p-4">
-      <h5 class="text-lg font-semibold">Upload Product Images</h5>
-
-      @if(showeErrorSuggestionFile){
-        <span class="p-error text-red-800 text-sm">
-          (NOTE : All fields are mandatory to be filled)
-        </span>
-      }
-
-      <p-fileupload
-        name="files[]"
-        (onSelect)="onFileSelect($event)"
-        (onRemove)="onFileRemove($event)"
-        (onClear)="onClearFiles()"
-        [multiple]="true"
-        accept="image/*"
-        maxFileSize="1000000"
-        mode="advanced"
-        styleClass="w-full"
-        chooseLabel="Choose"
-        uploadLabel="Upload"
-        cancelLabel="Cancel"
-        [showUploadButton]="false"
-  [showCancelButton]="false"
-      >
-        
-         <ng-template pTemplate="file"></ng-template>
-  <ng-template pTemplate="content"></ng-template>
-      </p-fileupload>
-    </div>
-    <p-orderList
-  [value]="uploadedFiles"
-  dragdrop="true"
->
-  <ng-template pTemplate="header">
-    (First = Front Image) Arrange Images by dragging
+<p-dialog header="Confirm Save" [(visible)]="displayConfirmation" [style]="{ width: '400px' }" [modal]="true">
+  <div class="flex items-center justify-center gap-4">
+    <i class="pi pi-info-circle" style="font-size: 2.5rem"></i>
+    <span>Create this product with {{ variants.length }} variant(s)?</span>
+  </div>
+  <ng-template #footer>
+    <p-button label="Cancel" icon="pi pi-times" (click)="displayConfirmation = false" text severity="secondary" />
+    <p-button label="Yes, Save" icon="pi pi-check" (click)="saveProduct()" raised autofocus />
   </ng-template>
-
-  <ng-template let-item pTemplate="item" let-i="index">
-    <div class="flex items-center gap-4 p-2">
-      <img
-        [src]="item.preview"
-        class="w-20 h-20 object-cover rounded border"
-      />
-
-      <div>
-        <div class="font-semibold">
-          {{ i === 0 ? '⭐ Front Image' : 'Gallery Image' }}
-        </div>
-        <small class="text-gray-500">
-          {{ item.file.name }}
-        </small>
-      </div>
-      <button
-        pButton
-        icon="pi pi-times"
-        class="p-button-rounded p-button-text p-button-danger"
-        (click)="removeFromOrderList(item)"
-      ></button>
-    </div>
-  </ng-template>
-</p-orderList>
-  </div>
-</p-fluid> -->
-<p-fluid class="w-full mt-5">
-  <div class="card p-4">
-
-    <h5 class="text-lg font-semibold mb-3">
-      Upload Product Images
-    </h5>
-
-    <p-fileupload
-        name="files[]"
-        (onSelect)="onFileSelect($event)"
-        (onRemove)="onFileRemove($event)"
-        (onClear)="onClearFiles()"
-        [multiple]="true"
-        accept="image/*"
-        maxFileSize="1000000"
-        mode="advanced"
-        styleClass="w-full"
-        chooseLabel="Choose"
-        uploadLabel="Upload"
-        cancelLabel="Cancel"
-        [showUploadButton]="false"
-  [showCancelButton]="false"
-      >
-      <ng-template pTemplate="file"></ng-template>
-  <ng-template pTemplate="content"></ng-template>
-</p-fileupload>
-   <div
-  *ngIf="uploadedFiles.length"
-  class="flex flex-col lg:flex-row gap-6 mt-4"
->
-
-  <!-- FRONT IMAGE -->
-  <div class="lg:w-1/3 w-full">
-    <div class="border rounded-xl p-4 bg-gray-50 h-full border border-d">
-      <h6 class="font-semibold mb-3 flex items-center gap-2">
-  <i class="pi pi-image"></i>
-  Front Image
-</h6>
-
-      <div class="relative">
-        <img
-          [src]="uploadedFiles[0].preview"
-          class="w-full h-[200px] object-contain rounded-lg border bg-white"
-        />
-      </div>
-    </div>
-  </div>
-
-  <!-- GALLERY -->
-  <div class="lg:w-2/3 w-full">
-    <div class="border rounded-xl p-4 bg-white h-full">
-      <h6 class="font-semibold mb-3">
-        Gallery (Drag to reorder)
-      </h6>
-
-      <div
-        cdkDropList
-        cdkDropListOrientation="horizontal"
-        class="flex gap-4 overflow-x-auto pb-2"
-        (cdkDropListDropped)="drop($event)"
-      >
-        <div
-          *ngFor="let item of uploadedFiles; let i = index"
-          cdkDrag
-          class="relative w-28 flex-shrink-0 group"
-        >
-          <img
-            [src]="item.preview"
-            class="w-28 h-28 object-cover rounded-lg border cursor-move"
-          />
-
-          <!-- FRONT BADGE -->
-          <span
-            *ngIf="i === 0"
-            class="absolute top-1 left-1 bg-black/80 text-white text-[10px] px-2 py-1 rounded"
-          >
-            Front
-          </span>
-
-          <!-- MODERN REMOVE BUTTON -->
-          <button
-            type="button"
-            class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center"
-            (click)="removeFromOrderList(item)"
-          >
-            ✕
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-
-  </div>
-</p-fluid>
-
-
-<p-fluid class="flex flex-col md:flex-row gap-6 mt-5">
-  <div class="w-full md:w-1/2 flex ">
-    <div class="card flex flex-col gap-4 p-4 justify-end">
-      <p-button pTooltip="save" tooltipPosition="left" label="Save Product" icon="pi pi-save" raised type="button"
-        (click)="onSubmit(formRef)"  size="large">
-      </p-button>
-    </div>
-  </div>
-</p-fluid>
+</p-dialog>

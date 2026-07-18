@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, ViewChild } from '@angular/core';
-import { Confirmation, ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,329 +7,188 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
-import { RatingModule } from 'primeng/rating';
 import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { SelectModule } from 'primeng/select';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { DialogModule } from 'primeng/dialog';
 import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { FileUploadModule } from 'primeng/fileupload';
 import { Product } from '@/models/product.model';
 import { ProductService } from '@/pages/products/product.service';
 import { Router } from '@angular/router';
 import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
-import { ProductImage } from '@/models/productImage';
-import { ProductResponse } from '@/models/product-response.model';
 
-
-interface Column {
-  field: string;
-  header: string;
-  customExportHeader?: string;
-}
-
-interface ExportColumn {
-  title: string;
-  dataKey: string;
-}
 @Component({
   selector: 'app-manageproducts',
-  imports: [CommonModule,
-    TableModule,
-    FormsModule,
-    ButtonModule,
-    RippleModule,
-    ToastModule,
-    ToolbarModule,
-    RatingModule,
-    InputTextModule,
-    TextareaModule,
-    SelectModule,
-    RadioButtonModule,
-    InputNumberModule,
-    DialogModule,
-    TagModule,
-    InputIconModule,
-    IconFieldModule,
-    ConfirmDialogModule],
+  imports: [
+    CommonModule, TableModule, FormsModule, ButtonModule, RippleModule,
+    ToastModule, ToolbarModule, InputTextModule, DialogModule, TagModule,
+    InputIconModule, IconFieldModule, ConfirmDialogModule, FileUploadModule
+  ],
   templateUrl: './manageproducts.html',
   styleUrl: './manageproducts.scss'
 })
-export class Manageproducts {
-
-  productDialog: boolean = false;
-
+export class Manageproducts implements OnInit {
   products = signal<Product[]>([]);
-
-  product!: Product;
-
-  productResponse: ProductResponse | undefined;
-
-  selectedProducts!: Product[] | null;
-
-  submitted: boolean = false;
-
-  statuses!: any[];
-
   flattenedProducts: any[] = [];
+  selectedProducts!: Product[] | null;
+  loading = false;
+  totalRecords = 0;
+  page = 0;
+  size = 20;
+  hasMore = true;
+
+  displayExcelImport = false;
+  excelFile: File | null = null;
+  importResult: any = null;
+  importing = false;
 
   @ViewChild('dt') dt!: Table;
 
-  exportColumns!: ExportColumn[];
-
-  cols!: Column[];
-  loading = false;
-totalRecords = 0;
-
-page = 0;
-size = 10;
-hasMore=true;
-
   constructor(
     private productService: ProductService,
-    private messageService: MessageService, private router: Router, private confirmationService: ConfirmationService
-  ) { }
-
-  exportCSV() {
-    this.dt.exportCSV();
-  }
+    private messageService: MessageService,
+    private router: Router,
+    private confirmationService: ConfirmationService
+  ) {}
 
   ngOnInit() {
-    this.loadDemoData();
-    
-  }
-loadDemoData() {
-  if (this.loading || !this.hasMore) {
-    return;
+    this.loadProducts();
   }
 
-  this.loading = true;
+  loadProducts() {
+    if (this.loading || !this.hasMore) return;
+    this.loading = true;
+    this.productService.getAllProducts(this.page, this.size).subscribe({
+      next: (res) => {
+        const existing = this.products();
+        const newProducts = res.content || [];
+        this.products.set([...existing, ...newProducts]);
+        this.hasMore = !res.last;
+        this.page++;
+        this.totalRecords = res.totalElements || 0;
+        this.flattenProducts();
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.messageService.add({
+          key: 'global', severity: 'error', summary: 'Error', detail: 'Failed to fetch products'
+        });
+      }
+    });
+  }
 
-  this.productService.getAllProducts(this.page, this.size).subscribe({
-    next: (res) => {
-      this.productResponse = res;
+  flattenProducts() {
+    this.flattenedProducts = this.products().flatMap(product =>
+      (product.variants || []).map(variant => ({
+        productId: product.productId,
+        productNumericId: product.id,
+        variantId: variant.id,
+        name: product.name,
+        category: product.categoryId,
+        rating: variant.rating,
+        image: this.getFrontImage(variant),
+        weight: variant.weight,
+        unit: variant.unit,
+        retailPrice: variant.retailPrice,
+        wholesalePrice: variant.wholesalePrice,
+        sku: variant.sku,
+        status: variant.availableQuantity > 0 ? 'INSTOCK' : 'OUTOFSTOCK'
+      }))
+    );
+  }
 
-      // 🔥 APPEND instead of replace
-      const existingProducts = this.products();
-      const newProducts = res.content || [];
-
-      this.products.set([
-        ...existingProducts,
-        ...newProducts
-      ]);
-
-      // pagination flags
-      this.hasMore = !res.last;   // backend pageable flag
-      this.page++;               // move to next page
-
-      // static configs (set once is also fine)
-      this.statuses = [
-        { label: 'INSTOCK', value: 'instock' },
-        { label: 'LOWSTOCK', value: 'lowstock' },
-        { label: 'OUTOFSTOCK', value: 'outofstock' }
-      ];
-
-      this.cols = [
-        { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
-        { field: 'name', header: 'Name' },
-        { field: 'image', header: 'Image' },
-        { field: 'price', header: 'Price' },
-        { field: 'category', header: 'Category' },
-        { field: 'subcategory', header: 'Sub Category' }
-      ];
-
-      // re-flatten after appending
-      this.flattenProducts();
-
-      this.exportColumns = this.cols.map((col) => ({
-        title: col.header,
-        dataKey: col.field
-      }));
-
-      this.loading = false;
-    },
-    error: (err) => {
-      this.loading = false;
-      console.error('Failed to fetch products:', err);
-      this.messageService.add({
-        key: 'global',
-        severity: 'error',
-        summary: 'Oops!',
-        detail: 'Failed to fetch the products'
-      });
+  getFrontImage(variant: ProductVariantResponseDto) {
+    if (variant.productImage && variant.productImage.length > 0) {
+      const frontImg = variant.productImage.find(x => x.viewType === 'front' || x.viewType === 'FRONT');
+      return frontImg ? frontImg.imageUrl : variant.imageUrl;
     }
-  });
-}
-
-
-//   loadDemoData() {
-//     // this.productService.getAllProducts().then((data) => {
-//     //     this.products.set(data);
-//     // });
-
-//     this.productService.getAllProducts(this.page, this.size).subscribe({
-//       next: (res) => {
-//         this.productResponse = res;
-//         this.products.set(this.productResponse.content);
-
-//         this.statuses = [
-//           { label: 'INSTOCK', value: 'instock' },
-//           { label: 'LOWSTOCK', value: 'lowstock' },
-//           { label: 'OUTOFSTOCK', value: 'outofstock' }
-//         ];
-
-//         this.cols = [
-//           { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
-//           { field: 'name', header: 'Name' },
-//           { field: 'image', header: 'Image' },
-//           { field: 'price', header: 'Price' },
-//           { field: 'category', header: 'Category' },
-//           { field: 'subcategory', header: 'Sub Category' }
-//         ];
-// this.flattenProducts();
-//         this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
-//       },
-//       error: (err) => {
-//         console.error('Failed to fetch products:', err);
-//         this.messageService.add({
-//           key: 'global',
-//           severity: 'error',
-//           summary: 'Oops!',
-//           detail: 'Failed to fetch the products'
-//         });
-//       }
-//     });
-
-
-//   }
-
-  onGlobalFilter(table: Table, event: Event) {
-    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    return variant.imageUrl;
   }
 
   openNew() {
     this.router.navigate(['/admin/products/add']);
   }
 
-  flattenProducts() {
-  this.flattenedProducts = this.products().flatMap(product =>
-    product.variants.map(variant => ({
-      productId: product.productId,
-      variantId: variant.id,
-      code: variant.id, // or variant.sku if available
-      name: product.name,
-      category: product.category,
-      rating: variant.rating,
-      image: this.getFrontImage(variant),
-      color: variant.color,
-      // you can keep aggregated info if needed
-      totalSizes: variant.sizes.length,
-      minPrice: Math.min(...variant.sizes.map(s => s.price)),
-      maxPrice: Math.max(...variant.sizes.map(s => s.price)),
-      status: variant.sizes.some(s => s.availableQuantity > 0) ? 'INSTOCK' : 'OUTOFSTOCK'
-    }))
-  );
-  console.log("this.flattenedProducts", this.flattenedProducts);
-}
-
-getFrontImage(variant: ProductVariantResponseDto) {
-  if (variant.productImage && variant.productImage.length > 0) {
-    const frontImg = variant.productImage.find(
-      x => x.viewType === 'front' || x.viewType === 'FRONT'
-    );
-    return frontImg ? frontImg.imageUrl : variant.color;
-  }
-  return variant.color;
-  
-}
-
   editProduct(product: any) {
-    console.log("edit click", product)
-    this.router.navigate(
-      ['/admin/products/edit'],
-      {
-        queryParams: { variantId: product.variantId, mode: 'edit' }
-      }
-    );
-   // this.product = { ...product };
-  }
-
-  deleteSelectedProducts() {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete the selected products?',
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.products.set(this.products().filter((val) => !this.selectedProducts?.includes(val)));
-        this.selectedProducts = null;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Products Deleted',
-          life: 3000
-        });
-      }
+    this.router.navigate(['/admin/products/edit'], {
+      queryParams: { productId: product.productNumericId, mode: 'edit' }
     });
   }
 
-  hideDialog() {
-    this.productDialog = false;
-    this.submitted = false;
-  }
-
-  deleteProduct(product: Product) {
+  deleteProduct(product: any) {
     this.confirmationService.confirm({
       message: 'Are you sure you want to delete ' + product.name + '?',
-      header: 'Confirm',
+      header: 'Confirm Delete',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.products.set(this.products().filter((val) => val.id !== product.id));
-        //this.product = {};
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Product Deleted',
-          life: 3000
+        this.productService.deleteProduct(product.productNumericId).subscribe({
+          next: () => {
+            this.products.set(this.products().filter(p => p.id !== product.productNumericId));
+            this.flattenProducts();
+            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Product deleted', life: 3000 });
+          },
+          error: () => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete' });
+          }
         });
       }
     });
   }
 
-  // findIndexById(id: string): number {
-  //   let index = -1;
-  //   for (let i = 0; i < this.products().length; i++) {
-  //     if (this.products()[i].id === id) {
-  //       index = i;
-  //       break;
-  //     }
-  //   }
+  // Excel Import
+  openExcelImport() {
+    this.excelFile = null;
+    this.importResult = null;
+    this.displayExcelImport = true;
+  }
 
-  //   return index;
-  // }
-
-  createId(): string {
-    let id = '';
-    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (var i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
+  onExcelFileSelect(event: any) {
+    if (event.files && event.files.length > 0) {
+      this.excelFile = event.files[0];
     }
-    return id;
+  }
+
+  importExcel() {
+    if (!this.excelFile) {
+      this.messageService.add({ key: 'global', severity: 'warn', summary: 'No File', detail: 'Please select an Excel file' });
+      return;
+    }
+    this.importing = true;
+    const formData = new FormData();
+    formData.append('file', this.excelFile);
+    this.productService.importExcel(formData).subscribe({
+      next: (res: any) => {
+        this.importing = false;
+        this.importResult = res;
+        if (res.success) {
+          this.messageService.add({ key: 'global', severity: 'success', summary: 'Import Complete', detail: res.message });
+          this.products.set([]);
+          this.page = 0;
+          this.hasMore = true;
+          this.loadProducts();
+        }
+      },
+      error: (err: any) => {
+        this.importing = false;
+        this.importResult = err.error;
+        this.messageService.add({ key: 'global', severity: 'error', summary: 'Import Failed', detail: err.error?.message || 'Import failed' });
+      }
+    });
+  }
+
+  onGlobalFilter(table: Table, event: Event) {
+    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
   getSeverity(status: string) {
     switch (status) {
-      case 'INSTOCK':
-        return 'success';
-      case 'LOWSTOCK':
-        return 'warn';
-      case 'OUTOFSTOCK':
-        return 'danger';
-      default:
-        return 'info';
+      case 'INSTOCK': return 'success';
+      case 'LOWSTOCK': return 'warn';
+      case 'OUTOFSTOCK': return 'danger';
+      default: return 'info';
     }
   }
 }

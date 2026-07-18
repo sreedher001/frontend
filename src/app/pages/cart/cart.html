@@ -54,14 +54,14 @@
                 ₹{{ item.originalPrice }}
               </span>
 
-              @if(item.discount > 0){
+              @if(item.discount && item.discount > 0){
               <span class="ml-2 px-2 py-[2px] text-[11px] font-semibold
              text-green-700 bg-green-50 border border-green-200
              rounded-md tracking-wide">
-                Saved ₹{{ item.originalPrice - item.price }}/- per item
+                Saved ₹{{ (item.originalPrice || item.price) - item.price }}/- per item
               </span>}
 
-              @if(item.discount > 0){ <div class="absolute -top-2 right-2 flex flex-col items-center
+              @if(item.discount && item.discount > 0){ <div class="absolute -top-2 right-2 flex flex-col items-center
          animate-[swing_3s_ease-in-out_infinite] z-20">
 
                 <!-- String -->
@@ -86,10 +86,8 @@
             </div>
             <div class="flex-1  flex-col ">
               <div class="flex items-center gap-2 text-sm sm:text-base">
-                <span class="w-3 h-3 rounded-full border border-gray-300" [style.background]="item.color">
-                </span>
                 <span class="font-medium text-gray-600 text-lg sm:text-base">
-                  {{ item.color }}
+                  {{ item.weight }} {{ item.unit }}
                 </span>
               </div>
 
