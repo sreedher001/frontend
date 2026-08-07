@@ -9,6 +9,8 @@ import Nora from '@primeuix/themes/nora';
 import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { LayoutService } from '../service/layout.service';
+import { StoreSettingsService } from '@/store-settings/store-settings.service';
+import { MessageService } from 'primeng/api';
 
 const presets = {
     Aura,
@@ -43,23 +45,16 @@ declare type SurfacesType = {
     template: `
         <div class="flex flex-col gap-4">
             <div>
-                <span class="text-sm text-muted-color font-semibold">Primary</span>
-                <div class="pt-2 flex gap-2 flex-wrap justify-start">
-                    @for (primaryColor of primaryColors(); track primaryColor.name) {
-                        <button
-                            type="button"
-                            [title]="primaryColor.name"
-                            (click)="updateColors($event, 'primary', primaryColor)"
-                            [ngClass]="{
-                                    'outline outline-primary': primaryColor.name === selectedPrimaryColor()
-                                }"
-                            class="cursor-pointer w-5 h-5 rounded-full flex shrink-0 items-center justify-center outline-offset-1 shadow"
-                            [style]="{
-                                    'background-color': primaryColor?.name === 'noir' ? 'var(--text-color)' : primaryColor?.palette?.['500']
-                                }"
-                        >
-                        </button>
-                    }
+                <span class="text-sm text-muted-color font-semibold">Brand Color</span>
+                <div class="pt-2 flex items-center gap-2">
+                    <input
+                        type="color"
+                        [value]="storeSettingsService.current.primaryColor"
+                        (change)="onBrandColorChange($event)"
+                        class="w-8 h-8 p-0 border-0 rounded cursor-pointer"
+                        title="Pick brand color"
+                    />
+                    <span class="text-xs text-muted-color">Saved site-wide for all visitors</span>
                 </div>
             </div>
             <div>
@@ -101,6 +96,10 @@ export class AppConfigurator {
     config: PrimeNG = inject(PrimeNG);
 
     layoutService: LayoutService = inject(LayoutService);
+
+    storeSettingsService = inject(StoreSettingsService);
+
+    private messageService = inject(MessageService);
 
     platformId = inject(PLATFORM_ID);
 
@@ -414,6 +413,22 @@ export class AppConfigurator {
         }
     }
 
+    onBrandColorChange(event: Event) {
+        const hex = (event.target as HTMLInputElement).value;
+
+        // Instant live preview before the save round-trip completes.
+        this.storeSettingsService.applyPrimaryColor(hex);
+
+        this.storeSettingsService.update({ ...this.storeSettingsService.current, primaryColor: hex }).subscribe({
+            next: () => {
+                this.messageService.add({ key: 'global', severity: 'success', summary: 'Brand color updated', detail: 'This color now applies site-wide.' });
+            },
+            error: () => {
+                this.messageService.add({ key: 'global', severity: 'error', summary: 'Error', detail: 'Failed to save brand color.' });
+            }
+        });
+    }
+
     updateColors(event: any, type: string, color: any) {
         if (type === 'primary') {
             this.layoutService.layoutConfig.update((state) => ({ ...state, primary: color.name }));
@@ -438,6 +453,10 @@ export class AppConfigurator {
         const preset = presets[event as KeyOfType<typeof presets>];
         const surfacePalette = this.surfaces.find((s) => s.name === this.selectedSurfaceColor())?.palette;
         $t().preset(preset).preset(this.getPresetExt()).surfacePalette(surfacePalette).use({ useDefaultOptions: true });
+
+        // Presets ship their own default primary (e.g. Aura's "noir"); re-assert
+        // the persisted brand color on top so switching presets never loses it.
+        this.storeSettingsService.applyPrimaryColor(this.storeSettingsService.current.primaryColor);
     }
 
     onMenuModeChange(event: string) {

@@ -7,13 +7,13 @@
 
   <div
     *ngFor="let cat of categories"
-    (click)="scrollToCategory(cat)"
-    [ngClass]="selectedCategory === cat ?
+    (click)="scrollToCategory(cat.slug)"
+    [ngClass]="selectedCategory === cat.slug ?
     'bg-white text-black font-semibold border-l-4 border-black shadow-sm' :
     'text-gray-500'"
     class="px-4 py-4 text-sm cursor-pointer transition-all duration-200">
 
-    {{cat}}
+    {{cat.name}}
 
   </div>
 
@@ -28,24 +28,25 @@
 
     <div
       *ngFor="let cat of categories"
-      [attr.id]="cat">
+      [attr.id]="'cat-' + cat.slug">
 
       <h6 class="text-sm font-semibold text-gray-800 mb-3">
-        {{cat}}
+        {{cat.name}}
       </h6>
 
       <div class="grid grid-cols-2 gap-x-3 gap-y-5">
 
-  <div *ngFor="let item of getItems(cat); let last = last"
+  <div *ngFor="let item of getItems(cat.slug); let last = last"
        class="flex flex-col items-center">
 
     <!-- Image Card -->
     <div class="relative w-full rounded-xl overflow-hidden shadow-sm cursor-pointer"
-         (click)="last ? seeAll(cat) : openItem(item)">
+         (click)="last ? seeAll(cat.slug) : openItem(item)">
 
       <!-- Image -->
       <img
         [src]="item.image"
+        [alt]="item.name"
         class="w-full h-36 object-cover"
         [ngClass]="last ? 'blur-sm brightness-75' : ''"/>
 

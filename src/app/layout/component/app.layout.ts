@@ -7,11 +7,12 @@ import { AppSidebar } from './app.sidebar';
 import { AppFooter } from './app.footer';
 import { LayoutService } from '../service/layout.service';
 import { JwtHelper } from '@/jwt/jwt-helper';
+import { WhatsappFloatButton } from '@/shared/whatsapp-float-button/whatsapp-float-button';
 
 @Component({
     selector: 'app-layout',
     standalone: true,
-    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
+    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter, WhatsappFloatButton],
     template: `<div class="layout-wrapper" [ngClass]="containerClass">
         <app-topbar></app-topbar>
         <app-sidebar></app-sidebar>
@@ -22,6 +23,7 @@ import { JwtHelper } from '@/jwt/jwt-helper';
             <app-footer></app-footer>
         </div>
         <div class="layout-mask animate-fadein"></div>
+        <app-whatsapp-float-button></app-whatsapp-float-button>
     </div> `
 })
 export class AppLayout {

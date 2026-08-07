@@ -22,17 +22,20 @@ import { AccordionModule, AccordionPanel } from 'primeng/accordion';
 import { ReviewService } from '../productreview/review-service';
 import { JwtHelper } from '@/jwt/jwt-helper';
 import { InputTextModule } from 'primeng/inputtext';
-import { TabPanel, TabsModule } from "primeng/tabs";
 import { ImageModule } from 'primeng/image';
+import { SeoService } from '@/seo/seo.service';
+import { StoreSettingsService } from '@/store-settings/store-settings.service';
+import { CommonService } from '@/layout/service/common';
 
 interface RelatedItem {
   variantId:number;
+  slug?: string;
   label: string; // Variant name
   image: string; // Front image URL
 }
 @Component({
   selector: 'app-productdetails',
-  imports: [GalleriaModule,TabsModule,ImageModule, ButtonModule, InputTextModule, AccordionPanel, AccordionModule, DialogModule, FormsModule, BadgeModule, TagModule, PanelMenuModule, CarouselModule, LoginComponent, Signup, TabPanel],
+  imports: [GalleriaModule,ImageModule, ButtonModule, InputTextModule, AccordionPanel, AccordionModule, DialogModule, FormsModule, BadgeModule, TagModule, PanelMenuModule, CarouselModule, LoginComponent, Signup],
   templateUrl: './productdetails.html',
   styleUrl: './productdetails.scss'
 })
@@ -49,27 +52,7 @@ this.showSizeSelector=false;
 relatedItems: RelatedItem[] = [];
 productId!: number;
 productResponse!:ProductResponse;
-showSizeGuide: boolean = false;
-unit: 'cm' | 'inch' = 'cm';
 //  product: Product |null=null;
-sizeGuideData = {
-  cm: [
-    { size: '32', standardSize: 'S', bust: '81-84', waist: '71-74', hip: '91-94', frontLength: '109' },
-    { size: '34', standardSize: 'M', bust: '86-89', waist: '76-79', hip: '97-99', frontLength: '112' },
-    { size: '35', standardSize: 'L', bust: '91-94', waist: '81-84', hip: '102-104', frontLength: '114' },
-    { size: '38', standardSize: 'XL', bust: '97-99', waist: '86-89', hip: '107-109', frontLength: '114' },
-    { size: '42', standardSize: 'XXL', bust: '107-109', waist: '102-104', hip: '119-122', frontLength: '114' },
-    { size: '46', standardSize: '5XL', bust: '117-119', waist: '112-114', hip: '130-132', frontLength: '117' }
-  ],
-  inch: [
-    { size: '32', standardSize: 'S', bust: '32-33', waist: '28-29', hip: '36-37', frontLength: '43' },
-    { size: '34', standardSize: 'M', bust: '34-35', waist: '30-31', hip: '38-39', frontLength: '44' },
-    { size: '35', standardSize: 'L', bust: '36-37', waist: '32-33', hip: '40-41', frontLength: '45' },
-    { size: '38', standardSize: 'XL', bust: '38-39', waist: '34-35', hip: '42-43', frontLength: '45' },
-    { size: '42', standardSize: 'XXL', bust: '42-43', waist: '40-41', hip: '47-48', frontLength: '45' },
-    { size: '46', standardSize: '5XL', bust: '46-47', waist: '44-45', hip: '51-52', frontLength: '46' }
-  ]
-};
 product: Product = {
   id: 0,
   productId: '',
@@ -145,16 +128,39 @@ showNotifyModal = false;
 selectedOutOfStockSize: any;
 guestEmail: string = '';
   constructor(private route: ActivatedRoute, private cd: ChangeDetectorRef, private productService: ProductService, private cartService: CartService,
-    private jwtHelper: JwtHelper,private messageService: MessageService,private router: Router,private reviewService:ReviewService) {}
+    private jwtHelper: JwtHelper,private messageService: MessageService,private router: Router,private reviewService:ReviewService,
+    private seoService: SeoService, private storeSettingsService: StoreSettingsService) {}
+
+  private commonService = new CommonService();
+
+  get hasDiscount(): boolean {
+    const v = this.product.variant;
+    return !!v?.mrp && v.mrp > v.retailPrice;
+  }
+
+  get discountPercent(): number {
+    const v = this.product.variant;
+    if (!this.hasDiscount || !v?.mrp) return 0;
+    return Math.round(((v.mrp - v.retailPrice) / v.mrp) * 100);
+  }
+
+  get discountAmount(): number {
+    const v = this.product.variant;
+    if (!this.hasDiscount || !v?.mrp) return 0;
+    return Math.round(v.mrp - v.retailPrice);
+  }
   
   ngOnInit(): void {
     this.loading=true;
     this.setThumbnailPosition();
     this.prepareRatingBreakdown();
     this.route.paramMap.subscribe(params => {
-    this.productId = Number(params.get('id'));
-    this.getProductByVariantId(this.productId);
-    this.fetchSimilarProducts(this.productId);
+    const idParam = params.get('id') || '';
+    if (/^\d+$/.test(idParam)) {
+      this.getProductByVariantId(Number(idParam));
+    } else {
+      this.getProductBySlug(idParam);
+    }
 
     if(localStorage.getItem("isLoggedIn")==="true"){
       this.isLoggedIn=true;}
@@ -234,8 +240,9 @@ closeFullscreen() {
   const frontImage = variant.productImage.find((img:any) => img.viewType === 'front');
   return {
     variantId:variant?.id,
+    slug: variant?.slug,
     label: variant.variantName,
-    image: frontImage?.imageUrl || variant.name  // fallback if no front image
+    image: frontImage?.imageUrl ? this.commonService.resolveImageUrl(frontImage.imageUrl) : variant.name  // fallback if no front image
   } as RelatedItem;
 });
         
@@ -269,7 +276,7 @@ goToProductDetails(id: string) {
   this.showStylePanel = false;
   const currentId = this.route.snapshot.paramMap.get('id');
   if (currentId !== id) {
-    this.router.navigate([`/product-details/${id}`]);
+    this.router.navigate(['/product-details', id]);
   }
 }
 
@@ -280,25 +287,46 @@ goToProductDetails(id: string) {
   
   getProductByVariantId(productId:number) {
     this.loading=true;
-    
-
     this.productService.getProductByVariantId(productId).subscribe({
-      next: (data) => {
-
-      this.product = data;
-      this.product.variant =data.variant;
-      this.product.variant.variantName=data.variant.variantName;
-      this.product.variant.productImage=data.variant.productImage ?? [];
-        this.images = this.product.variant.productImage.map((img: any) => ({
-          itemImageSrc: img.imageUrl,
-          thumbnailImageSrc: img.imageUrl,
-          alt: this.product?.name,
-        }));this.loading=false;
-      },
+      next: (data) => this.onProductLoaded(data),
       error: (err) => {
         console.error('Error fetching product:', err);
         this.loading=false;
       }
+    });
+  }
+
+  getProductBySlug(slug: string) {
+    this.loading=true;
+    this.productService.getProductByVariantSlug(slug).subscribe({
+      next: (data) => this.onProductLoaded(data),
+      error: (err) => {
+        console.error('Error fetching product:', err);
+        this.loading=false;
+      }
+    });
+  }
+
+  private onProductLoaded(data: Product) {
+    this.product = data;
+    this.product.variant = data.variant;
+    this.product.variant.variantName = data.variant.variantName;
+    this.product.variant.productImage = data.variant.productImage ?? [];
+    this.images = this.product.variant.productImage.map((img: any) => ({
+      itemImageSrc: this.commonService.resolveImageUrl(img.imageUrl),
+      thumbnailImageSrc: this.commonService.resolveImageUrl(img.imageUrl),
+      alt: this.product?.name,
+    }));
+    this.loading=false;
+    this.productId = data.variant.id;
+    this.fetchSimilarProducts(data.variant.id);
+
+    const canonicalPath = data.variant.slug ? `/product-details/${data.variant.slug}` : `/product-details/${data.variant.id}`;
+    this.seoService.update({
+      title: `${this.product.variant.variantName || this.product.name} - Buy Online`,
+      description: this.product.shortDescription || `Buy ${this.product.name} online. Authentic quality, retail and wholesale pricing available at ${this.storeSettingsService.current.storeName}.`,
+      image: this.commonService.resolveImageUrl(this.product.variant.productImage?.[0]?.imageUrl),
+      canonicalUrl: typeof window !== 'undefined' ? `${window.location.origin}${canonicalPath}` : undefined
     });
   }
 
@@ -508,9 +536,6 @@ toggleSignupPanel() {
 }
 toggleLogin() {
   this.showLogin = !this.showLogin;
-}
-getSizeGuide(unit: 'cm' | 'inch') {
-  return this.sizeGuideData[unit];
 }
 
 loadReviews(variantId: number) {

@@ -14,6 +14,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { Return } from '../admin/admin-returns/return';
+import { ResolveImagePipe } from '@/shared/resolve-image.pipe';
 
 interface OrderItemDto {
   productId: number;
@@ -60,7 +61,7 @@ interface StepData {
   selector: 'app-orderstatus',
   imports: [StepperModule, CardModule,StepperModule,CommonModule, TableModule,ButtonModule,TagModule,ImageModule,
 
-    DialogModule,InputTextModule,FormsModule,AutoCompleteModule
+    DialogModule,InputTextModule,FormsModule,AutoCompleteModule,ResolveImagePipe
   ],
   templateUrl: './orderstatus.html',
   styleUrl: './orderstatus.scss'
@@ -71,6 +72,7 @@ export class Orderstatus {
 
   activeStep = 0;
 loading:boolean=true;
+errorMessage: string | null = null;
 steps: StepData[] = [];
 maxAllowedStep: number = 1;
 
@@ -128,10 +130,16 @@ constructor(
       
       error: (err) => {
         console.error('Error fetching order status:', err);
+        this.loading = false;
+        this.errorMessage = err?.status === 401
+          ? 'Please sign in to track this order.'
+          : 'We could not find an order with this number. Please check the order number and try again.';
       }
     });
   } else {
     console.warn('No order number found in route.');
+    this.loading = false;
+    this.errorMessage = 'No order number was provided.';
   }
 }
 

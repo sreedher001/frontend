@@ -24,7 +24,7 @@
         <!-- CART ITEM -->
         <div
           class="relative flex gap-3 p-3 border border-gray-300 rounded-lg bg-white shadow-sm w-full transition-all duration-200 hover:shadow-md"
-          [class.opacity-50]="item.selectedSizeObj?.availableQuantity <= 0">
+          [class.opacity-50]="(item.availableQuantity ?? 0) <= 0">
 
           <!-- REMOVE -->
           <div class="absolute -top-3 -right-3 z-30 border-2 border-white rounded-full shadow">
@@ -34,7 +34,7 @@
 
           <!-- IMAGE -->
           <div class="w-20 h-25 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center">
-            <img [src]="item.imageUrl" class="max-w-full max-h-full object-contain cursor-pointer"
+            <img [src]="item.imageUrl | resolveImage" [alt]="item.variantName || 'Product image'" class="max-w-full max-h-full object-contain cursor-pointer"
               (click)="goToProductDetails(item.variantId)" />
 
           </div>
@@ -42,9 +42,14 @@
           <!-- DETAILS -->
           <div class="flex-1  flex-col ">
 
-            <p class="font-medium text-lg sm:text-base">
-              {{ item.variantName }}
-            </p>
+            <div class="flex items-start justify-between gap-2 pr-6">
+              <p class="font-medium text-lg sm:text-base">
+                {{ item.variantName }}
+              </p>
+              <span class="font-semibold text-black text-base whitespace-nowrap">
+                ₹{{ item.total | number:'1.2-2' }}
+              </span>
+            </div>
             <div class="flex items-center gap-2 text-sm sm:text-base">
               <span class="font-semibold text-black text-lg sm:text-base">
                 ₹{{ item.price }}
@@ -93,11 +98,11 @@
 
               <!-- STOCK -->
               <span>
-                @if(item.selectedSizeObj?.availableQuantity > 0){
+                @if((item.availableQuantity ?? 0) > 0){
                 <!-- <p class="text-pink-800 text-sm ">Lowest price in last 30 days</p>
                 <i class="pi pi-truck text-gray-400"> Estimated delivery by {{ getEstimatedDelivery() }}</i> -->
                 }
-                @if(item.selectedSizeObj?.availableQuantity <= 0){ <p-tag value="Out of Stock" severity="danger"
+                @if((item.availableQuantity ?? 0) <= 0){ <p-tag value="Out of Stock" severity="danger"
                   class="text-xs"></p-tag>
                   }
               </span>
@@ -118,19 +123,9 @@
                 </p-button>
               </div>
 
-              <div class="w-40 w-full">
-                <p-autocomplete [(ngModel)]="item.selectedSizeObj" name="size" #size="ngModel" required
-                  [suggestions]="autoFilteredSizeValue" optionLabel="size" field="size" dropdown forceSelection="true"
-                  type="false" (completeMethod)="filterSize($event,item)" inputId="size"
-                  (keydown)="preventTyping($event)" (onSelect)="onSizeChange(item)"
-                  [inputStyle]="{ 'caretColor': 'transparent' }" class="w-full">
-                </p-autocomplete>
-                @if(item?.selectedSizeObj?.availableQuantity <= 0 && getItemLength(item)>1){ <span>
-                    <p-tag value="Check other quantity" severity="danger" class="text-xs font-medium">
-                    </p-tag>
-                  </span>
-                  }
-              </div>
+              <span class="text-xs text-gray-500 self-center">
+                (₹{{ item.price }} × {{ item.quantity }} = ₹{{ item.total | number:'1.2-2' }})
+              </span>
 
             </div>
 
@@ -366,9 +361,15 @@ bg-white border border-green-200 text-green-700 rounded-md">
           </span>
         </div>
 
-        <span class="font-semibold">
-          -₹{{ promo.discount | number:'1.2-2' }}
-        </span>
+        <div class="flex items-center gap-3">
+          <span class="font-semibold">
+            -₹{{ promo.discount | number:'1.2-2' }}
+          </span>
+          @if(promo.type === 'COUPON'){
+          <i class="pi pi-times cursor-pointer text-green-700 hover:text-red-600"
+             title="Remove coupon" (click)="removeCoupon()"></i>
+          }
+        </div>
 
       </div>
 
@@ -383,8 +384,15 @@ bg-white border border-green-200 text-green-700 rounded-md">
       <!-- Final Total -->
       <div class="flex justify-between items-center mb-3">
         <span class="font-semibold text-lg">Total Payable</span>
-        <span class="font-semibold text-lg">
-          ₹{{ getFinalTotal() | number:'1.2-2' }}
+        <span class="flex flex-col items-end">
+          @if(cart.appliedPromotions.length > 0){
+          <span class="text-gray-400 text-sm line-through">
+            ₹{{ (getCartSubtotal() + getShippingFee()) | number:'1.2-2' }}
+          </span>
+          }
+          <span class="font-semibold text-lg text-green-700">
+            ₹{{ getFinalTotal() | number:'1.2-2' }}
+          </span>
         </span>
       </div>
 

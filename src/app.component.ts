@@ -11,6 +11,7 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { LoaderService } from '@/interceptors/loaderservice';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { StoreSettingsService } from '@/store-settings/store-settings.service';
 
 declare let gtag: any;
 
@@ -24,32 +25,33 @@ declare let gtag: any;
     CommonModule
   ],
   template: `
-    <p-toast key="global" position="top-center" [baseZIndex]="10000"></p-toast>
+    <p-toast key="global" position="top-center" [baseZIndex]="10000" styleClass="app-global-toast"></p-toast>
 <div
   *ngIf="isLoading"
   class="zfc-loader fixed inset-0 flex items-center justify-center"
 >
-  <div class="zfc-text dune-font">
-    <span>Z</span><span>Y</span><span>R</span><span>A</span>
+  <div class="zfc-text">
+    <span *ngFor="let ch of loaderLetters; let i = index" [style.animation-delay.s]="0.2 * (i + 1)">{{ ch }}</span>
   </div>
 </div>
 
     <router-outlet></router-outlet>
   `,styles: [`
-    .zfc-text span {
+    .zfc-text {
+  display: flex; gap: 0.4rem;
+}
+.zfc-text span {
   opacity: 0;
   transform: translateY(20px);
   animation: reveal 0.6s ease-in-out infinite;
-  font-size: 4rem; font-weight: 800; letter-spacing: 0.2em; display: flex; gap: 0.4rem;
+  font-size: 2.5rem; font-weight: 800; letter-spacing: 0.1em;
    background: linear-gradient(90deg, #c9892b, #f5d77c, #c9892b); background-size: 200%;
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-      
-}
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 
-.zfc-text span:nth-child(1) { animation-delay: 0.3s; }
-.zfc-text span:nth-child(2) { animation-delay: 0.6s; }
-.zfc-text span:nth-child(3) { animation-delay: 0.9s; }
-.zfc-text span:nth-child(4) { animation-delay: 1.2s; }
+}
+@media (min-width: 640px) {
+  .zfc-text span { font-size: 4rem; letter-spacing: 0.2em; }
+}
 
 @keyframes goldFlow {
   0% { background-position: 0%; }
@@ -87,10 +89,10 @@ declare let gtag: any;
 export class AppComponent implements OnInit, OnDestroy {
   isLoading = false;
   private loadingSub!: Subscription;
-letters = ['Z', 'F', 'C'];
   constructor(
     private loaderService: LoaderService,
-    private cdr: ChangeDetectorRef,private router: Router
+    private cdr: ChangeDetectorRef,private router: Router,
+    private storeSettingsService: StoreSettingsService
   ) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
@@ -114,5 +116,10 @@ letters = ['Z', 'F', 'C'];
 
   ngOnDestroy() {
     this.loadingSub?.unsubscribe();
+  }
+
+  get loaderLetters(): string[] {
+    const name = this.storeSettingsService.current.storeName || 'Store';
+    return (name.split(' ')[0] || name).toUpperCase().slice(0, 8).split('');
   }
 }

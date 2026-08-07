@@ -21,6 +21,9 @@ import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { DrawerModule } from 'primeng/drawer';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { StoreSettingsService } from '@/store-settings/store-settings.service';
+import { Category } from '@/pages/products/product.service';
+import { ResolveImagePipe } from '@/shared/resolve-image.pipe';
 
 @Component({
   selector: 'app-topbar',
@@ -28,43 +31,125 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   imports: [RouterModule, CommonModule, StyleClassModule, //AppConfigurator, 
     BadgeModule, FormsModule, InputTextModule,
     ButtonModule, DrawerModule,
-    MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule, AutoCompleteModule, Cart, AppConfigurator],
+    MenuModule, OverlayBadgeModule, ButtonModule, TooltipModule, AutoCompleteModule, Cart, AppConfigurator, ResolveImagePipe],
   template: `<div class="layout-topbar 
          
          shadow-md  text-[#8a5c1d]">
-  <div class="layout-topbar-logo-container flex items-center">
+  <div class="layout-topbar-logo-container flex items-center shrink-0">
     <!-- Menu button -->
     @if(isAdmin){<button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
       <i class="pi pi-bars "></i>
     </button>}@else{
-      <!-- <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
-      <i class="pi pi-filter text-orange-500"></i>
-    </button> -->
+      <button class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 mr-2" (click)="mobileNavVisible = true">
+        <i class="pi pi-bars text-xl"></i>
+      </button>
     }
 
     <!-- Logo -->
-    <a class="layout-topbar-logo ml-2" routerLink="/">
-      <span class="my-title">SPICE STORE</span>
+    <a class="layout-topbar-logo ml-2 flex items-center gap-2 shrink-0" routerLink="/">
+      @if(storeSettingsService.current.logoUrl && storeSettingsService.current.logoUrl !== 'assets/images/logo.png'){
+      <img [src]="storeSettingsService.current.logoUrl | resolveImage" [alt]="storeSettingsService.current.storeName" class="w-[90px] h-[77px] object-contain shrink-0" />
+      }
+      <span class="hidden lg:inline text-lg font-semibold tracking-wide brand-font whitespace-nowrap">{{ storeSettingsService.current.storeName | uppercase }}</span>
     </a>
 
-    <!-- Retail / Wholesale Mode Switcher -->
+    <!-- Retail / Wholesale Mode Switcher (desktop) -->
     @if(!isAdmin){
-    <div class="ml-3 hidden sm:flex items-center border border-gray-300 rounded-full overflow-hidden text-xs font-semibold">
+    <div class="ml-3 hidden lg:flex items-center border border-gray-300 rounded-full overflow-hidden text-sm font-semibold shrink-0 whitespace-nowrap">
       <button
-        class="px-3 py-1 transition-all duration-200"
-        [class]="currentPurchaseType === 'RETAIL' ? 'bg-[#8a5c1d] text-white' : 'bg-white text-gray-600 hover:bg-gray-100'"
+        class="px-3 min-[1300px]:px-5 py-2 transition-all duration-200 whitespace-nowrap"
+        [class]="currentPurchaseType === 'RETAIL' ? 'bg-[var(--p-primary-color)] text-[var(--p-primary-contrast-color)]' : 'bg-white text-gray-600 hover:bg-gray-100'"
         (click)="switchMode('RETAIL')"
       >Retail</button>
       <button
-        class="px-3 py-1 transition-all duration-200"
-        [class]="currentPurchaseType === 'WHOLESALE' ? 'bg-[#8a5c1d] text-white' : 'bg-white text-gray-600 hover:bg-gray-100'"
+        class="px-3 min-[1300px]:px-5 py-2 transition-all duration-200 whitespace-nowrap"
+        [class]="currentPurchaseType === 'WHOLESALE' ? 'bg-[var(--p-primary-color)] text-[var(--p-primary-contrast-color)]' : 'bg-white text-gray-600 hover:bg-gray-100'"
         (click)="switchMode('WHOLESALE')"
       >Wholesale</button>
     </div>
     }
   </div>
 
-  <div class="layout-topbar-actions flex-1 ">
+  <!-- Retail / Wholesale Mode Switcher (mobile-only bar) -->
+  @if(!isAdmin){
+  <div class="lg:hidden fixed top-32 left-0 w-full z-[996] bg-white border-b border-gray-200 flex justify-center py-1.5 shadow-sm">
+    <div class="flex items-center border border-gray-300 rounded-full overflow-hidden text-sm font-semibold">
+      <button
+        class="px-6 py-2 transition-all duration-200"
+        [class]="currentPurchaseType === 'RETAIL' ? 'bg-[var(--p-primary-color)] text-[var(--p-primary-contrast-color)]' : 'bg-white text-gray-600'"
+        (click)="switchMode('RETAIL')"
+      >Retail</button>
+      <button
+        class="px-6 py-2 transition-all duration-200"
+        [class]="currentPurchaseType === 'WHOLESALE' ? 'bg-[var(--p-primary-color)] text-[var(--p-primary-contrast-color)]' : 'bg-white text-gray-600'"
+        (click)="switchMode('WHOLESALE')"
+      >Wholesale</button>
+    </div>
+  </div>
+  }
+
+  @if(!isAdmin){
+  <nav class="hidden lg:flex flex-1 items-center justify-center gap-0 min-[1300px]:gap-2 h-full">
+
+    <a routerLink="/" routerLinkActive="bg-[var(--p-primary-color)] text-[var(--p-primary-contrast-color)] rounded-full"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="px-2 min-[1300px]:px-4 py-1.5 text-sm font-semibold tracking-wide uppercase whitespace-nowrap transition-colors duration-150 rounded-full hover:bg-gray-100 hover:text-[var(--p-primary-color)]">
+      Home
+    </a>
+
+    <a routerLink="/home" fragment="about"
+      class="px-2 min-[1300px]:px-4 py-1.5 text-sm font-semibold tracking-wide uppercase whitespace-nowrap transition-colors duration-150 rounded-full hover:bg-gray-100 hover:text-[var(--p-primary-color)]">
+      About Us
+    </a>
+
+    <!-- Products + Mega Menu -->
+    <div class="relative group h-full flex items-center">
+      <button type="button"
+        class="px-2 min-[1300px]:px-4 py-1.5 text-sm font-semibold tracking-wide uppercase whitespace-nowrap transition-colors duration-150 rounded-full hover:bg-gray-100 hover:text-[var(--p-primary-color)] flex items-center gap-1">
+        Products
+        <i class="pi pi-chevron-down text-[10px]"></i>
+      </button>
+
+      <div class="hidden group-hover:block absolute left-1/2 -translate-x-1/2 top-full z-[998]">
+        <div class="w-64 bg-[var(--p-primary-color)] rounded-b-xl shadow-xl py-3 mt-0">
+
+          <a routerLink="/search"
+            class="block px-5 py-2 text-sm font-bold text-white cursor-pointer hover:text-[var(--p-primary-100)]">
+            All Products
+          </a>
+
+          @if(topLevelCategories.length > 0){
+          @for(top of topLevelCategories; track top.id) {
+          <a (click)="goToCategory(top)"
+            class="block px-5 py-2 text-sm font-bold text-white cursor-pointer hover:text-[var(--p-primary-100)]">
+            {{ top.name }}
+          </a>
+          @if(getSubcategories(top.id).length > 0){
+          @for(sub of getSubcategories(top.id); track sub.id) {
+          <a (click)="goToCategory(sub)"
+            class="block pl-8 pr-5 py-1.5 text-sm font-semibold text-white/90 cursor-pointer hover:text-[var(--p-primary-100)]">
+            {{ sub.name }}
+          </a>
+          }
+          }
+          }
+          } @else {
+          <p class="text-sm text-white/80 text-center py-2">No categories yet</p>
+          }
+
+        </div>
+      </div>
+    </div>
+
+    <a routerLink="/home" fragment="contact"
+      class="px-2 min-[1300px]:px-4 py-1.5 text-sm font-semibold tracking-wide uppercase whitespace-nowrap transition-colors duration-150 rounded-full hover:bg-gray-100 hover:text-[var(--p-primary-color)]">
+      Contact Us
+    </a>
+
+  </nav>
+  }
+
+  <div class="layout-topbar-actions">
     <div class="layout-config-menu ">
         <!-- Dark Mode Toggle (Commented) -->
 <!--         
@@ -118,9 +203,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
         -->
 
         
-  <div class="sm:hidden">
-  <button 
-    class="layout-topbar-action relative flex items-center justify-center  rounded-full shrink-0 " 
+  <div class="lg:hidden">
+  <button
+    class="layout-topbar-action relative flex items-center justify-center  rounded-full shrink-0 "
     (click)="showMobileSearch = true"
     pTooltip="Search"
     tooltipPosition="bottom"
@@ -157,12 +242,13 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
           </p-autoComplete>
         </div> -->
         
-        <div class="hidden sm:block w-80">
+        <div class="hidden lg:block lg:w-28 min-[1300px]:w-80">
   <p-autoComplete
     [(ngModel)]="searchQuery"
     [suggestions]="filteredProducts"
     (completeMethod)="filterProducts($event)"
     (onSelect)="onProductSelected($event)"
+    (keyup.enter)="onSearchEnter()"
     [dropdown]="false"
     [minLength]="1"
     [forceSelection]="false"
@@ -288,10 +374,60 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     </div>
     <!-- END: Icons Always Visible -->
 
-    
+
   </div>
 </div>
 
+@if(!isAdmin){
+<p-drawer
+  [(visible)]="mobileNavVisible"
+  position="left"
+  header="Menu"
+  [style]="{ width: '280px' }">
+
+  <div class="flex flex-col">
+
+    <a routerLink="/" (click)="mobileNavVisible = false"
+      class="px-2 py-3 text-sm font-semibold tracking-wide uppercase border-b border-gray-100">
+      Home
+    </a>
+
+    <a routerLink="/home" fragment="about" (click)="mobileNavVisible = false"
+      class="px-2 py-3 text-sm font-semibold tracking-wide uppercase border-b border-gray-100">
+      About Us
+    </a>
+
+    <div class="border-b border-gray-100">
+      <button type="button" (click)="mobileProductsExpanded = !mobileProductsExpanded"
+        class="w-full flex items-center justify-between px-2 py-3 text-sm font-semibold tracking-wide uppercase">
+        Products
+        <i class="pi" [ngClass]="mobileProductsExpanded ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+      </button>
+      @if(mobileProductsExpanded){
+      <div class="pb-2">
+        <a routerLink="/search" (click)="mobileNavVisible = false"
+          class="block pl-4 pr-2 py-2 text-sm text-gray-700">
+          All Products
+        </a>
+        @for(top of topLevelCategories; track top.id) {
+        <a (click)="goToCategory(top); mobileNavVisible = false"
+          class="block pl-4 pr-2 py-2 text-sm text-gray-700 cursor-pointer">
+          {{ top.name }}
+        </a>
+        }
+      </div>
+      }
+    </div>
+
+    <a routerLink="/home" fragment="contact" (click)="mobileNavVisible = false"
+      class="px-2 py-3 text-sm font-semibold tracking-wide uppercase border-b border-gray-100">
+      Contact Us
+    </a>
+
+  </div>
+
+</p-drawer>
+}
 
 <p-drawer
   [(visible)]="visibleCartDrawer"
@@ -322,6 +458,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
           type="text"
           [(ngModel)]="searchQuery"
           (ngModelChange)="filterProducts({ query: $event })"
+          (keyup.enter)="onSearchEnter()"
           placeholder="Search it..."
           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-400"
         />
@@ -355,6 +492,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 export class AppTopbar implements OnInit {
 
   drawerVisible: boolean = false;
+  mobileNavVisible: boolean = false;
+  mobileProductsExpanded: boolean = false;
   showMobileSearch = false;
   quickSearchTags: string[] = [];
 
@@ -389,8 +528,19 @@ export class AppTopbar implements OnInit {
    remainingTime: number = 0;
   displayTime: string = '';
   interval: any;
+  categories: Category[] = [];
+  get topLevelCategories(): Category[] {
+    return this.categories.filter(c => c.parentId == null);
+  }
+  getSubcategories(parentId: number): Category[] {
+    return this.categories.filter(c => c.parentId === parentId);
+  }
+  goToCategory(category: Category) {
+    this.router.navigate(['/search'], { queryParams: { categoryName: category.name } });
+  }
   constructor(public layoutService: LayoutService, private cartService: CartService, private messageService: MessageService,private sanitizer: DomSanitizer,
-    private router: Router, private jwtHelper: JwtHelper, private productService: ProductService, private cd: ChangeDetectorRef) {
+    private router: Router, private jwtHelper: JwtHelper, private productService: ProductService, private cd: ChangeDetectorRef,
+    public storeSettingsService: StoreSettingsService) {
     // Debounce the search input to avoid spamming API calls
     this.searchSubject.pipe(debounceTime(300)).subscribe(query => {
 
@@ -430,6 +580,11 @@ export class AppTopbar implements OnInit {
 
     this.setUserMenuItem();
 this.setDrawerWidth();
+
+    this.productService.getAllCategories().subscribe({
+      next: (cats) => this.categories = cats,
+      error: () => this.categories = []
+    });
     if (localStorage.getItem("isLoggedIn") === "true") {
       this.isLoggedIn=true;
       this.cartService.getCart().subscribe(); // loads and updates BehaviorSubject
@@ -661,8 +816,8 @@ highlightSearch(product: any, query: string): SafeHtml {
   console.log("Selected product:", product);
 
   if (product && product.productName) {
-    this.router.navigate(['/products'], { queryParams: { search: product.productName } });
-    
+    this.router.navigate(['/search'], { queryParams: { search: product.productName } });
+
     this.searchQuery = product.productName;
     this.showMobileSearch = false;
   }
@@ -670,6 +825,14 @@ highlightSearch(product: any, query: string): SafeHtml {
 
   onModelChange(value: any) {
     this.searchQuery = value;
+  }
+
+  onSearchEnter() {
+    const query = typeof this.searchQuery === 'string' ? this.searchQuery.trim() : '';
+    if (!query) return;
+
+    this.router.navigate(['/search'], { queryParams: { search: query } });
+    this.showMobileSearch = false;
   }
   toggleMobileSearch() {
     this.showMobileSearch = !this.showMobileSearch;

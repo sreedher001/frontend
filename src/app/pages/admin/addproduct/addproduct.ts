@@ -16,6 +16,9 @@ import { MessageService, TreeNode } from 'primeng/api';
 import { Router } from '@angular/router';
 import { ProductService } from '@/pages/products/product.service';
 import { Addproductservice } from './addproductservice';
+import { isAllowedImageFile } from '@/shared/image-validation';
+
+type Availability = 'retail' | 'wholesale' | 'both';
 
 interface VariantRow {
   id?: number;
@@ -25,8 +28,9 @@ interface VariantRow {
   sku: string;
   barcode: string;
   retailPrice: number;
+  mrp: number | null;
   wholesalePrice: number;
-  wholesaleEnabled: boolean;
+  availability: Availability;
   minWholesaleQuantity: number | null;
   wholesaleDiscount: number | null;
   availableQuantity: number;
@@ -61,6 +65,12 @@ export class Addproduct implements OnInit {
     { label: 'Pieces (pcs)', value: 'pcs' },
     { label: 'Packets', value: 'pkts' },
     { label: 'Boxes', value: 'boxes' }
+  ];
+
+  availabilityOptions = [
+    { label: 'Retail Only', value: 'retail' },
+    { label: 'Wholesale Only', value: 'wholesale' },
+    { label: 'Both (Retail & Wholesale)', value: 'both' }
   ];
 
   product: any = {
@@ -110,8 +120,9 @@ export class Addproduct implements OnInit {
       sku: '',
       barcode: '',
       retailPrice: 0,
+      mrp: null,
       wholesalePrice: 0,
-      wholesaleEnabled: false,
+      availability: 'retail',
       minWholesaleQuantity: null,
       wholesaleDiscount: null,
       availableQuantity: 0,
@@ -144,8 +155,9 @@ export class Addproduct implements OnInit {
       sku: '',
       barcode: '',
       retailPrice: src.retailPrice,
+      mrp: src.mrp,
       wholesalePrice: src.wholesalePrice,
-      wholesaleEnabled: src.wholesaleEnabled,
+      availability: src.availability,
       minWholesaleQuantity: src.minWholesaleQuantity,
       wholesaleDiscount: src.wholesaleDiscount,
       availableQuantity: src.availableQuantity,
@@ -159,6 +171,15 @@ export class Addproduct implements OnInit {
 
   onVariantFileSelect(event: any, index: number) {
     for (const file of event.files) {
+      if (!isAllowedImageFile(file)) {
+        this.messageService.add({
+          key: 'global',
+          severity: 'warn',
+          summary: 'Unsupported file',
+          detail: `"${file.name}" isn't a JPG, PNG, or WEBP image`
+        });
+        continue;
+      }
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.variants[index].files.push(file);
@@ -213,8 +234,10 @@ export class Addproduct implements OnInit {
         sku: v.sku,
         barcode: v.barcode,
         retailPrice: v.retailPrice,
+        mrp: v.mrp,
         wholesalePrice: v.wholesalePrice,
-        wholesaleEnabled: v.wholesaleEnabled,
+        retailEnabled: v.availability === 'retail' || v.availability === 'both',
+        wholesaleEnabled: v.availability === 'wholesale' || v.availability === 'both',
         minWholesaleQuantity: v.minWholesaleQuantity,
         wholesaleDiscount: v.wholesaleDiscount,
         availableQuantity: v.availableQuantity,

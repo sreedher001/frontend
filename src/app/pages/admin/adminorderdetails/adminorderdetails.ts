@@ -12,11 +12,12 @@ import { ButtonModule } from 'primeng/button';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
+import { ResolveImagePipe } from '@/shared/resolve-image.pipe';
 
 @Component({
   selector: 'app-adminorderdetails',
   imports: [TagModule,CommonModule,
-    FormsModule,TableModule,DatePipe,AvatarGroupModule,AvatarModule,ProgressSpinnerModule,ButtonModule,AutoCompleteModule],
+    FormsModule,TableModule,DatePipe,AvatarGroupModule,AvatarModule,ProgressSpinnerModule,ButtonModule,AutoCompleteModule,ResolveImagePipe],
   templateUrl: './adminorderdetails.html',
   styleUrl: './adminorderdetails.scss'
 })

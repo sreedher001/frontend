@@ -5,13 +5,33 @@
 >
   <h2 class="text-2xl font-bold text-yellow-800 mb-4"> Banner Management</h2>
 
-  <p-button
-     
-    label="Add Banner"
-    icon="pi pi-plus"
-    class="mb-3"
-    (click)="openNew()"
-  ></p-button>
+  <div class="flex items-center gap-2 mb-3">
+    <p-button
+      label="Add Banner"
+      icon="pi pi-plus"
+      (click)="openNew()"
+    ></p-button>
+
+    <button
+      type="button"
+      pButton
+      [icon]="showGuidelines ? 'pi pi-eye-slash' : 'pi pi-eye'"
+      class="p-button-text p-button-rounded"
+      [pTooltip]="showGuidelines ? 'Hide guidelines' : 'Show guidelines'"
+      tooltipPosition="right"
+      (click)="showGuidelines = !showGuidelines"
+    ></button>
+  </div>
+
+  <div *ngIf="showGuidelines" class="max-w-md mb-4 p-3 rounded-lg border border-yellow-200 bg-yellow-50 flex gap-2 text-sm text-gray-700">
+    <i class="pi pi-eye text-yellow-700 mt-0.5"></i>
+    <div class="flex flex-col gap-1">
+      <p class="font-semibold text-gray-900">Banner Upload Guidelines</p>
+      <p><span class="font-medium">Recommended size:</span> 1200 x 400 px (3:1 aspect ratio)</p>
+      <p><span class="font-medium">Preferred format:</span> WEBP for the best quality-to-size balance. JPG and PNG are also supported.</p>
+      <p><span class="font-medium">Max file size:</span> 5 MB</p>
+    </div>
+  </div>
 
   <p-table
     [value]="banners"
@@ -25,6 +45,7 @@
         <th>Title</th>
         <th>Redirect URL</th>
         <th>Type</th>
+        <th>Mode</th>
         <th>Actions</th>
       </tr>
     </ng-template>
@@ -33,13 +54,23 @@
       <tr>
         <td>
           <img
-            [src]="banner.imageUrl"
+            [src]="resolveImageUrl(banner.imageUrl)"
             class="w-20 h-12 rounded-lg object-cover"
           />
         </td>
         <td>{{ banner.title }}</td>
         <td>{{ banner.redirectUrl }}</td>
         <td>{{ banner.bannerType }}</td>
+        <td>
+          <span
+            class="text-xs font-semibold px-2 py-1 rounded-full"
+            [ngClass]="{
+              'bg-blue-100 text-blue-700': (banner.purchaseType || 'BOTH') === 'BOTH',
+              'bg-green-100 text-green-700': banner.purchaseType === 'RETAIL',
+              'bg-orange-100 text-orange-700': banner.purchaseType === 'WHOLESALE'
+            }"
+          >{{ (banner.purchaseType || 'BOTH') === 'BOTH' ? 'Both' : (banner.purchaseType === 'RETAIL' ? 'Retail' : 'Wholesale') }}</span>
+        </td>
         <td>
           <button
             pButton
@@ -70,10 +101,12 @@
     <div class="flex flex-col gap-3">
       <input
         type="file"
+        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
         multiple
         (change)="onFileSelect($event)"
         *ngIf="!selectedBannerId"
       />
+      <p class="text-xs text-gray-400 -mt-2" *ngIf="!selectedBannerId">JPG, PNG, or WEBP</p>
 
       <input
         pInputText
@@ -99,6 +132,19 @@
         placeholder="Select Banner Type"
         class="w-full"
       ></p-autoComplete>
+
+      <div>
+        <label class="block text-xs text-gray-500 mb-1">Applicable Mode</label>
+        <p-select
+          [(ngModel)]="bannerForm.purchaseType"
+          [options]="purchaseTypeOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select Mode"
+          class="w-full"
+        ></p-select>
+        <p class="text-xs text-gray-400 mt-1">Controls whether this banner shows in Retail mode, Wholesale mode, or both.</p>
+      </div>
 
       <div class="flex justify-end mt-4 space-x-2">
         <button

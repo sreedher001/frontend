@@ -12,6 +12,7 @@ import { JwtHelper } from '@/jwt/jwt-helper';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { Router } from '@angular/router';
+import { StoreSettingsService } from '@/store-settings/store-settings.service';
 declare var Razorpay: any;
 
 interface Address {
@@ -47,7 +48,7 @@ editingAddressId: any =0;
   private razorpayLoaded = false;
 
   constructor(private route: Router,private fb: FormBuilder, private messageService: MessageService, private checkoutService: CheckoutService,
-    private jwtHelper: JwtHelper,private confirmationService: ConfirmationService
+    private jwtHelper: JwtHelper,private confirmationService: ConfirmationService,private storeSettingsService: StoreSettingsService
   ) {
     this.addressForm = this.fb.group({
       name:['', Validators.required],
@@ -74,6 +75,10 @@ editingAddressId: any =0;
   }
   ngOnInit(): void {
     this.userInfo = this.jwtHelper.getUserInfo();
+    if (!this.userInfo) {
+      this.route.navigate(['/auth/login']);
+      return;
+    }
     this.userId = this.userInfo.id;
     this.getAllShippingAddress(this.userId);
     this.loadRazorpayScriptN();
@@ -252,7 +257,7 @@ openRazorpayWidgetN(order: any) {
     key: order.apikey,
     amount: order.amount,
     currency: order.currency,
-    name: "ZFC Store",
+    name: this.storeSettingsService.current.storeName,
     description: "Order Payment",
     order_id: order.razorPayOrderId,
     handler: (response: any) => {
@@ -309,7 +314,7 @@ openRazorpayWidget(order: any) {
     key: order.apikey,
     amount: order.amount,
     currency: order.currency,
-    name: "ZFC Store",
+    name: this.storeSettingsService.current.storeName,
     description: "Order Payment",
     order_id: order.razorPayOrderId,
     handler: (response: any) => {

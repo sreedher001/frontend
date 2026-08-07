@@ -12,10 +12,11 @@ import { OrderService } from '../orderhistory/order.service';
 import { OrderDetailResponse } from '../orderstatus/orderstatus';
 import { MessageService } from 'primeng/api';
 import { ProfileService } from '../profile/profile.service';
+import { ResolveImagePipe } from '@/shared/resolve-image.pipe';
 
 @Component({
   selector: 'app-order-success-component',
-  imports: [InputOtpModule, ButtonModule, CommonModule,TooltipModule,InputTextModule,TagModule, FormsModule,CardModule],
+  imports: [InputOtpModule, ButtonModule, CommonModule,TooltipModule,InputTextModule,TagModule, FormsModule,CardModule,ResolveImagePipe],
   templateUrl: './order-success-component.html',
   styleUrl: './order-success-component.scss',
 })

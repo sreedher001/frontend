@@ -31,8 +31,12 @@ export class CartService {
     private cartSubject = new BehaviorSubject<CartResponse | null>(null);
     cart$ = this.cartSubject.asObservable();
 
+    // Wholesale mode is opt-in per browser session only - never the
+    // silent default on a fresh visit, so sessionStorage (not
+    // localStorage) is used and it always starts back at RETAIL once
+    // the tab/browser is closed.
     private purchaseTypeSubject = new BehaviorSubject<PurchaseType>(
-        (localStorage.getItem('purchaseType') as PurchaseType) || 'RETAIL'
+        (sessionStorage.getItem('purchaseType') as PurchaseType) || 'RETAIL'
     );
     purchaseType$ = this.purchaseTypeSubject.asObservable();
 
@@ -51,7 +55,7 @@ export class CartService {
     }
 
     setPurchaseType(type: PurchaseType) {
-        localStorage.setItem('purchaseType', type);
+        sessionStorage.setItem('purchaseType', type);
         this.purchaseTypeSubject.next(type);
     }
 
@@ -92,12 +96,12 @@ export class CartService {
         );
     }
 
-    updateCartItem(productId: number, quantity: number, size: string, sizeId: number) {
-        const params = new HttpParams()
+    updateCartItem(productId: number, quantity: number, size?: string, sizeId?: number) {
+        let params = new HttpParams()
             .set('productId', productId)
-            .set('quantity', quantity)
-            .set('size', size)
-            .set('sizeId', sizeId);
+            .set('quantity', quantity);
+        if (size != null) params = params.set('size', size);
+        if (sizeId != null) params = params.set('sizeId', sizeId);
 
         return this.http.post<CartResponse>(`${this.baseUrl}/cart/update`, null, { params }).pipe(
             tap(cart => this.cartSubject.next(cart))

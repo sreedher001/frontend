@@ -30,7 +30,7 @@
 
   <!-- Banner Carousel -->
   <p-carousel
-    [value]="banners"
+    [value]="visibleBanners"
     [numVisible]="1"
     [numScroll]="1"
     [circular]="true"
@@ -45,8 +45,8 @@
         shadow-md overflow-hidden transition-transform duration-500 transform hover:scale-105 cursor-pointer"
         >
 
-        <img [src]="banner.imageUrl" alt="{{ banner.title }}"
-          class="w-full h-72 sm:h-72 object-cover" />
+        <img [src]="banner.imageUrl | resolveImage" alt="{{ banner.title }}"
+          class="w-full aspect-[3/1] object-cover" />
 
         <div class="p-3 text-center">
           <p class="font-semibold text-yellow-900 text-base sm:text-lg">
@@ -58,15 +58,74 @@
   </p-carousel>
 </div>
 
+<div class="px-4 sm:px-6 mt-8 mb-2 flex items-center gap-2 text-sm text-gray-500">
+  <a routerLink="/" class="hover:text-[var(--p-primary-color)]">Home</a>
+  <i class="pi pi-angle-right text-xs"></i>
+  <span class="text-[var(--p-primary-color)] font-semibold uppercase">{{ breadcrumbLabel }}</span>
+</div>
+
+<div class="px-4 sm:px-6 flex flex-col lg:flex-row gap-6 items-start">
+
+  <!-- Desktop Filter Sidebar -->
+  <aside class="hidden lg:block w-64 shrink-0 border border-gray-200 rounded-lg overflow-hidden bg-[#fdfbf3] sticky top-20">
+
+    <div class="px-4 py-3 border-b border-gray-200">
+      <h3 class="text-lg font-bold tracking-wide">FILTER</h3>
+    </div>
+
+    <div class="px-4 py-4 border-b border-gray-200">
+      <h4 class="text-xs font-semibold tracking-wider text-gray-500 uppercase mb-3">Availability</h4>
+      <div class="flex flex-col gap-2">
+        <label class="flex items-center gap-2 cursor-pointer text-sm">
+          <p-radioButton name="availability" value="in_stock" [(ngModel)]="selectedFilters.availability"
+            (onClick)="applyFilters()"></p-radioButton>
+          In stock
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer text-sm">
+          <p-radioButton name="availability" value="out_stock" [(ngModel)]="selectedFilters.availability"
+            (onClick)="applyFilters()"></p-radioButton>
+          Out of stock
+        </label>
+      </div>
+    </div>
+
+    <div class="px-4 py-4 border-b border-gray-200">
+      <h4 class="text-xs font-semibold tracking-wider text-gray-500 uppercase mb-3">Price</h4>
+      <p-slider [(ngModel)]="selectedFilters.price" [range]="true" [min]="0" [max]="10000"
+        (onSlideEnd)="applyFilters()" styleClass="w-full"></p-slider>
+      <div class="text-xs text-gray-500 mt-3">
+        Price: Rs {{ selectedFilters.price[0] }} - Rs {{ selectedFilters.price[1] }}
+      </div>
+    </div>
+
+    @if(categoryOptions.length > 0){
+    <div class="px-4 py-4">
+      <h4 class="text-xs font-semibold tracking-wider text-gray-500 uppercase mb-3">Product Type</h4>
+      <div class="flex flex-col gap-2">
+        @for(cat of categoryOptions; track cat.value) {
+        <label class="flex items-center gap-2 cursor-pointer text-sm">
+          <p-checkbox [value]="cat.value" [(ngModel)]="selectedFilters.categoryName"
+            (onChange)="applyFilters()"></p-checkbox>
+          {{ cat.label }}
+        </label>
+        }
+      </div>
+    </div>
+    }
+
+  </aside>
+
+  <div class="flex-1 w-full">
+
 <div
-  class="grid gap-1 cursor-pointer mt-12"
+  class="grid gap-1 cursor-pointer"
   [ngClass]="{
     'grid-cols-1': gridView === 1,
     'grid-cols-2': gridView === 2,
     'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4': gridView === 4
   }"
 >
- @for (item of prods; track item.id) {
+ @for (item of visibleProds; track item.id) {
 
   <div
     class="bg-white  shadow-md border border-orange-100 overflow-hidden hover:shadow-lg transition duration-300 relative"
@@ -108,10 +167,16 @@
       'object-contain': gridView === 1,
       'object-cover': gridView !== 1
     }"
-    [src]="item.imageUrl"
+    [src]="item.imageUrl | resolveImage"
     [alt]="item.variantName"
     loading="lazy"
   />
+
+  @if (isWholesaleMode && isWholesaleAvailable(item)) {
+  <span class="absolute top-2 left-2 bg-black text-white text-[10px] font-semibold tracking-wide px-2 py-0.5 rounded-full z-20">
+    WHOLESALE
+  </span>
+  }
 
   <!-- Discount Tag -->
  <!-- BIG DISCOUNT TAG -->
@@ -161,27 +226,37 @@
       </p>
 
       <div class="flex items-center gap-2">
-  
+
+  @if (isWholesaleMode && !isWholesaleAvailable(item)) {
+  <span class="text-black font-semibold text-lg">Price on Request</span>
+  } @else {
   <!-- Final Price -->
   <span class="text-black font-semibold text-lg ">
-    ₹{{ item.finalPrice | number:'1.0-0' }}
+    ₹{{ getDisplayPrice(item) | number:'1.0-0' }}
   </span>
+  @if (isWholesaleMode && isWholesaleAvailable(item)) {
+  <span class="text-xs text-gray-500">/ unit</span>
+  }
 
   <!-- MRP -->
-  @if (item?.discountPercentage > 0) {
+  @if (!isWholesaleMode && hasDiscount(item)) {
   <span class="text-md text-gray-400 line-through ">
-    ₹{{ item?.price }}
+    ₹{{ item?.mrp }}
   </span>
   }
 
   <!-- Discount -->
-  @if (item?.discountPercentage > 0) {
-  <span class="text-md font-semibold text-green-600 ">
-    {{ item.discountPercentage }}% OFF
+  @if (!isWholesaleMode && hasDiscount(item)) {
+  <span class="text-md font-bold text-green-600 ">
+    ₹{{ discountAmount(item) }} OFF
   </span>
+  }
   }
 
 </div>
+@if (isWholesaleMode && !isWholesaleAvailable(item)) {
+<span class="text-[11px] text-gray-500">Contact us for wholesale pricing</span>
+}
 <!-- Rating Badge -->
 <div
   class="absolute bottom-2 right-2  backdrop-blur px-2 py-1 rounded
@@ -267,9 +342,9 @@
 <!-- Floating CTA Button (only if modal closed and not logged in) -->
 @if (!showSignupPanel && !isLoggedIn) {
  <div
-  class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 
-         flex items-center gap-3 px-5 py-3 rounded-full 
-         shadow-md border border-yellow-400 
+  class="fixed bottom-24 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-40
+         flex items-center gap-3 px-5 py-3 rounded-full
+         shadow-md border border-yellow-400
          bg-gradient-to-r from-[#fff7ed] via-[#fae8e0] to-[#fdf6ee] 
          text-[#8a5c1d] font-semibold cursor-pointer 
          hover:scale-105 transition-transform duration-200"
@@ -284,11 +359,14 @@
 
 </div>
 
+  </div>
+
+</div>
+
 @if(!lastPage && !loading){<div class="flex justify-center my-8" >
   <p-button
     label="Load More"
     icon="pi pi-chevron-down"   outlined
-    class="dune-font"
     (onClick)="loadMore()"
   ></p-button>
 </div>}

@@ -14,6 +14,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputOtpModule } from 'primeng/inputotp';
 import { CartService } from '../cart/cart.service';
 import { DividerModule } from 'primeng/divider';
+import { StoreSettingsService } from '@/store-settings/store-settings.service';
 
 @Component({
     selector: 'app-login',
@@ -23,7 +24,7 @@ import { DividerModule } from 'primeng/divider';
     @if(!isForgotPasswordFlow) {
     <div class="w-full max-w-md mx-auto bg-white dark:bg-surface-900 p-6 sm:p-8 rounded-2xl shadow-lg">
       <div class="text-center mb-6">
-        <span class="text-2xl font-bold text-orange-500">SPICE STORE</span>
+        <span class="text-2xl font-bold text-orange-500">{{ storeSettingsService.current.storeName | uppercase }}</span>
         <p class="text-lg text-gray-500 dark:text-gray-400 mt-1">Sign in and continue shopping</p>
       </div>
 
@@ -125,7 +126,7 @@ import { DividerModule } from 'primeng/divider';
     @if(isForgotPasswordFlow) {
     <div class="w-full max-w-md mx-auto bg-white dark:bg-surface-900 p-6 sm:p-8 rounded-2xl shadow-lg">
       <div class="text-center mb-6">
-        <span class="text-2xl font-bold text-orange-500">SPICE STORE</span>
+        <span class="text-2xl font-bold text-orange-500">{{ storeSettingsService.current.storeName | uppercase }}</span>
         <h2 class="text-lg text-gray-500 mt-1">Forgot Password</h2>
       </div>
       <div class="space-y-4">
@@ -197,7 +198,8 @@ export class LoginComponent implements OnInit {
         private jwtHelper: JwtHelper,
         private messageService: MessageService,
         private route: ActivatedRoute,
-        private cartService: CartService
+        private cartService: CartService,
+        public storeSettingsService: StoreSettingsService
     ) {}
 
     ngOnInit() {

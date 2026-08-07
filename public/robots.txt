@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /myprofile
+Disallow: /order/
+Disallow: /wishlist
+Disallow: /auth/
+
+Sitemap: https://buenoexports.com/sitemap.xml

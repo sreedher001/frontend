@@ -1,0 +1,65 @@
+<div class="card">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold">Customers</h2>
+    <p-button icon="pi pi-refresh" label="Refresh" severity="secondary" outlined (onClick)="load()" />
+  </div>
+
+  <p-table #dt [value]="users" [loading]="loading" dataKey="id" [rowHover]="true" [paginator]="true" [rows]="15"
+    [globalFilterFields]="['username', 'email', 'phoneNumber']" responsiveLayout="scroll">
+    <ng-template pTemplate="caption">
+      <div class="flex justify-end">
+        <p-iconfield iconPosition="left">
+          <p-inputicon styleClass="pi pi-search" />
+          <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search customers..." />
+        </p-iconfield>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Username</th>
+        <th>Contact</th>
+        <th>Purchase Mode</th>
+        <th>Role</th>
+        <th>Enabled</th>
+        <th style="width: 4rem">Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-user>
+      <tr>
+        <td class="font-medium">{{ user.username }}</td>
+        <td>
+          <div class="flex flex-col text-sm">
+            <span *ngIf="user.email">{{ user.email }}</span>
+            <span *ngIf="user.phoneNumber" class="text-gray-500">{{ user.phoneNumber }}</span>
+          </div>
+        </td>
+        <td>
+          <p-tag [value]="user.preferredPurchaseType" [severity]="user.preferredPurchaseType === 'WHOLESALE' ? 'warn' : 'info'" />
+        </td>
+        <td>
+          <p-select
+            [ngModel]="primaryRole(user)"
+            (ngModelChange)="changeRole(user, $event)"
+            [options]="roleOptions"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="w-36" />
+        </td>
+        <td>
+          <p-toggleswitch [ngModel]="user.enabled" (ngModelChange)="toggleEnabled(user)" />
+        </td>
+        <td>
+          <p-button icon="pi pi-trash" severity="danger" size="small" rounded outlined (onClick)="deleteUser(user)" pTooltip="Delete" />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center py-6 text-gray-500">No customers yet.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-confirmdialog [style]="{ width: '450px' }" />
+<p-toast key="global" />

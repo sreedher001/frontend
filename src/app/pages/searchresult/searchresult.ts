@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
@@ -14,7 +14,7 @@ import { combineLatest } from 'rxjs';
 import { ProductResponse } from '@/models/product-response.model';
 import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
 import { Banner, ProductService } from '../products/product.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { JwtHelper } from '@/jwt/jwt-helper';
 import { MessageService } from 'primeng/api';
 import { Signup } from "../auth/signup/signup";
@@ -22,15 +22,23 @@ import { LoginComponent } from "../auth/login";
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { CheckboxModule } from 'primeng/checkbox';
 import { SliderModule } from 'primeng/slider';
+import { SeoService } from '@/seo/seo.service';
+import { StoreSettingsService } from '@/store-settings/store-settings.service';
+import { ResolveImagePipe } from '@/shared/resolve-image.pipe';
+import { CartService, PurchaseType } from '../cart/cart.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-searchresult',
   imports: [CardModule, CommonModule,CheckboxModule, ButtonModule, FluidModule, TagModule, FormsModule, BadgeModule, CarouselModule,
-    ChipModule, Signup, LoginComponent,RadioButtonModule,SliderModule],
+    ChipModule, Signup, LoginComponent,RadioButtonModule,SliderModule,ResolveImagePipe, RouterModule],
   templateUrl: './searchresult.html',
   styleUrl: './searchresult.scss'
 })
-export class Searchresult implements OnInit{
+export class Searchresult implements OnInit, OnDestroy {
+
+  purchaseType: PurchaseType = 'RETAIL';
+  private purchaseTypeSub!: Subscription;
 
   products: Product[] = [];
     productResponseDto!:ProductResponse;
@@ -59,20 +67,26 @@ sortOptions = [
 selectedSort = '';
 selectedSortLabel = '';
 banners: Banner[] = [];
+categoryOptions: { label: string; value: string }[] = [];
+
+  get visibleBanners(): Banner[] {
+    const mode = this.isWholesaleMode ? 'WHOLESALE' : 'RETAIL';
+    return this.banners.filter(b => (b.purchaseType || 'BOTH') === 'BOTH' || b.purchaseType === mode);
+  }
 showSort = false;
 selectedFilters:any = {
-  price: [0,10000]
+  price: [0,10000],
+  categoryName: [],
+  availability: null
 };
 searchPayload: any = {
   filters: {
-    color: [],
-    size: [],
-    subCategory: [],
-    pattern: [],
-    styleCategory: []
+    categoryName: []
   },
+  query: null,
   minPrice: 0,
   maxPrice: 10000,
+  inStock: null,
   sort: '',
   page: 0,
   size: 20
@@ -81,20 +95,35 @@ prods: any[] = [];
 urlFilters: any = {};
     constructor(private productService: ProductService,private router: Router,private jwtHelper: JwtHelper,
 
-    private messageService: MessageService,public route: ActivatedRoute
+    private messageService: MessageService,public route: ActivatedRoute,
+    private seoService: SeoService, private cartService: CartService, private storeSettingsService: StoreSettingsService
   ) { }
     ngOnInit(): void {
+
+this.seoService.update({
+  title: 'Search Results',
+  description: `Search products at ${this.storeSettingsService.current.storeName}.`
+});
+
+this.purchaseTypeSub = this.cartService.purchaseType$.subscribe(type => {
+  this.purchaseType = type;
+});
 
 this.route.queryParamMap.subscribe(paramMap => {
 
   this.urlFilters = {};
+  this.searchPayload.query = null;
 
   paramMap.keys.forEach(key => {
 
     const value = paramMap.get(key);
     if (!value) return;
 
-    this.urlFilters[key] = value.split(',');
+    if (key === 'search') {
+      this.searchPayload.query = value;
+    } else {
+      this.urlFilters[key] = value.split(',');
+    }
 
   });
 
@@ -127,7 +156,16 @@ this.route.queryParamMap.subscribe(paramMap => {
   });
 }
 
-  this.filter();
+  this.productService.getAllCategories().subscribe({
+    next: (cats) => {
+      this.categoryOptions = cats.map(c => ({ label: c.name, value: c.name }));
+      this.filter();
+    },
+    error: () => {
+      this.categoryOptions = [];
+      this.filter();
+    }
+  });
     }
     updateGridView() {
   this.gridView = window.innerWidth >= 1024 ? 4 : 1;
@@ -141,11 +179,7 @@ onResize() {
 
   // reset filters
   this.searchPayload.filters = {
-    color: [],
-    size: [],
-    subCategory: [],
-    pattern: [],
-    styleCategory: []
+    categoryName: []
   };
 
   // apply URL filters
@@ -156,11 +190,14 @@ onResize() {
   });
 
   // apply UI filters
-  Object.keys(this.selectedFilters).forEach(key => {
-    if (this.searchPayload.filters.hasOwnProperty(key)) {
-      this.searchPayload.filters[key] = this.selectedFilters[key];
-    }
-  });
+  if (this.selectedFilters.categoryName?.length) {
+    this.searchPayload.filters.categoryName = this.selectedFilters.categoryName;
+  }
+
+  this.searchPayload.inStock =
+    this.selectedFilters.availability === 'in_stock' ? true :
+    this.selectedFilters.availability === 'out_stock' ? false :
+    null;
 
 }
 applyFilters() {
@@ -216,12 +253,59 @@ searchProducts(append: boolean = false) {
 
 }
 
- 
+
     getBanners() {
    this.productService.getAllBanners().subscribe({
       next: (data) => (this.banners = data),
       error: (err) => console.error('Failed to load banners:', err)
     });
+  }
+
+  ngOnDestroy(): void {
+    this.purchaseTypeSub?.unsubscribe();
+  }
+
+  get isWholesaleMode(): boolean {
+    return this.purchaseType === 'WHOLESALE';
+  }
+
+  get breadcrumbLabel(): string {
+    const params = this.route.snapshot.queryParamMap;
+    return params.get('search') || params.get('categoryName') || 'All Products';
+  }
+
+  isWholesaleAvailable(item: any): boolean {
+    return !!item?.wholesalePrice;
+  }
+
+  /** Hides Wholesale Only items while browsing in Retail mode and vice
+   * versa, since search results come from a flat index that includes both. */
+  get visibleProds(): any[] {
+    if (this.isWholesaleMode) {
+      return this.prods.filter(p => !!p.wholesaleEnabled);
+    }
+    return this.prods.filter(p => p.retailEnabled !== false);
+  }
+
+  getDisplayPrice(item: any): number {
+    if (this.isWholesaleMode && this.isWholesaleAvailable(item)) {
+      return item.wholesalePrice;
+    }
+    return item.retailPrice;
+  }
+
+  hasDiscount(item: any): boolean {
+    return !!item?.mrp && item.mrp > item.retailPrice;
+  }
+
+  discountPercent(item: any): number {
+    if (!this.hasDiscount(item)) return 0;
+    return Math.round(((item.mrp - item.retailPrice) / item.mrp) * 100);
+  }
+
+  discountAmount(item: any): number {
+    if (!this.hasDiscount(item)) return 0;
+    return Math.round(item.mrp - item.retailPrice);
   }
   filter() {
     this.filters = [
@@ -238,37 +322,6 @@ searchProducts(append: boolean = false) {
     ]
   },
   {
-    name: 'Color',
-    key: 'color',
-    type: 'checkbox',
-    options: [
-      { label: 'Black', value: 'black', code: '#000000' },
-      { label: 'White', value: 'white', code: '#ffffff' },
-      { label: 'Blue', value: 'blue', code: '#2563eb' },
-      { label: 'Red', value: 'red', code: '#dc2626' },
-      { label: 'Green', value: 'green', code: '#16a34a' },
-      { label: 'Yellow', value: 'yellow', code: '#eab308' },
-      { label: 'Pink', value: 'pink', code: '#ec4899' },
-      { label: 'Purple', value: 'purple', code: '#7c3aed' },
-      { label: 'Gray', value: 'gray', code: '#6b7280' },
-      { label: 'Orange', value: 'orange', code: '#f97316' },
-      { label: 'Brown', value: 'brown', code: '#a0522d' }
-    ]
-  },
-  {
-    name: 'Size',
-    key: 'size',
-    type: 'checkbox',
-    options: [
-      { label: 'S', value: 'S' },
-      { label: 'M', value: 'M' },
-      { label: 'L', value: 'L' },
-      { label: 'XL', value: 'XL' },
-      { label: 'XXL', value: 'XXL' },
-      { label: 'XXXL', value: 'XXXL' },
-    ]
-  },
-  {
     name: 'Availability',
     key: 'availability',
     type: 'radio',
@@ -276,6 +329,12 @@ searchProducts(append: boolean = false) {
       { label: 'In Stock', value: 'in_stock' },
       { label: 'Out of Stock', value: 'out_stock' }
     ]
+  },
+  {
+    name: 'Product Type',
+    key: 'categoryName',
+    type: 'checkbox',
+    options: this.categoryOptions
   }
 ];
 this.activeFilter = this.filters[0]; // default to first filter
@@ -357,7 +416,7 @@ getFilterSummary(): string {
 
   }
   onCardClick(item:any){
-  this.router.navigate(['/product-details', item.variantId]);
+  this.router.navigate(['/product-details', item.variantSlug || item.variantId]);
 }
 isInWishlist(variant: any): boolean {
   return this.wishlistVariantIds.has(variant.id);
@@ -435,29 +494,6 @@ getFrontImage(product: Product): string {
 getVariantFrontImage(variant: any): string {
   const frontImage = variant.productImage?.find((img: any) => img.viewType === 'front');
   return frontImage?.imageUrl || 'assets/placeholder.jpg';
-}
-
-getVariantFinalPrice(variant: any): number {
-  const size = variant?.sizes?.[0];
-  if (!size) return 0;
-  return size.price - (size.price * (size.discountPercentage ?? 0)) / 100;
-}
-
-getVariantSavings(variant: any): string {
-  const size = variant?.sizes?.[0];
-  if (!size || !size.discountPercentage) return '';
-  const discountAmount = (size.price * size.discountPercentage) / 100;
-  return `Save ₹${discountAmount.toFixed(0)}`;
-}
-
-getBestSize(variant: any) {
-  if (!variant?.sizes?.length) return null;
-  return variant.sizes.reduce((prev:any, curr:any) =>
-    curr.price < prev.price ? curr : prev
-  );
-}
-hasDiscount(product: any): boolean {
-  return !!product.variants?.[0]?.sizes?.[0]?.discountPercentage;
 }
 
 editProduct(variant: any,event: MouseEvent) {

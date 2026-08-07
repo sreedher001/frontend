@@ -8,7 +8,7 @@
   <!-- Introduction -->
   <section class="mb-8">
     <p>
-      Welcome to <strong>ZFC </strong> (“Company”, “we”, “our”, “us”).
+      Welcome to <strong>{{ storeSettingsService.current.storeName }}</strong> (“Company”, “we”, “our”, “us”).
       By accessing or purchasing from our website, you agree to the following
       Terms, Privacy Policy, Shipping Policy, and Refund Policy.
     </p>
@@ -18,11 +18,16 @@
   <section class="mb-8">
     <h2 class="text-xl font-semibold mb-3">1. Company Information</h2>
     <ul class="list-disc pl-6 space-y-1">
-      <li>Business Name: ZFC - Zyra Fashion Curves</li>
-      <li>Registered Address: Devala-643270, Gudalur Nilgiris, Tamil Nadu, India</li>
-      <li>Email: zyrafashioncurves@gmail.com</li>
-      <li>Phone: 8270741734</li>
-      
+      <li>Business Name: {{ storeSettingsService.current.storeName }}</li>
+      @if (fullAddress) {
+      <li>Registered Address: {{ fullAddress }}</li>
+      }
+      @if (storeSettingsService.current.supportEmail) {
+      <li>Email: {{ storeSettingsService.current.supportEmail }}</li>
+      }
+      @if (storeSettingsService.current.supportPhone) {
+      <li>Phone: {{ storeSettingsService.current.supportPhone }}</li>
+      }
     </ul>
   </section>
 
@@ -42,9 +47,9 @@
     <ul class="list-disc pl-6 space-y-1">
       <li>All products are subject to availability.</li>
       <li>Prices may change without prior notice.</li>
-      <li>Product colors may vary slightly due to display differences.</li>
-      <li>Size measurements may have 1-2 cm tolerance.</li>
-      <li>Minor stitching or fabric variations may occur.</li>
+      <li>Product colors and appearance may vary slightly due to display differences.</li>
+      <li>Package weights may have minor tolerances during packing.</li>
+      <li>Natural variation in aroma, color, and texture may occur across batches due to seasonal and sourcing factors.</li>
     </ul>
   </section>
 
@@ -61,7 +66,7 @@
   </section>
 
   <!-- Shipping -->
-  <section class="mb-8">
+  <section id="delivery" class="mb-8">
     <h2 class="text-xl font-semibold mb-3">5. Shipping Policy</h2>
     <ul class="list-disc pl-6 space-y-1">
       <li>Delivery timelines are estimates and may vary.</li>
@@ -73,17 +78,19 @@
   </section>
 
   <!-- Cancellation -->
-  <section class="mb-8">
+  <section id="cancellation" class="mb-8">
     <h2 class="text-xl font-semibold mb-3">6. Cancellation Policy</h2>
     <ul class="list-disc pl-6 space-y-1">
       <li>Orders may be cancelled only before dispatch.</li>
       <li>Once shipped, cancellation is not possible.</li>
-      <li>To cancel, contact us immediately at .</li>
+      @if (storeSettingsService.current.supportEmail) {
+      <li>To cancel, contact us immediately at {{ storeSettingsService.current.supportEmail }}.</li>
+      }
     </ul>
   </section>
 
   <!-- Returns -->
-  <section class="mb-8">
+  <section id="returns" class="mb-8">
     <h2 class="text-xl font-semibold mb-3">7. Return & Refund Policy</h2>
     <ul class="list-disc pl-6 space-y-1">
       <li>Return requests must be raised within 7 days of delivery.</li>
@@ -95,7 +102,7 @@
   </section>
 
   <!-- Privacy -->
-  <section class="mb-8">
+  <section id="privacy" class="mb-8">
     <h2 class="text-xl font-semibold mb-3">8. Privacy Policy</h2>
     <p class="mb-2">
       We collect information such as name, email, phone number, shipping address,
@@ -115,7 +122,7 @@
   <section class="mb-8">
     <h2 class="text-xl font-semibold mb-3">9. Limitation of Liability</h2>
     <p>
-      ZFC shall not be liable for indirect or consequential damages,
+      {{ storeSettingsService.current.storeName }} shall not be liable for indirect or consequential damages,
       delivery delays caused by third parties, or losses beyond the order value.
     </p>
   </section>
@@ -124,9 +131,9 @@
   <section class="mb-8">
     <h2 class="text-xl font-semibold mb-3">10. Governing Law</h2>
     <p>
-      These Terms are governed by the laws of India.
+      These Terms are governed by the laws of {{ storeSettingsService.current.country }}.
       Any disputes shall be subject to the jurisdiction of courts in
-      Tamil Nadu, India.
+      {{ storeSettingsService.current.state }}, {{ storeSettingsService.current.country }}.
     </p>
   </section>
 
@@ -134,7 +141,9 @@
   <section>
     <h2 class="text-xl font-semibold mb-3">11. Grievance </h2>
     <ul class="list-disc pl-6 space-y-1">
-      <li>Email: zyrafashioncurves@gmail.com</li>
+      @if (storeSettingsService.current.supportEmail) {
+      <li>Email: {{ storeSettingsService.current.supportEmail }}</li>
+      }
       <li>Response Time: Within 48 hours</li>
       <li>Resolution Time: Within 30 days</li>
     </ul>

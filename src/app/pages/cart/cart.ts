@@ -12,7 +12,6 @@ import { Productdetails } from '../productdetails/productdetails';
 import { ProductService } from '../products/product.service';
 import { MessageService } from 'primeng/api';
 import { TagModule } from 'primeng/tag';
-import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { Router } from '@angular/router';
 import { BadgeModule } from 'primeng/badge';
 import { Message, MessageModule } from "primeng/message";
@@ -21,10 +20,11 @@ import { Signup } from "../auth/signup/signup";
 import { firstValueFrom } from 'rxjs';
 import confetti from 'canvas-confetti';
 import lottie from 'lottie-web';
+import { ResolveImagePipe } from '@/shared/resolve-image.pipe';
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [ButtonModule, CommonModule, FormsModule, BadgeModule, CardModule, DecimalPipe, TagModule, AutoCompleteModule, ButtonModule, MessageModule],
+  imports: [ButtonModule, CommonModule, FormsModule, BadgeModule, CardModule, DecimalPipe, TagModule, ButtonModule, MessageModule, ResolveImagePipe],
   templateUrl: './cart.html',
   styleUrl: './cart.scss'
 })
@@ -62,7 +62,6 @@ showCouponStamp = false;
   showCouponsPanel = true;
   showLockedCouponsPopup = false;
 
-  autoFilteredSizeValue: any[] = [];
 
   relatedProducts: Product[] = [];
 remainingTime: number = 0;
@@ -223,10 +222,6 @@ remainingTime: number = 0;
 
 
 
-  getItemLength(item: CartItemDto) {
-    return 1;
-  }
-
 
   // loadCart(): void {
   //   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
@@ -296,24 +291,6 @@ remainingTime: number = 0;
     return finalPrice * item.quantity;
   }
 
-
-  filterSize(event: AutoCompleteCompleteEvent, item: any) {
-    const query = event.query;
-    const filtered: any[] = [];
-
-    for (let i = 0; i < (item.sizeOptions as any[]).length; i++) {
-      const sizeItem = (item.sizeOptions as any[])[i];
-      if (sizeItem.size.toLowerCase().indexOf(query.toLowerCase()) == 0 && sizeItem.availableQuantity > 0) {
-        filtered.push(sizeItem);
-      }
-    }
-
-    this.autoFilteredSizeValue = filtered;
-  }
-
-  preventTyping(event: KeyboardEvent): void {
-    event.preventDefault();
-  }
 
   goToProductDetails(variantId: number): void {
     this.router.navigate(['/product-details', variantId]);
@@ -440,26 +417,12 @@ remainingTime: number = 0;
 
   increaseQuantity(item: any) {
 
-  const sizeInfo = item.sizeOptions?.find(
-    (s: any) => s.size === item.size
-  );
-
-  if (!sizeInfo) {
-    this.messageService.add({
-      key: 'global',
-      severity: 'error',
-      summary: 'Size Info Missing',
-      detail: 'Cannot find stock info',
-    });
-    return;
-  }
-
-  if (item.quantity >= sizeInfo.availableQuantity) {
+  if (item.availableQuantity != null && item.quantity >= item.availableQuantity) {
     this.messageService.add({
       key: 'global',
       severity: 'warn',
       summary: 'Stock Limit',
-      detail: `Only ${sizeInfo.availableQuantity} available`,
+      detail: `Only ${item.availableQuantity} available`,
     });
     return;
   }
@@ -534,7 +497,7 @@ remainingTime: number = 0;
   updateCartItem(item: any, newQuantity: number) {
 
   this.cartService
-    .updateCartItem(item.id, newQuantity, item.size, item.sizeId)
+    .updateCartItem(item.id, newQuantity)
     .subscribe({
       next: () => {
         this.cartService.getCart().subscribe();
@@ -542,43 +505,6 @@ remainingTime: number = 0;
       error: (err) => console.error(err)
     });
 }
-
-  onSizeChange(item: any) {
-    if (!item.selectedSizeObj) return;
-
-    const newSize = item.selectedSizeObj;
-
-    const newQuantity = 1; // always reset qty on size change
-
-    if (this.isLoggedIn) {
-      this.cartService
-        .updateCartItem(
-          item.id,              // cartItemId
-          newQuantity,
-          newSize.size,         // size string
-          newSize.id            // sizeId
-        )
-        .subscribe({
-          next: () => {
-            //  DO NOT mutate item locally
-            //  Just refresh cart from backend
-            this.cartService.getCart().subscribe();
-          },
-          error: (err) => {
-            console.error('Size update failed', err);
-            this.messageService.add({
-              key: 'global',
-              severity: 'error',
-              summary: 'Failed to update size',
-              detail: 'Please try again'
-            });
-          }
-        });
-    } else {
-      // Guest cart
-      // this.updateGuestCartSize(item, newSize);
-    }
-  }
 
   // removeFromCart(item: any): void {
   //   if (this.isLoggedIn) {
@@ -747,13 +673,6 @@ remainingTime: number = 0;
       next: (res: any) => {
 
         this.cart = res;
-
-        this.cart.items.forEach((item: any) => {
-          item.sizeOptions = item.availableSizes;
-          item.selectedSizeObj = item.sizeOptions.find(
-            (opt: any) => opt.size === item.size
-          );
-        });
 
         this.appliedCoupon = res.appliedCoupon;
         this.discount = res.discount;

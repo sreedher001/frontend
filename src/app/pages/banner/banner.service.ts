@@ -10,6 +10,7 @@ export interface Banner {
   title: string;
   redirectUrl: string;
   bannerType: string;
+  purchaseType?: string;
   uploadedAt: string;
   uploadedBy: number;
 }

@@ -45,7 +45,7 @@
                         <p-avatarGroup>
                             @for (item of order.items; track item.variantId) {
                             <p-overlay-badge [value]=item.quantity severity="contrast" class="flex">
-                                <p-avatar [image]="item.imageUrl" shape="square" size="xlarge"></p-avatar>
+                                <p-avatar [image]="item.imageUrl | resolveImage" shape="square" size="xlarge"></p-avatar>
                             </p-overlay-badge>
                             }
 
@@ -96,7 +96,7 @@
                     <p-avatarGroup>
                         @for (item of order.items; track item.variantId) {
                         <p-overlay-badge [value]=item.quantity severity="contrast" class="inline-flex">
-                            <p-avatar [image]="item.imageUrl" shape="square" size="xlarge" (click)="goToProductDetails(item.variantId)"></p-avatar>
+                            <p-avatar [image]="item.imageUrl | resolveImage" shape="square" size="xlarge" (click)="goToProductDetails(item.variantId)"></p-avatar>
                         </p-overlay-badge>
                         }
 
@@ -246,7 +246,8 @@
 
           <div class="flex items-center gap-3">
             <img
-              [src]="item.imageUrl"
+              [src]="item.imageUrl | resolveImage"
+              [alt]="item.productName"
               class="w-12 h-12 rounded-md object-cover"
             />
             <div>

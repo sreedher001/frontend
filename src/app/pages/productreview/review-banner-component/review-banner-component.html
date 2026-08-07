@@ -17,7 +17,8 @@
   <!-- Left -->
   <div class="flex items-center gap-2 min-w-0">
     <img
-      [src]="pending[0].imageUrl"
+      [src]="pending[0].imageUrl | resolveImage"
+      [alt]="pending[0].productName"
       class="w-12 h-12 rounded-md object-cover "
     />
 

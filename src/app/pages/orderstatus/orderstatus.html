@@ -1,5 +1,5 @@
 <!-- Make sure you're not loading -->
-@if (!loading) {
+@if (!loading && order) {
   <p-card class="order-card mt-10">
     <h2>Order #{{ order.orderNumber }}</h2>
     <p><strong>Order Date:</strong> {{ order.orderDate | date: 'dd MMM yyyy, hh:mm a' }}</p>
@@ -139,7 +139,7 @@
       <ng-template pTemplate="body" let-item>
         <tr>
           <td>
-            <img [src]="item.imageUrl" alt="{{ item.productName }}"
+            <img [src]="item.imageUrl | resolveImage" alt="{{ item.productName }}"
               style="height: 50px; width: 50px; object-fit: contain; margin-right: 8px" />
             {{ item.productName }}
           </td>
@@ -170,6 +170,15 @@
       </ng-template>
     </p-table>
   </p-card>
+} @else {
+  <div class="flex flex-col items-center justify-center py-24 px-4 text-center">
+    @if (errorMessage) {
+      <i class="pi pi-exclamation-circle text-4xl text-orange-500 mb-4"></i>
+      <p class="text-lg font-semibold text-gray-700">{{ errorMessage }}</p>
+    } @else {
+      <i class="pi pi-spin pi-spinner text-4xl text-gray-400"></i>
+    }
+  </div>
 }
 
 

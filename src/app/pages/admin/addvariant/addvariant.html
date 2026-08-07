@@ -109,6 +109,16 @@
           </p-floatlabel>
         </div>
 
+        <!-- MRP -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <p-floatlabel variant="on">
+            <p-inputnumber [(ngModel)]="variant.mrp" name="mrp" mode="decimal"
+              [minFractionDigits]="2" [min]="0" inputId="mrp" class="w-full" />
+            <label for="mrp">MRP / Original Price (optional)</label>
+          </p-floatlabel>
+          <p class="text-xs text-gray-400 mt-1">Set higher than Retail Price to show a strikethrough discount.</p>
+        </div>
+
         <!-- Wholesale Price -->
         <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
           <p-floatlabel variant="on">
@@ -118,10 +128,10 @@
           </p-floatlabel>
         </div>
 
-        <!-- Wholesale Enabled -->
-        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 flex items-center">
-          <p-checkbox [(ngModel)]="variant.wholesaleEnabled" name="wholesaleEnabled" binary="true" inputId="wholesaleEnabled"></p-checkbox>
-          <label for="wholesaleEnabled" class="ml-2">Wholesale Enabled</label>
+        <!-- Availability -->
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
+          <label class="block mb-1 text-sm text-gray-600">Availability *</label>
+          <p-select [(ngModel)]="variant.availability" name="availability" [options]="availabilityOptions" optionLabel="label" optionValue="value" class="w-full"></p-select>
         </div>
 
         <!-- Min Wholesale Qty -->
@@ -176,11 +186,9 @@
       <!-- Variant Description -->
       <div class="flex flex-wrap w-full">
         <div class="w-full sm:w-1/2 px-2 mb-4">
-          <p-floatlabel variant="on">
-            <textarea pTextarea id="variantDescription" name="variantDescription"
-              [(ngModel)]="variant.variantDescription" [autoResize]="true" rows="3" class="w-full"></textarea>
-            <label for="variantDescription">Variant Description</label>
-          </p-floatlabel>
+          <label class="block text-sm font-medium mb-1" for="variantDescription">Variant Description</label>
+          <textarea pTextarea id="variantDescription" name="variantDescription"
+            [(ngModel)]="variant.variantDescription" [autoResize]="true" rows="3" class="w-full"></textarea>
         </div>
       </div>
     </div>
@@ -194,12 +202,13 @@
       </h5>
 
       <p-fileupload name="files[]" (onSelect)="onFileSelect($event)" (onRemove)="onFileRemove($event)"
-        (onClear)="onClearFiles()" [multiple]="true" accept="image/*" maxFileSize="1000000"
+        (onClear)="onClearFiles()" [multiple]="true" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" maxFileSize="1000000"
         mode="advanced" styleClass="w-full" chooseLabel="Choose"
         [showUploadButton]="false" [showCancelButton]="false">
         <ng-template pTemplate="file"></ng-template>
         <ng-template pTemplate="content"></ng-template>
       </p-fileupload>
+      <p class="text-xs text-gray-400 mt-1">JPG, PNG, or WEBP, up to 1MB each</p>
 
       <div *ngIf="uploadedFiles.length" class="flex flex-col lg:flex-row gap-6 mt-4">
         <!-- Front Image -->

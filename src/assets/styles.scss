@@ -4,6 +4,33 @@
 @use 'primeicons/primeicons.css';
 @use './demo/demo.scss';
 
+/* Keep global toasts below the fixed topbar instead of overlapping it */
+.app-global-toast.p-toast-top-center {
+  top: 4.5rem !important;
+}
+
+/* Premium editorial serif for brand wordmarks and display text */
+.brand-font {
+  font-family: 'Fraunces', 'Lato', serif;
+  letter-spacing: 0.01em;
+}
+
+/*
+ * The primary brand color is no longer hardcoded here. It's persisted in
+ * Store Settings (StoreSettings.primaryColor) and applied at runtime via
+ * StoreSettingsService.applyPrimaryColor() - once on app bootstrap (see
+ * app.config.ts's provideAppInitializer), and again whenever an admin
+ * changes it from the Store Settings page or the topbar color picker.
+ * A static !important override here would permanently block both.
+ */
+
+/* Smoother, more premium interaction feel across cards, buttons, and links */
+a,
+button,
+.p-button {
+  transition: box-shadow 0.25s ease, transform 0.25s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
 :host ::ng-deep .custom-cart-btn.p-button {
   font-size: 0.75rem;        /* text-xs */
   padding: 0.25rem 0.75rem;  /* px-3 py-1 */
@@ -35,38 +62,8 @@
   }
 }
 
-@font-face {
-  font-family: 'Dune Rise';
-  src: url('/assets/fonts/dune-rise/Dune_Rise.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-.my-title {
-  font-family: 'Dune Rise', serif;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #000;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  background: linear-gradient(to right, #000, #000);
-  -webkit-background-clip: text;
-  display: inline-block;
-}
-
-
-.dune-font {
-  font-family: 'Dune Rise';
-  font-size: small;
-}
-
-.dune-font-large {
-  font-family: 'Dune Rise';
-  font-size: large;
-}
-
 body {
-    
+    font-family: 'Fraunces', 'Lato', serif;
     background-color: #ffffff;
 }
 

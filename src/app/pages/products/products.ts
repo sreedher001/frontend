@@ -1,6 +1,7 @@
 import { Product } from '@/models/product.model';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Injectable, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, Injectable, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { Carousel, CarouselModule } from 'primeng/carousel';
@@ -14,7 +15,6 @@ import { MessageService } from 'primeng/api';
 import { Rating } from 'primeng/rating';
 import { FormsModule } from '@angular/forms';
 import { BadgeModule } from 'primeng/badge';
-import { Tooltip } from 'primeng/tooltip';
 import { ProductResponse } from '@/models/product-response.model';
 import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
 import { ChipModule } from 'primeng/chip';
@@ -22,22 +22,27 @@ import { Signup } from "../auth/signup/signup";
 import {  LoginComponent } from "../auth/login";
 import { ReviewBannerComponent } from "../productreview/review-banner-component/review-banner-component";
 import { MOOD_CONFIG } from './mood-config';
-import { COLLECTION_CONFIG } from './collection-config';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ReelService } from '../admin/reel-component/reel.service';
+import { ProductCard } from './product-card/product-card';
+import { SeoService } from '@/seo/seo.service';
+import { StoreSettingsService } from '@/store-settings/store-settings.service';
+import { CommonService } from '@/layout/service/common';
 
 @Component({
   selector: 'app-products',
-  imports: [CardModule, CommonModule, ButtonModule, FluidModule, TagModule, FormsModule, BadgeModule, Tooltip, CarouselModule,
-    ChipModule, Signup, LoginComponent, ReviewBannerComponent],
+  imports: [CardModule, CommonModule, ButtonModule, FluidModule, TagModule, FormsModule, BadgeModule, CarouselModule,
+    ChipModule, Signup, LoginComponent, ReviewBannerComponent, ProductCard],
   templateUrl: './products.html',
   styleUrl: './products.scss'
 })
 @Injectable({
   providedIn: 'root' 
 })
-export class Products implements OnInit {
-  @ViewChild('collectionContainer') collectionContainer!: ElementRef;
+export class Products implements OnInit, OnDestroy {
+  isWholesaleMode = false;
+  private purchaseTypeSub!: Subscription;
+
   showSizes = false;
 selectedSize: any = null; selectedVariant: any;
  showAiAssistant = false;
@@ -45,6 +50,20 @@ selectedSize: any = null; selectedVariant: any;
   userInput = '';
   chatMessages: any[] = [];
 banners: Banner[] = [];
+bestSellers: Product[] = [];
+
+  get visibleBanners(): Banner[] {
+    const mode = this.isWholesaleMode ? 'WHOLESALE' : 'RETAIL';
+    return this.banners.filter(b => (b.purchaseType || 'BOTH') === 'BOTH' || b.purchaseType === mode);
+  }
+
+  /** A variant only shows in the storefront section matching the customer's
+   * current mode - e.g. a Wholesale Only product never appears while
+   * browsing in Retail mode, and vice versa. */
+  isAvailableInMode(variant: any): boolean {
+    if (this.isWholesaleMode) return !!variant.wholesaleEnabled;
+    return variant.retailEnabled !== false;
+  }
   aiSuggestions = [
   '💍 Wedding Guest',
   '🎉 Festive Party',
@@ -84,7 +103,6 @@ lastPage: boolean = false;
 showWearSections = false;
 private aiIndex = 0;
 moods = MOOD_CONFIG;
-collections = COLLECTION_CONFIG;
 
 reels: any[] = [];
 activeIndex = 0;
@@ -95,8 +113,16 @@ activeIndex = 0;
 @ViewChildren('videoPlayer') fullVideos!: QueryList<ElementRef<HTMLVideoElement>>;
   constructor(private productService: ProductService,private router: Router,private jwtHelper: JwtHelper,
      private cartService: CartService, private reelService: ReelService,
-    private messageService: MessageService,private route: ActivatedRoute
+    private messageService: MessageService,private route: ActivatedRoute,
+    private seoService: SeoService,
+    public storeSettingsService: StoreSettingsService
   ) {
+  }
+
+  commonService = new CommonService();
+
+  resolveImageUrl(path: string): string {
+    return this.commonService.resolveImageUrl(path);
   }
   ngAfterViewInit() {
 
@@ -107,7 +133,15 @@ activeIndex = 0;
 
 }
   ngOnInit(): void {
+this.seoService.update({
+  title: 'Shop Authentic Spices, Tea, Coffee & Dry Fruits',
+  description: 'Browse retail and wholesale spices, masalas, tea, coffee, dry fruits, and herbs sourced directly from trusted growers across India.'
+});
+this.purchaseTypeSub = this.cartService.purchaseType$.subscribe(type => {
+  this.isWholesaleMode = type === 'WHOLESALE';
+});
 this.getBanners();
+    this.getBestSellers();
     this.startTaglineRotation();
 
 if(localStorage.getItem("isLoggedIn")==="true"){
@@ -161,6 +195,11 @@ if(localStorage.getItem("isLoggedIn")==="true"){
   this.loadReels();
 
   }
+
+  ngOnDestroy(): void {
+    this.purchaseTypeSub?.unsubscribe();
+  }
+
   loadReels() {
 
   this.reelService.getAllReels().subscribe({
@@ -175,15 +214,6 @@ if(localStorage.getItem("isLoggedIn")==="true"){
     },
     error: (err) => {
       console.error("Failed to load reels", err);
-    }
-  });
-
-}
-  openCollection(collection: any) {
-
-  this.router.navigate(['/search'], {
-    queryParams: {
-      [collection.filterKey]: collection.filterValue
     }
   });
 
@@ -370,6 +400,35 @@ addToCart() {
   this.closeSizes();
 }
 
+quickAdd(variant: ProductVariantResponseDto, event: Event) {
+  event.stopPropagation();
+
+  const payload = {
+    variantId: variant.id,
+    quantity: 1,
+    purchaseType: this.cartService.getPurchaseType(),
+  };
+
+  this.cartService.addToCart(payload).subscribe({
+    next: () => {
+      this.messageService.add({
+        key: 'global',
+        severity: 'success',
+        summary: 'Added to Bag',
+        detail: `${variant.variantName} added successfully`
+      });
+    },
+    error: () => {
+      this.messageService.add({
+        key: 'global',
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to add item'
+      });
+    }
+  });
+}
+
 getStartingPrice(variant: any): number {
   return variant?.retailPrice || 0;
 }
@@ -378,6 +437,13 @@ getStartingPrice(variant: any): number {
    this.productService.getAllBanners().subscribe({
       next: (data) => (this.banners = data),
       error: (err) => console.error('Failed to load banners:', err)
+    });
+  }
+
+  getBestSellers() {
+    this.productService.getBestSellers(8).subscribe({
+      next: (data) => (this.bestSellers = data),
+      error: (err) => console.error('Failed to load best sellers:', err)
     });
   }
 
@@ -538,7 +604,7 @@ handleLoginSuccess($event:any) {
     return 'assets/no-image.png'; // fallback if no front image found
   }
   onCardClick(product:Product,variant:ProductVariantResponseDto) {
-  this.router.navigate(['/product-details',variant.id]);
+  this.router.navigate(['/product-details', variant.slug || variant.id]);
   this.fetchProducts();
 }
   buyNow(product: Product): void {
@@ -809,9 +875,7 @@ selectSuggestion(text: string) {
 // }
 
 goCategory() {
-  this.collectionContainer.nativeElement.scrollIntoView({
-    behavior: 'smooth'
-  });
+  this.router.navigate(['/category']);
 }
 
 openReel(index: number) {

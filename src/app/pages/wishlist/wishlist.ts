@@ -8,6 +8,7 @@ import { WishlistService } from './wishlist.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ProductService } from '../products/product.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ResolveImagePipe } from '@/shared/resolve-image.pipe';
 
 
 interface WishlistItem {
@@ -20,7 +21,7 @@ interface WishlistItem {
 }
 @Component({
   selector: 'app-wishlist',
-  imports: [AvatarModule, CardModule, CommonModule,ButtonModule,ConfirmDialogModule],
+  imports: [AvatarModule, CardModule, CommonModule,ButtonModule,ConfirmDialogModule,ResolveImagePipe],
   templateUrl: './wishlist.html',
   styleUrl: './wishlist.scss'
 })

@@ -1,0 +1,164 @@
+<div class="card">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold">Store Settings</h2>
+    <p-button label="Save Changes" icon="pi pi-check" [loading]="saving" (onClick)="save()" />
+  </div>
+
+  <p class="text-sm text-gray-500 mb-6">
+    These details drive the storefront branding, contact info, and SEO tags across the site. No code changes needed - update them here.
+  </p>
+
+  <div class="flex flex-col gap-6" *ngIf="!loading">
+
+    <!-- Branding -->
+    <section>
+      <h3 class="text-base font-semibold mb-3">Branding</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Store Name *</label>
+          <input pInputText [(ngModel)]="form.storeName" name="storeName" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Tagline</label>
+          <input pInputText [(ngModel)]="form.tagline" name="tagline" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Logo</label>
+          <div class="flex items-center gap-3">
+            @if(form.logoUrl){
+            <img [src]="form.logoUrl | resolveImage" alt="Logo preview" class="w-14 h-14 object-contain border rounded bg-white" />
+            }
+            <label class="px-3 py-2 border rounded cursor-pointer text-sm hover:bg-gray-50 flex items-center gap-2">
+              <i class="pi" [ngClass]="uploadingLogo ? 'pi-spin pi-spinner' : 'pi-upload'"></i>
+              {{ uploadingLogo ? 'Uploading...' : 'Upload Logo' }}
+              <input type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                class="hidden" [disabled]="uploadingLogo" (change)="onLogoSelected($event)" />
+            </label>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">Recommended: 512×512px, square, PNG or WebP (WebP gives the smallest file size). Keep under 200KB for fast loading.</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Favicon</label>
+          <div class="flex items-center gap-3">
+            @if(form.faviconUrl){
+            <img [src]="form.faviconUrl | resolveImage" alt="Favicon preview" class="w-8 h-8 object-contain border rounded bg-white" />
+            }
+            <label class="px-3 py-2 border rounded cursor-pointer text-sm hover:bg-gray-50 flex items-center gap-2">
+              <i class="pi" [ngClass]="uploadingFavicon ? 'pi-spin pi-spinner' : 'pi-upload'"></i>
+              {{ uploadingFavicon ? 'Uploading...' : 'Upload Favicon' }}
+              <input type="file" accept=".png,.webp,image/png,image/webp"
+                class="hidden" [disabled]="uploadingFavicon" (change)="onFaviconSelected($event)" />
+            </label>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">Recommended: 32×32px or 64×64px, square, PNG or WebP.</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Currency Symbol</label>
+          <input pInputText [(ngModel)]="form.currencySymbol" name="currencySymbol" class="w-full" placeholder="₹" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Brand Color</label>
+          <div class="flex items-center gap-2">
+            <input type="color" [(ngModel)]="form.primaryColor" name="primaryColor" class="w-10 h-10 p-0 border rounded cursor-pointer" />
+            <input pInputText [(ngModel)]="form.primaryColor" name="primaryColorHex" class="w-full" placeholder="#c2410c" />
+          </div>
+          <p class="text-xs text-gray-400 mt-1">Used as the primary color across buttons, links, and highlights site-wide.</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <label class="block text-sm font-medium mb-1">About Description</label>
+        <textarea pTextarea [(ngModel)]="form.aboutDescription" name="aboutDescription" rows="4" class="w-full"></textarea>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section>
+      <h3 class="text-base font-semibold mb-3">Contact</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Support Email</label>
+          <input pInputText [(ngModel)]="form.supportEmail" name="supportEmail" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Support Phone</label>
+          <input pInputText [(ngModel)]="form.supportPhone" name="supportPhone" class="w-full" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Address -->
+    <section>
+      <h3 class="text-base font-semibold mb-3">Address</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium mb-1">Address Line</label>
+          <input pInputText [(ngModel)]="form.addressLine" name="addressLine" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">City</label>
+          <input pInputText [(ngModel)]="form.city" name="city" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">State</label>
+          <input pInputText [(ngModel)]="form.state" name="state" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Country</label>
+          <input pInputText [(ngModel)]="form.country" name="country" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Postal Code</label>
+          <input pInputText [(ngModel)]="form.postalCode" name="postalCode" class="w-full" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Social -->
+    <section>
+      <h3 class="text-base font-semibold mb-3">Social Links</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Instagram URL</label>
+          <input pInputText [(ngModel)]="form.instagramUrl" name="instagramUrl" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Facebook URL</label>
+          <input pInputText [(ngModel)]="form.facebookUrl" name="facebookUrl" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Twitter / X URL</label>
+          <input pInputText [(ngModel)]="form.twitterUrl" name="twitterUrl" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">LinkedIn URL</label>
+          <input pInputText [(ngModel)]="form.linkedinUrl" name="linkedinUrl" class="w-full" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium mb-1">Website Domain</label>
+          <input pInputText [(ngModel)]="form.websiteDomain" name="websiteDomain" class="w-full" placeholder="https://example.com" />
+        </div>
+      </div>
+    </section>
+
+    <!-- SEO -->
+    <section>
+      <h3 class="text-base font-semibold mb-3">SEO Defaults</h3>
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">SEO Title</label>
+          <input pInputText [(ngModel)]="form.seoTitle" name="seoTitle" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">SEO Description</label>
+          <textarea pTextarea [(ngModel)]="form.seoDescription" name="seoDescription" rows="3" class="w-full"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <div class="flex justify-end">
+      <p-button label="Save Changes" icon="pi pi-check" [loading]="saving" (onClick)="save()" />
+    </div>
+  </div>
+</div>
+
+<p-toast key="global" />

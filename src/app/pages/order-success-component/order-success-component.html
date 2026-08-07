@@ -74,7 +74,8 @@
 
       <img
         *ngIf="item.imageUrl"
-        [src]="item.imageUrl"
+        [src]="item.imageUrl | resolveImage"
+        [alt]="item.productName"
         class="w-12 h-12 rounded object-cover"
       />
 

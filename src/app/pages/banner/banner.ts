@@ -11,11 +11,16 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { BannerService, Banner } from './banner.service';
 import { ConfirmDialog } from "primeng/confirmdialog";
+import { isAllowedImageFile } from '@/shared/image-validation';
+import { CommonService } from '@/layout/service/common';
+import { TooltipModule } from 'primeng/tooltip';
+import { SelectModule } from 'primeng/select';
 
 export interface BannerUploadDto {
   title: string;
   redirectUrl: string;
   bannerType: string;
+  purchaseType: string;
 }
 
 @Component({
@@ -31,7 +36,9 @@ export interface BannerUploadDto {
     DialogModule,
     InputTextModule,
     ToastModule,
-    ConfirmDialog
+    ConfirmDialog,
+    TooltipModule,
+    SelectModule
 ],
   providers: [MessageService],
   templateUrl: './banner.html',
@@ -39,19 +46,32 @@ export interface BannerUploadDto {
 })
 export class BannerComponent implements OnInit {
   banners: Banner[] = [];
+  showGuidelines = true;
   displayDialog = false;
   selectedFiles: File[] = [];
   selectedBannerId: number | null = null;
-  bannerForm: BannerUploadDto = { title: '', redirectUrl: '', bannerType: '' };
+  bannerForm: BannerUploadDto = { title: '', redirectUrl: '', bannerType: '', purchaseType: 'BOTH' };
 
   // Autocomplete fields
   bannerTypes = ['Homepage', 'Offer', 'Festival'];
   filteredBannerTypes: string[] = [];
 
+  purchaseTypeOptions = [
+    { label: 'Both (Retail & Wholesale)', value: 'BOTH' },
+    { label: 'Retail Only', value: 'RETAIL' },
+    { label: 'Wholesale Only', value: 'WHOLESALE' }
+  ];
+
+  commonService = new CommonService();
+
   constructor(
     private bannerService: BannerService,
     private messageService: MessageService,private confirmationService: ConfirmationService
   ) {}
+
+  resolveImageUrl(path: string): string {
+    return this.commonService.resolveImageUrl(path);
+  }
 
   ngOnInit(): void {
     this.loadBanners();
@@ -68,14 +88,27 @@ export class BannerComponent implements OnInit {
   //  Open Add Banner dialog
   openNew() {
     this.selectedBannerId = null;
-    this.bannerForm = { title: '', redirectUrl: '', bannerType: '' };
+    this.bannerForm = { title: '', redirectUrl: '', bannerType: '', purchaseType: 'BOTH' };
     this.selectedFiles = [];
     this.displayDialog = true;
   }
 
   //  File select handler
   onFileSelect(event: any) {
-    this.selectedFiles = Array.from(event.target.files);
+    const files: File[] = Array.from(event.target.files);
+    const valid = files.filter(isAllowedImageFile);
+    const rejected = files.filter(f => !isAllowedImageFile(f));
+
+    if (rejected.length) {
+      this.messageService.add({
+        key: 'global',
+        severity: 'warn',
+        summary: 'Unsupported file',
+        detail: `${rejected.map(f => f.name).join(', ')} isn't JPG, PNG, or WEBP`
+      });
+    }
+
+    this.selectedFiles = valid;
   }
 
   //  Filter banner types for autocomplete
@@ -168,6 +201,7 @@ export class BannerComponent implements OnInit {
       title: banner.title,
       redirectUrl: banner.redirectUrl,
       bannerType: banner.bannerType,
+      purchaseType: banner.purchaseType || 'BOTH',
     };
     this.displayDialog = true;
   }

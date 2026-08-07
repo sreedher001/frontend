@@ -2,9 +2,10 @@
 
 <p-toolbar class="mb-6 mt-12">
   <ng-template #start>
-    <div class="flex gap-2">
+    <div class="flex gap-2 items-center flex-wrap">
       <p-button label="Add Product" icon="pi pi-plus" severity="contrast" (onClick)="openNew()" />
       <p-button label="Import Excel" icon="pi pi-file-excel" severity="secondary" outlined (onClick)="openExcelImport()" />
+      <p-select [(ngModel)]="availabilityFilter" [options]="availabilityOptions" optionLabel="label" optionValue="value" class="w-52" />
     </div>
   </ng-template>
   <ng-template #end>
@@ -15,12 +16,12 @@
   </ng-template>
 </p-toolbar>
 
-<p-table #dt [value]="flattenedProducts" [paginator]="false" [rowHover]="true" dataKey="variantId"
+<p-table #dt [value]="displayedProducts" [paginator]="false" [rowHover]="true" dataKey="variantId"
   [globalFilterFields]="['name', 'sku', 'weight']" [tableStyle]="{ 'min-width': '70rem' }">
   <ng-template #caption>
     <div class="flex items-center justify-between">
       <h5 class="m-0">Manage Products</h5>
-      <span class="text-sm text-gray-500">{{ flattenedProducts.length }} variant(s) shown</span>
+      <span class="text-sm text-gray-500">{{ displayedProducts.length }} variant(s) shown</span>
     </div>
   </ng-template>
 
@@ -33,6 +34,7 @@
       <th>SKU</th>
       <th>Retail Price</th>
       <th>Wholesale Price</th>
+      <th>Availability</th>
       <th>Status</th>
       <th style="min-width: 12rem">Actions</th>
     </tr>
@@ -51,6 +53,7 @@
       <td><code class="text-xs bg-gray-100 px-1 py-0.5 rounded">{{ item.sku }}</code></td>
       <td>&#8377;{{ item.retailPrice | number:'1.2-2' }}</td>
       <td>&#8377;{{ item.wholesalePrice | number:'1.2-2' }}</td>
+      <td><p-tag [value]="availabilityLabel(item)" [severity]="availabilitySeverity(item)" /></td>
       <td><p-tag [value]="item.status" [severity]="getSeverity(item.status)" /></td>
       <td>
         <div class="flex gap-1">

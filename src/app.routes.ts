@@ -39,9 +39,12 @@ import { PromotionForm } from '@/pages/admin/promotions/promotion-form/promotion
 import { ShippingRules } from '@/pages/admin/shipping-rules/shipping-rules';
 import { ShippingRuleFormComponent } from '@/pages/admin/shipping-rules/shipping-rule-form-component/shipping-rule-form-component';
 import { ReelComponent } from '@/pages/admin/reel-component/reel-component';
+import { AdminCategories } from '@/pages/admin/admin-categories/admin-categories';
+import { AdminUsers } from '@/pages/admin/admin-users/admin-users';
 import { Otpauth } from '@/pages/auth/otpauth/otpauth';
 import { LoginComponent } from '@/pages/auth/login';
 import { OrderSuccessComponent } from '@/pages/order-success-component/order-success-component';
+import { AdminStoreSettings } from '@/pages/admin/admin-store-settings/admin-store-settings';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -49,7 +52,7 @@ export const appRoutes: Routes = [
         children: [
             { path: 'admin/dashboard', component: Dashboard, canActivate: [AuthGuard] },
             { path: '', component: Products },
-           // { path: 'products', component: Products },
+            { path: 'products', component: Products },
             { path: 'product-details/:id', component: Productdetails },
             { path: 'admin/products/edit', component: EditVariant, canActivate: [AuthGuard] },
             { path: 'admin/products/add', component: Addproduct, canActivate: [AuthGuard] },
@@ -59,6 +62,9 @@ export const appRoutes: Routes = [
             { path: 'wishlist', component: Wishlist },
             { path: 'myprofile', component: Profile },
             { path: 'admin/banner', component: BannerComponent },
+            { path: 'admin/categories', component: AdminCategories, canActivate: [AuthGuard] },
+            { path: 'admin/customers', component: AdminUsers, canActivate: [AuthGuard] },
+            { path: 'admin/store-settings', component: AdminStoreSettings, canActivate: [AuthGuard] },
             { path: 'search', component: Searchresult },
             { path: 'admin/orders', component: Adminorder, canActivate: [AuthGuard] },
             { path: 'admin/invoice', component: Invoice, canActivate: [AuthGuard] },

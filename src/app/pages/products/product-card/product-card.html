@@ -1,0 +1,91 @@
+<div
+  class="group relative flex flex-col w-full bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+  (click)="open.emit()">
+
+  @if (isAdmin) {
+  <div class="absolute top-2 right-2 flex gap-1 z-10">
+    <p-button pTooltip="Edit" icon="pi pi-pencil" severity="info" size="small" rounded outlined
+      (onClick)="edit.emit($event); $event.stopPropagation()"></p-button>
+    <p-button pTooltip="Delete" icon="pi pi-trash" severity="danger" size="small" rounded outlined
+      (onClick)="remove.emit($event); $event.stopPropagation()"></p-button>
+  </div>
+  } @else {
+  <p-button
+    [icon]="inWishlist ? 'pi pi-heart-fill' : 'pi pi-heart'"
+    [severity]="inWishlist ? 'danger' : 'secondary'"
+    [raised]="inWishlist"
+    rounded size="small"
+    class="absolute top-2 right-2 z-10"
+    [pTooltip]="inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'" tooltipPosition="left"
+    (onClick)="wishlistToggle.emit($event); $event.stopPropagation()">
+  </p-button>
+  }
+
+  <div class="relative w-full aspect-square bg-gray-50 overflow-hidden">
+    <img [src]="image" [alt]="variant.variantName" loading="lazy"
+      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+    @if (isWholesaleMode && isWholesaleAvailable) {
+    <span class="absolute top-2 left-2 bg-[var(--p-primary-color)] text-white text-[10px] font-semibold tracking-wide px-2 py-0.5 rounded-full">
+      WHOLESALE
+    </span>
+    }
+    @if (hasDiscount) {
+    <span class="absolute top-2 left-2 bg-green-600 text-white text-[10px] font-semibold tracking-wide px-2 py-0.5 rounded-full">
+      {{ discountPercent }}% OFF
+    </span>
+    }
+  </div>
+
+  <div class="flex flex-col gap-1 p-3">
+    <p class="text-sm font-medium text-gray-800 truncate" [title]="product.name">{{ product.name }}</p>
+
+    <div class="flex items-center justify-between h-4">
+      <span class="text-xs text-gray-500">{{ packLabel }}</span>
+      @if (variant.rating) {
+      <span class="flex items-center gap-1 text-xs text-gray-600">
+        <i class="pi pi-star-fill text-yellow-500" style="font-size: 10px;"></i>
+        {{ variant.rating }}
+      </span>
+      }
+    </div>
+
+    @if (isWholesaleMode && isWholesaleAvailable) {
+    <div class="flex items-baseline gap-1">
+      <span class="text-base font-bold text-gray-900">₹{{ displayPrice | number:'1.0-0' }}</span>
+      <span class="text-[10px] text-gray-500">/ unit</span>
+    </div>
+    @if (variant.minWholesaleQuantity) {
+    <span class="text-[11px] text-gray-500">Min. order: {{ variant.minWholesaleQuantity }} units</span>
+    }
+    } @else if (isWholesaleMode && !isWholesaleAvailable) {
+    <span class="text-base font-bold text-gray-900">Price on Request</span>
+    <span class="text-[11px] text-gray-500">Contact us for wholesale pricing</span>
+    } @else {
+    <div class="flex items-baseline gap-1.5 flex-wrap">
+      <span class="text-base font-bold text-gray-900">₹{{ displayPrice | number:'1.0-0' }}</span>
+      @if (hasDiscount) {
+      <span class="text-xs text-gray-400 line-through">₹{{ variant.mrp | number:'1.0-0' }}</span>
+      <span class="text-xs font-bold text-green-600">₹{{ discountAmount | number:'1.0-0' }} OFF</span>
+      }
+    </div>
+    }
+
+    @if (isWholesaleMode && !isWholesaleAvailable) {
+    <button
+      class="mt-1 w-full py-2 rounded-lg border border-gray-300 text-xs font-semibold tracking-wide
+             text-gray-400 cursor-not-allowed flex items-center justify-center gap-2"
+      pTooltip="Not available for wholesale purchase" tooltipPosition="top"
+      disabled
+      (click)="$event.stopPropagation()">
+      <i class="pi pi-shopping-bag"></i> ADD
+    </button>
+    } @else {
+    <button
+      class="mt-1 w-full py-2 rounded-lg border border-[var(--p-primary-color)] text-xs font-semibold tracking-wide
+             text-[var(--p-primary-color)] hover:bg-[var(--p-primary-color)] hover:text-white transition-colors flex items-center justify-center gap-2"
+      (click)="add.emit($event); $event.stopPropagation()">
+      <i class="pi pi-shopping-bag"></i> ADD
+    </button>
+    }
+  </div>
+</div>

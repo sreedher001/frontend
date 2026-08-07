@@ -3,7 +3,8 @@
   <!-- Product Info -->
   <div class="flex items-center gap-4">
     <img
-      [src]="data.imageUrl"
+      [src]="data.imageUrl | resolveImage"
+      [alt]="data.productName"
       class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-gray-200"
     />
 

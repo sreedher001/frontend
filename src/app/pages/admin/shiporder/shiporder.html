@@ -25,17 +25,15 @@
 
      <!-- Comment: Full Width -->
 <div class=" mb-4">
-  <p-floatlabel variant="on">
-    <textarea 
-      pTextarea required
-      id="comment" 
-      name="comment" 
-      [(ngModel)]="shippingDto.comment" 
-      class="w-full" 
-      rows="3"
-    ></textarea>
-    <label for="comment">Comment about the parcel*</label>
-  </p-floatlabel>
+  <label class="block text-sm font-medium mb-1" for="comment">Comment about the parcel*</label>
+  <textarea
+    pTextarea required
+    id="comment"
+    name="comment"
+    [(ngModel)]="shippingDto.comment"
+    class="w-full"
+    rows="3"
+  ></textarea>
 </div>
 
 

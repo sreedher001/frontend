@@ -16,6 +16,10 @@ import { MessageService, TreeNode } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../products/product.service';
 import { Addproductservice } from '../admin/addproduct/addproductservice';
+import { isAllowedImageFile } from '@/shared/image-validation';
+import { CommonService } from '@/layout/service/common';
+
+type Availability = 'retail' | 'wholesale' | 'both';
 
 interface VariantRow {
   id?: number;
@@ -25,8 +29,9 @@ interface VariantRow {
   sku: string;
   barcode: string;
   retailPrice: number;
+  mrp: number | null;
   wholesalePrice: number;
-  wholesaleEnabled: boolean;
+  availability: Availability;
   minWholesaleQuantity: number | null;
   wholesaleDiscount: number | null;
   availableQuantity: number;
@@ -67,6 +72,12 @@ export class EditVariant implements OnInit {
     { label: 'Boxes', value: 'boxes' }
   ];
 
+  availabilityOptions = [
+    { label: 'Retail Only', value: 'retail' },
+    { label: 'Wholesale Only', value: 'wholesale' },
+    { label: 'Both (Retail & Wholesale)', value: 'both' }
+  ];
+
   product: any = {
     name: '',
     shortDescription: '',
@@ -83,6 +94,7 @@ export class EditVariant implements OnInit {
   };
 
   variants: VariantRow[] = [];
+  private commonService = new CommonService();
 
   constructor(
     private route: ActivatedRoute,
@@ -143,6 +155,14 @@ export class EditVariant implements OnInit {
     });
   }
 
+  deriveAvailability(retailEnabled: boolean | undefined, wholesaleEnabled: boolean | undefined): Availability {
+    const retail = retailEnabled !== false;
+    const wholesale = !!wholesaleEnabled;
+    if (retail && wholesale) return 'both';
+    if (wholesale) return 'wholesale';
+    return 'retail';
+  }
+
   populateProduct(res: any) {
     this.productId = res.id;
     this.product = {
@@ -170,7 +190,7 @@ export class EditVariant implements OnInit {
         const existingImgs: { id?: number; url: string }[] = [];
         if (v.productImage) {
           v.productImage.forEach((img: any) => {
-            existingImgs.push({ id: img.id, url: img.imageUrl });
+            existingImgs.push({ id: img.id, url: this.commonService.resolveImageUrl(img.imageUrl) });
           });
         }
         this.variants.push({
@@ -181,8 +201,9 @@ export class EditVariant implements OnInit {
           sku: v.sku || '',
           barcode: v.barcode || '',
           retailPrice: v.retailPrice || 0,
+          mrp: v.mrp || null,
           wholesalePrice: v.wholesalePrice || 0,
-          wholesaleEnabled: v.wholesaleEnabled || false,
+          availability: this.deriveAvailability(v.retailEnabled, v.wholesaleEnabled),
           minWholesaleQuantity: v.minWholesaleQuantity || null,
           wholesaleDiscount: v.wholesaleDiscount || null,
           availableQuantity: v.availableQuantity || 0,
@@ -205,8 +226,9 @@ export class EditVariant implements OnInit {
       sku: '',
       barcode: '',
       retailPrice: 0,
+      mrp: null,
       wholesalePrice: 0,
-      wholesaleEnabled: false,
+      availability: 'retail',
       minWholesaleQuantity: null,
       wholesaleDiscount: null,
       availableQuantity: 0,
@@ -231,6 +253,15 @@ export class EditVariant implements OnInit {
 
   onVariantFileSelect(event: any, index: number) {
     for (const file of event.files) {
+      if (!isAllowedImageFile(file)) {
+        this.messageService.add({
+          key: 'global',
+          severity: 'warn',
+          summary: 'Unsupported file',
+          detail: `"${file.name}" isn't a JPG, PNG, or WEBP image`
+        });
+        continue;
+      }
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.variants[index].files.push(file);
@@ -296,14 +327,17 @@ export class EditVariant implements OnInit {
       categoryId: categoryId,
       variants: this.variants.map((v, i) => ({
         id: v.id || null,
+        deletedImageIds: v.deletedImageIds,
         variantName: v.variantName,
         weight: v.weight,
         unit: v.unit,
         sku: v.sku,
         barcode: v.barcode,
         retailPrice: v.retailPrice,
+        mrp: v.mrp,
         wholesalePrice: v.wholesalePrice,
-        wholesaleEnabled: v.wholesaleEnabled,
+        retailEnabled: v.availability === 'retail' || v.availability === 'both',
+        wholesaleEnabled: v.availability === 'wholesale' || v.availability === 'both',
         minWholesaleQuantity: v.minWholesaleQuantity,
         wholesaleDiscount: v.wholesaleDiscount,
         availableQuantity: v.availableQuantity,

@@ -18,6 +18,7 @@ import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-
 import { MessageService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '@/pages/products/product.service';
+import { isAllowedImageFile } from '@/shared/image-validation';
 import { Addproductservice } from '../addproduct/addproductservice';
 
 @Component({
@@ -56,6 +57,12 @@ export class Addvariant implements OnInit {
     { label: 'Boxes', value: 'boxes' }
   ];
 
+  availabilityOptions = [
+    { label: 'Retail Only', value: 'retail' },
+    { label: 'Wholesale Only', value: 'wholesale' },
+    { label: 'Both (Retail & Wholesale)', value: 'both' }
+  ];
+
   product: any = {
     name: ''
   };
@@ -67,8 +74,9 @@ export class Addvariant implements OnInit {
     sku: '',
     barcode: '',
     retailPrice: 0,
+    mrp: null,
     wholesalePrice: 0,
-    wholesaleEnabled: false,
+    availability: 'retail',
     minWholesaleQuantity: null,
     wholesaleDiscount: null,
     availableQuantity: 0,
@@ -151,6 +159,15 @@ export class Addvariant implements OnInit {
 
   onFileSelect(event: any) {
     for (const file of event.files) {
+      if (!isAllowedImageFile(file)) {
+        this.messageService.add({
+          key: 'global',
+          severity: 'warn',
+          summary: 'Unsupported file',
+          detail: `"${file.name}" isn't a JPG, PNG, or WEBP image`
+        });
+        continue;
+      }
       if (file.size <= this.maxFilesize) {
         this.uploadedFiles = [
           ...this.uploadedFiles,
@@ -183,8 +200,10 @@ export class Addvariant implements OnInit {
       sku: this.variant.sku,
       barcode: this.variant.barcode,
       retailPrice: this.variant.retailPrice,
+      mrp: this.variant.mrp,
       wholesalePrice: this.variant.wholesalePrice,
-      wholesaleEnabled: this.variant.wholesaleEnabled,
+      retailEnabled: this.variant.availability === 'retail' || this.variant.availability === 'both',
+      wholesaleEnabled: this.variant.availability === 'wholesale' || this.variant.availability === 'both',
       minWholesaleQuantity: this.variant.minWholesaleQuantity,
       wholesaleDiscount: this.variant.wholesaleDiscount,
       availableQuantity: this.variant.availableQuantity,

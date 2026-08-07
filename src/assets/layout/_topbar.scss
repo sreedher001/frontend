@@ -2,19 +2,21 @@
 
 .layout-topbar {
     position: fixed;
-    height: 4rem;
+    height: 8rem;
     z-index: 997;
     left: 0;
     top: 0;
     width: 100%;
     padding: 0 2rem;
     background-color: var(--surface-card);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
     transition: left var(--layout-section-transition-duration);
     display: flex;
     align-items: center;
 
     .layout-topbar-logo-container {
-        width: 20rem;
+        width: auto;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
     }
@@ -94,6 +96,12 @@
     .layout-config-menu {
         display: flex;
         gap: 1rem;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1299px) {
+    .layout-topbar {
+        padding: 0 1rem;
     }
 }
 

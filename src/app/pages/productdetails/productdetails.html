@@ -1,11 +1,11 @@
-@if (!loading && product) {
+@if (product.id) {
 <div class="mb-4 mt-11"></div>
 
 <div class="flex flex-col lg:flex-row items-start ">
   <!-- Product Carousel -->
 
 
-<div class="w-full relative overflow-hidden">
+<div class="w-full lg:w-1/2 relative overflow-hidden">
 
   <!-- STATIC VIEW SIMILAR -->
   <p-button outlined  rounded="false" sevirity="contrast"
@@ -41,19 +41,20 @@
 
     <div
       *ngFor="let item of images; let i = index"
-      class="min-w-full snap-center flex items-center justify-center"
+      class="min-w-full snap-center flex items-center justify-center aspect-square bg-gray-50"
     >
         <img
           [src]="item.itemImageSrc"
+          [alt]="item.alt || product?.name"
           (load)="onImageLoad($event)"
-          class="w-full h-auto object-cover cursor-zoom-in"
+          class="w-full h-full object-contain cursor-zoom-in"
           (click)="activeIndex = i;openFullscreen(activeIndex)"
         />
-    
+
        <!-- Icon overlay -->
   <p-button
     outlined
-    
+
     class="absolute bottom-3 right-3 z-30 px-3 py-2 pointer-events-none"
   >
     <i class="pi pi-expand"></i>
@@ -94,6 +95,7 @@
 
   <img
     [src]="images[activeIndex].itemImageSrc"
+    [alt]="images[activeIndex].alt || product?.name"
     class="max-w-full max-h-full object-contain"
   />
 
@@ -112,7 +114,7 @@
       <p  class="text-lg font-semibold  font-semibold">{{ product.variant.variantName }}</p>
       <!-- <p-tag   class="whitespace-nowrap">{{ product.category }}</p-tag> -->
      <!-- <div class="p-2 rounded-full flex items-center gap-2" [ngClass]="getRatingSeverity(product.variant.rating)">
-        <span class="font-medium text-lg dune-font">{{ product.variant.rating }}</span>
+        <span class="font-medium text-lg">{{ product.variant.rating }}</span>
         <i class="pi pi-star-fill text-xs" [ngClass]="{
     'text-green-600': product.variant.rating != null && product.variant.rating >= 4,
     'text-yellow-600': product.variant.rating != null && product.variant.rating >= 3 && product.variant.rating < 4,
@@ -121,142 +123,17 @@
       </div> -->
     </div>
     <!-- Price Display -->
-    <div class="flex items-center gap-3 ">
+    <div class="flex items-center gap-3 flex-wrap">
       <span class="font-bold text-lg">₹{{ product.variant.retailPrice }}</span>
-      @if (product.variant.wholesalePrice > 0 && product.variant.wholesalePrice < product.variant.retailPrice) {
-      <span class="line-through text-gray-500 text-lg">₹{{ product.variant.wholesalePrice }}</span>
+      @if (hasDiscount) {
+      <span class="line-through text-gray-500 text-lg">₹{{ product.variant.mrp }}</span>
+      <span class="text-sm font-bold text-green-600">₹{{ discountAmount }} OFF</span>
       }
     </div>
     <span class="text-sm text-gray-500">{{ product.variant.weight }} {{ product.variant.unit }}</span>
 
-
-
-    <!-- Size Guide Button near size selector -->
-
-
-<!-- PrimeNG Dialog -->
-<p-dialog
-  header="Size Guide"
-  [(visible)]="showSizeGuide"
-  [modal]="true"
-  [style]="{ width: '90vw', maxWidth: '700px' }"
-  [breakpoints]="{ '960px': '95vw' }"
-  [dismissableMask]="true"
->
-
-  <p-tabs value="size">
-
-    <!-- Tab Headers -->
-    <p-tablist>
-      <p-tab value="size">Size Chart</p-tab>
-      <p-tab value="measure">How to Measure</p-tab>
-    </p-tablist>
-
-    <!-- Tab Content -->
-    <p-tabpanels>
-
-      <!-- SIZE CHART TAB -->
-      <p-tabpanel value="size">
-
-        <!-- Toggle Buttons -->
-        <div class="flex justify-end mb-4">
-          <button
-            type="button"
-            class="px-3 py-1 text-sm font-semibold rounded-l border border-gray-300"
-            [ngClass]="{ 'bg-black text-white': unit === 'cm', 'bg-white text-gray-700': unit !== 'cm' }"
-            (click)="unit = 'cm'"
-          >
-            CM
-          </button>
-          <button
-            type="button"
-            class="px-3 py-1 text-sm font-semibold rounded-r border border-gray-300"
-            [ngClass]="{ 'bg-black text-white': unit === 'inch', 'bg-white text-gray-700': unit !== 'inch' }"
-            (click)="unit = 'inch'"
-          >
-            INCH
-          </button>
-        </div>
-
-        <div class="text-sm text-gray-700 space-y-2">
-          <p class="text-xs text-gray-500 italic">
-            All measurements are approximate.
-          </p>
-
-          <table class="w-full text-left border border-gray-100 text-sm">
-            <thead class="bg-gray-100">
-              <tr>
-                <th class="p-2">Sizes</th>
-                <th class="p-2">Standard Size</th>
-                <th class="p-2">To Fit Bust</th>
-                <th class="p-2">To Fit Waist</th>
-                <th class="p-2">To Fit Hip</th>
-                <th class="p-2">Front Length</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (row of getSizeGuide(unit); track row) {
-                <tr>
-                  <td class="p-2">{{ row.size }}</td>
-                  <td class="p-2">{{ row.standardSize }}</td>
-                  <td class="p-2">{{ row.bust }}</td>
-                  <td class="p-2">{{ row.waist }}</td>
-                  <td class="p-2">{{ row.hip }}</td>
-                  <td class="p-2">{{ row.frontLength }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-      </p-tabpanel>
-
-      <!-- HOW TO MEASURE TAB -->
-      <p-tabpanel value="measure">
-
-        <div class="text-center">
-          <img
-            src="assets/images/how-to-measure.png"
-            alt="How to Measure"
-            class="w-full max-w-md mx-auto"
-          />
-        </div>
-
-        <div class="mt-6 space-y-6 text-sm text-gray-700 leading-relaxed">
-
-  <div>
-    <p class="font-semibold tracking-wide uppercase text-xs text-gray-500">Shoulder</p>
-    <p>Measure from the tip of one shoulder straight across to the other.</p>
-  </div>
-
-  <div>
-    <p class="font-semibold tracking-wide uppercase text-xs text-gray-500">Bust</p>
-    <p>Wrap the tape around the fullest part of your bust, keeping it level.</p>
-  </div>
-
-  <div>
-    <p class="font-semibold tracking-wide uppercase text-xs text-gray-500">Waist</p>
-    <p>Measure around your natural waistline at the narrowest point.</p>
-  </div>
-
-  <div>
-    <p class="font-semibold tracking-wide uppercase text-xs text-gray-500">Hips</p>
-    <p>Measure around the fullest part of your hips.</p>
-  </div>
-
-</div>
-
-      </p-tabpanel>
-
-    </p-tabpanels>
-
-  </p-tabs>
-
-</p-dialog>
-
-
   <!-- ====== Product Details ====== -->
-<p-accordion class="space-y-3">
+<p-accordion class="space-y-3" value="0">
 
   <p-accordion-panel [value]="0">
     <p-accordion-header>Product Details</p-accordion-header>
@@ -314,7 +191,7 @@
   [class.translate-y-full]="!showStylePanel">
   <!-- Gradient Header -->
   <div class="p-4  flex justify-between items-center text-black">
-    <h4 class="text-lg font-semibold dune-font">Similar Items</h4>
+    <h4 class="text-lg font-semibold">Similar Items</h4>
     <button (click)="toggleStylePanel()" class="hover:text-yellow-500">
       <i class="pi pi-times text-xl"></i>
     </button>
@@ -328,7 +205,7 @@
         <div class="flex flex-col items-center justify-center">
           <img [src]="item.image" alt="{{ item.label }}"
             class="object-contain max-h-60 w-auto rounded-md shadow cursor-pointer"
-            (click)="goToProductDetails(item.variantId.toString())" />
+            (click)="goToProductDetails(item.slug || item.variantId.toString())" />
           <p class="text-sm font-semibold text-center mt-4">{{ item.label }}</p>
         </div>
       </ng-template>
@@ -385,8 +262,12 @@
     </button>
   </div>
   <div class="p-4">
-    <div class="flex items-center gap-3 mb-4">
+    <div class="flex items-center gap-3 mb-4 flex-wrap">
       <span class="text-lg font-bold">₹{{ product.variant.retailPrice }}</span>
+      @if (hasDiscount) {
+      <span class="line-through text-gray-500 text-sm">₹{{ product.variant.mrp }}</span>
+      <span class="text-xs font-bold text-green-600">₹{{ discountAmount }} OFF</span>
+      }
       <span class="text-sm text-gray-500">{{ product.variant.weight }} {{ product.variant.unit }}</span>
     </div>
     <div class="mt-2">
@@ -447,11 +328,11 @@
 
 <!-- Floating CTA Button (only if modal closed and not logged in) -->
 @if (!showSignupPanel && !isLoggedIn) {
-<div class="fixed bottom-30 left-1/2 transform -translate-x-1/2 z-40 
-         flex items-center gap-3 px-5 py-3 rounded-full 
-         shadow-md border border-black-400 
+<div class="fixed bottom-24 lg:bottom-6 left-1/2 transform -translate-x-1/2 z-40
+         flex items-center gap-3 px-5 py-3 rounded-full
+         shadow-md border border-black-400
          bg-white
-         text-black font-semibold cursor-pointer 
+         text-black font-semibold cursor-pointer
          hover:scale-105 transition-transform duration-200" (click)="toggleSignupPanel()">
   <i class="pi pi-user-plus text-xl"></i>
   <span class="font-medium whitespace-nowrap text-sm sm:text-base ">SIGN UP / SIGN IN</span>

@@ -21,6 +21,7 @@ import { ReviewModalComponent } from '../productreview/review-modal-component/re
 import { Return } from '../admin/admin-returns/return';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { InputTextModule } from 'primeng/inputtext';
+import { ResolveImagePipe } from '@/shared/resolve-image.pipe';
 
 export interface OrderSummaryDto {
   id:number;
@@ -42,7 +43,7 @@ interface StepData {
 @Component({
   selector: 'app-orderhistory',
   imports: [DatePipe,DialogModule,StepperModule,InputTextModule,
-    AutoCompleteModule,FormsModule,ButtonModule,CommonModule,ImageModule,CardModule,TableModule,ProgressSpinnerModule,AvatarGroupModule,AvatarModule,OverlayBadgeModule,TagModule],
+    AutoCompleteModule,FormsModule,ButtonModule,CommonModule,ImageModule,CardModule,TableModule,ProgressSpinnerModule,AvatarGroupModule,AvatarModule,OverlayBadgeModule,TagModule,ResolveImagePipe],
   templateUrl: './orderhistory.html',
   providers: [DialogService],
   styleUrl: './orderhistory.scss'

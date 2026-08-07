@@ -18,13 +18,15 @@ import { Product } from '@/models/product.model';
 import { ProductService } from '@/pages/products/product.service';
 import { Router } from '@angular/router';
 import { ProductVariantResponseDto } from '@/models/productVariantResponseDto';
+import { CommonService } from '@/layout/service/common';
+import { SelectModule } from 'primeng/select';
 
 @Component({
   selector: 'app-manageproducts',
   imports: [
     CommonModule, TableModule, FormsModule, ButtonModule, RippleModule,
     ToastModule, ToolbarModule, InputTextModule, DialogModule, TagModule,
-    InputIconModule, IconFieldModule, ConfirmDialogModule, FileUploadModule
+    InputIconModule, IconFieldModule, ConfirmDialogModule, FileUploadModule, SelectModule
   ],
   templateUrl: './manageproducts.html',
   styleUrl: './manageproducts.scss'
@@ -46,6 +48,14 @@ export class Manageproducts implements OnInit {
 
   @ViewChild('dt') dt!: Table;
 
+  availabilityFilter: 'all' | 'retail' | 'wholesale' | 'both' = 'all';
+  availabilityOptions = [
+    { label: 'All Products', value: 'all' },
+    { label: 'Retail Only', value: 'retail' },
+    { label: 'Wholesale Only', value: 'wholesale' },
+    { label: 'Both (Retail & Wholesale)', value: 'both' }
+  ];
+
   constructor(
     private productService: ProductService,
     private messageService: MessageService,
@@ -55,6 +65,19 @@ export class Manageproducts implements OnInit {
 
   ngOnInit() {
     this.loadProducts();
+  }
+
+  get displayedProducts(): any[] {
+    switch (this.availabilityFilter) {
+      case 'retail':
+        return this.flattenedProducts.filter(p => p.retailEnabled && !p.wholesaleEnabled);
+      case 'wholesale':
+        return this.flattenedProducts.filter(p => p.wholesaleEnabled && !p.retailEnabled);
+      case 'both':
+        return this.flattenedProducts.filter(p => p.retailEnabled && p.wholesaleEnabled);
+      default:
+        return this.flattenedProducts;
+    }
   }
 
   loadProducts() {
@@ -94,18 +117,36 @@ export class Manageproducts implements OnInit {
         unit: variant.unit,
         retailPrice: variant.retailPrice,
         wholesalePrice: variant.wholesalePrice,
+        retailEnabled: variant.retailEnabled !== false,
+        wholesaleEnabled: !!variant.wholesaleEnabled,
         sku: variant.sku,
         status: variant.availableQuantity > 0 ? 'INSTOCK' : 'OUTOFSTOCK'
       }))
     );
   }
 
+  availabilityLabel(item: any): string {
+    if (item.retailEnabled && item.wholesaleEnabled) return 'Both';
+    if (item.wholesaleEnabled) return 'Wholesale Only';
+    if (item.retailEnabled) return 'Retail Only';
+    return 'Unlisted';
+  }
+
+  availabilitySeverity(item: any): string {
+    if (item.retailEnabled && item.wholesaleEnabled) return 'info';
+    if (item.wholesaleEnabled) return 'warn';
+    if (item.retailEnabled) return 'success';
+    return 'danger';
+  }
+
+  private commonService = new CommonService();
+
   getFrontImage(variant: ProductVariantResponseDto) {
     if (variant.productImage && variant.productImage.length > 0) {
       const frontImg = variant.productImage.find(x => x.viewType === 'front' || x.viewType === 'FRONT');
-      return frontImg ? frontImg.imageUrl : variant.imageUrl;
+      return this.commonService.resolveImageUrl(frontImg ? frontImg.imageUrl : variant.imageUrl);
     }
-    return variant.imageUrl;
+    return this.commonService.resolveImageUrl(variant.imageUrl);
   }
 
   openNew() {

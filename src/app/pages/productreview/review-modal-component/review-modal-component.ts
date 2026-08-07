@@ -8,10 +8,11 @@ import { ButtonModule } from 'primeng/button';
 import { TextareaModule } from 'primeng/textarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { StyleClass } from "primeng/styleclass";
+import { ResolveImagePipe } from '@/shared/resolve-image.pipe';
 
 @Component({
   selector: 'app-review-modal-component',
-  imports: [RatingModule, FormsModule, ButtonModule, TextareaModule, InputTextModule],
+  imports: [RatingModule, FormsModule, ButtonModule, TextareaModule, InputTextModule, ResolveImagePipe],
   templateUrl: './review-modal-component.html',
   styleUrl: './review-modal-component.scss'
 })

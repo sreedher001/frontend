@@ -7,10 +7,11 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from "primeng/toast";
+import { ResolveImagePipe } from '@/shared/resolve-image.pipe';
 
 @Component({
   selector: 'app-review-banner-component',
-  imports: [ButtonModule, ToastModule],
+  imports: [ButtonModule, ToastModule, ResolveImagePipe],
   templateUrl: './review-banner-component.html',
   styleUrl: './review-banner-component.scss',
   animations: [

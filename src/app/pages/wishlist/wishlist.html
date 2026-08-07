@@ -14,7 +14,7 @@
       <p-card class="relative shadow-sm cursor-pointer" (click)="goToProductDetails(item.variantId)">
         <ng-template pTemplate="header">
           <p-avatar
-            [image]="item.imageUrl"
+            [image]="item.imageUrl | resolveImage"
             shape="square"
             size="xlarge"
             class="rounded-lg mx-auto mb-3"

@@ -1,16 +1,18 @@
 <div class="card">
 <section id="about" class="py-20 px-6 max-w-5xl mx-auto">
-  <h2 class="text-4xl font-serif font-semibold mb-6 text-gray-900 tracking-wide">About Spice Store</h2>
+  <h2 class="text-4xl font-semibold mb-6 text-gray-900 tracking-wide">About {{ storeSettingsService.current.storeName }}</h2>
+  @if (storeSettingsService.current.aboutDescription) {
   <p class="text-lg leading-relaxed text-gray-700 max-w-3xl">
-    Spice Store brings you the finest selection of authentic spices, tea powders, masalas, coffee powders, dry fruits, and herbs sourced directly from trusted growers across India.
+    {{ storeSettingsService.current.aboutDescription }}
   </p>
+  }
   <p class="text-lg leading-relaxed text-gray-700 max-w-3xl mt-4">
     Whether you're a home cook looking for premium retail packs or a business seeking wholesale quantities, we have the right products at the right prices.
   </p>
 </section>
 
 <section id="collections" class="py-20 px-6 bg-gray-50 max-w-5xl mx-auto">
-  <h2 class="text-4xl font-serif font-semibold mb-8 text-gray-900 tracking-wide">Our Range</h2>
+  <h2 class="text-4xl font-semibold mb-8 text-gray-900 tracking-wide">Our Range</h2>
   <ul class="list-disc pl-8 space-y-4 text-gray-700 text-lg max-w-3xl">
     <li>
       <span class="font-medium">Spices & Masalas</span> — Whole and ground spices, curry powders, and specialty masala blends.
@@ -28,23 +30,33 @@
 </section>
 
 <section id="wholesale" class="py-20 px-6 max-w-5xl mx-auto">
-  <h2 class="text-4xl font-serif font-semibold mb-6 text-gray-900 tracking-wide">Wholesale</h2>
+  <h2 class="text-4xl font-semibold mb-6 text-gray-900 tracking-wide">Wholesale</h2>
   <p class="text-lg leading-relaxed text-gray-700 max-w-3xl mb-8">
     Running a restaurant, hotel, or retail shop? Switch to Wholesale mode to access bulk pricing and special discounts on all our products.
   </p>
 </section>
 
 <section id="contact" class="py-20 px-6 bg-gray-50 max-w-5xl mx-auto">
-  <h2 class="text-4xl font-serif font-semibold mb-6 text-gray-900 tracking-wide">Contact</h2>
+  <h2 class="text-4xl font-semibold mb-6 text-gray-900 tracking-wide">Contact</h2>
   <ul class="text-gray-700 text-lg space-y-4 max-w-3xl">
+    @if (storeSettingsService.current.supportEmail) {
     <li class="flex items-center space-x-3">
       <i class="pi pi-envelope text-xl"></i>
-      <span>support@spicestore.in</span>
+      <span>{{ storeSettingsService.current.supportEmail }}</span>
     </li>
+    }
+    @if (storeSettingsService.current.supportPhone) {
+    <li class="flex items-center space-x-3">
+      <i class="pi pi-phone text-xl"></i>
+      <span>{{ storeSettingsService.current.supportPhone }}</span>
+    </li>
+    }
+    @if (storeSettingsService.current.country) {
     <li class="flex items-center space-x-3">
       <i class="pi pi-map-marker text-xl"></i>
-      <span>India</span>
+      <span>{{ fullAddress }}</span>
     </li>
+    }
   </ul>
 </section>
 </div>

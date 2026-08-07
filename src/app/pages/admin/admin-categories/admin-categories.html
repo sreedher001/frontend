@@ -1,0 +1,86 @@
+<div class="card">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold">Categories</h2>
+    <p-button label="Add Category" icon="pi pi-plus" (onClick)="openCreate()" />
+  </div>
+
+  <p-table [value]="categories" [loading]="loading" dataKey="id" [rowHover]="true" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Slug</th>
+        <th>Parent</th>
+        <th>Sort Order</th>
+        <th>Status</th>
+        <th style="width: 10rem">Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-category>
+      <tr>
+        <td class="font-medium">{{ category.name }}</td>
+        <td class="text-gray-500">{{ category.slug }}</td>
+        <td>{{ parentName(category) }}</td>
+        <td>{{ category.sortOrder }}</td>
+        <td>
+          <p-tag [value]="category.active ? 'Active' : 'Inactive'" [severity]="category.active ? 'success' : 'danger'" />
+        </td>
+        <td>
+          <p-button icon="pi pi-pencil" severity="info" size="small" rounded outlined class="mr-2" (onClick)="openEdit(category)" pTooltip="Edit" />
+          <p-button icon="pi pi-trash" severity="danger" size="small" rounded outlined (onClick)="delete(category)" pTooltip="Delete" />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center py-6 text-gray-500">No categories yet. Click "Add Category" to create one.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog [header]="editing ? 'Edit Category' : 'Add Category'" [(visible)]="displayDialog" [modal]="true" [style]="{ width: '480px' }">
+  <div class="flex flex-col gap-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">Name *</label>
+      <input pInputText [(ngModel)]="form.name" name="name" class="w-full" placeholder="e.g. Organic Spices" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Slug</label>
+      <input pInputText [(ngModel)]="form.slug" name="slug" class="w-full" placeholder="Auto-generated if left blank" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Description</label>
+      <input pInputText [(ngModel)]="form.description" name="description" class="w-full" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Image URL</label>
+      <input pInputText [(ngModel)]="form.imageUrl" name="imageUrl" class="w-full" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Parent Category</label>
+      <p-select [(ngModel)]="form.parentId" name="parentId" [options]="parentOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="None (Top Level)" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Sort Order</label>
+      <p-inputnumber [(ngModel)]="form.sortOrder" name="sortOrder" [min]="0" class="w-full" />
+    </div>
+
+    <div class="flex items-center gap-2">
+      <p-checkbox [(ngModel)]="form.active" name="active" binary="true" inputId="active" />
+      <label for="active" class="text-sm">Active</label>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" severity="secondary" text (onClick)="displayDialog = false" />
+    <p-button label="Save" icon="pi pi-check" (onClick)="save()" />
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog />
+<p-toast key="global" />

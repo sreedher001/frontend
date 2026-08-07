@@ -11,6 +11,7 @@ export interface Banner {
   title: string;
   redirectUrl: string;
   bannerType: string;
+  purchaseType?: string;
   uploadedAt: string;
   uploadedBy: number;
 }
@@ -20,11 +21,10 @@ export interface Category {
   name: string;
   slug: string;
   description: string;
-  image: string;
+  imageUrl: string;
   sortOrder: number;
   active: boolean;
-  parentId: number;
-  children: Category[];
+  parentId: number | null;
 }
 
 @Injectable({
@@ -67,8 +67,16 @@ export class ProductService {
     return this.http.get<Product>(`${this.apiUrl}/products/variants/${variantId}`);
   }
 
+  getProductByVariantSlug(slug: string): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/products/variants/slug/${slug}`);
+  }
+
   getProductById(id: number): Observable<Product> {
     return this.http.get<Product>(`${this.apiUrl}/products/${id}`);
+  }
+
+  getBestSellers(limit = 8): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/products/best-sellers`, { params: { limit } });
   }
 
   getProductBySlug(slug: string): Observable<Product> {
@@ -188,6 +196,18 @@ export class ProductService {
     return this.http.get<Category[]>(`${this.apiUrl}/categories`);
   }
 
+  createCategory(category: Partial<Category>): Observable<Category> {
+    return this.http.post<Category>(`${this.apiUrl}/categories`, category);
+  }
+
+  updateCategory(id: number, category: Partial<Category>): Observable<Category> {
+    return this.http.put<Category>(`${this.apiUrl}/categories/${id}`, category);
+  }
+
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/categories/${id}`);
+  }
+
   // Banner methods
   getAllBanners(): Observable<Banner[]> {
     return this.http.get<Banner[]>(`${this.apiUrl}/banners/all-banners`);
@@ -199,7 +219,7 @@ export class ProductService {
   }
 
   updateProductWithVariants(productId: number, formData: FormData) {
-    return this.http.post<any>(`${this.apiUrl}/admin/products/${productId}/update-with-variants`, formData);
+    return this.http.put<any>(`${this.apiUrl}/admin/products/${productId}/update-with-variants`, formData);
   }
 
   importExcel(formData: FormData): Observable<any> {
