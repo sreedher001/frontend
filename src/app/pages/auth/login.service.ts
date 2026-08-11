@@ -60,14 +60,9 @@ verifyOtp(email: string, otp: string): Observable<any> {
   return this.http.post(`${this.baseUrl}/auth/verify-otp`,{}, { params });
 }
 
-  //  POST 
+  //  POST
  resetPassword(email: string, otp: string, password: string): Observable<any> {
-  const params = new HttpParams()
-    .set('email', email)
-    .set('otp', otp)
-    .set('password', password);
-
-  return this.http.post(`${this.baseUrl}/auth/reset-password`,{}, { params });
+  return this.http.post(`${this.baseUrl}/auth/reset-password`, { email, otp, password });
 }
 
 subscribeNewsletter(email: string): Observable<any> {
