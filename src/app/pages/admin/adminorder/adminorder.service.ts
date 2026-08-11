@@ -51,11 +51,7 @@ getOrdersByDateRange(startDate: string, endDate: string, page: number = 0, size:
   }
 
   rejectOrder(orderNumber: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${orderNumber}/reject`, {});
-  }
-
-  shipOrder(dto: ShippingDto): Observable<any> {
-    return this.http.post(`${this.baseUrl}/ship`, dto);
+    return this.http.post(`${this.baseUrl}/admin/orders/${orderNumber}/reject`, {});
   }
 
   getOrderDetails(orderId: number): Observable<AdminOrder> {

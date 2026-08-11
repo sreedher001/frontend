@@ -82,18 +82,6 @@ onPageChange(event: any): void {
     });
   }
 
-  shipOrder(order: AdminOrder) {
-    const dto = {
-      orderId: order.orderNumber,
-      address: 'Test Address',
-      city: 'Test City',
-      pincode: '123456',
-    };
-    this.orderService.shipOrder(dto).subscribe(() => {
-      this.messageService.add({ severity: 'info', summary: 'Shipped', detail: 'Order sent to Shiprocket' });
-    });
-  }
-
   viewOrderDetails(orderId: number): void {
   this.orderService.getOrderDetails(orderId).subscribe({
     next: (orderDetails) => {

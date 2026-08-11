@@ -122,7 +122,7 @@ export class ProductService {
       };
     }
     return this.http.post<any>(
-      `${this.apiUrl}/interest/variants/${variantId}/sizes/${sizeId}/stock-interest`,
+      `${this.apiUrl}/interest/variants/${variantId}/stock-interest`,
       { email },
       options
     );
