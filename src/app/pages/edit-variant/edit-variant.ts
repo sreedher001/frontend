@@ -311,7 +311,8 @@ export class EditVariant implements OnInit {
     this.displayConfirmation = false;
     this.saving = true;
 
-    const categoryId = this.selectedCategoryKey?.id || this.selectedCategoryKey;
+    const categoryKey: any = this.selectedCategoryKey;
+    const categoryId = categoryKey?.data?.id ?? categoryKey?.id ?? categoryKey;
 
     const metadata: any = {
       name: this.product.name,

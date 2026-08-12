@@ -213,7 +213,8 @@ export class Addproduct implements OnInit {
     this.displayConfirmation = false;
     this.loading = true;
 
-    const categoryId = this.selectedCategoryKey?.id || this.selectedCategoryKey;
+    const categoryKey: any = this.selectedCategoryKey;
+    const categoryId = categoryKey?.data?.id ?? categoryKey?.id ?? categoryKey;
 
     const metadata: any = {
       name: this.product.name,
