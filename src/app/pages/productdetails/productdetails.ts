@@ -467,10 +467,30 @@ addToCart(variant: any, event: Event, navigateToCart: boolean = false): void {
 
   
 
-  buyNow(variant: any,event: Event): void {
-   
-  this.addToCart(variant,event,false);
-  
+  buyNow(variant: any, event: Event): void {
+    event.stopPropagation();
+
+    this.cartService.addToCart({
+      variantId: variant.id,
+      quantity: 1,
+      purchaseType: this.cartService.getPurchaseType(),
+    }).subscribe({
+      next: () => {
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+          this.router.navigate(['/checkout']);
+        } else {
+          this.router.navigate(['/auth/login']);
+        }
+      },
+      error: () => {
+        this.messageService.add({
+          key: 'global',
+          severity: 'error',
+          summary: 'Add Failed',
+          detail: 'Could not add to cart. Please try again.'
+        });
+      }
+    });
   }
 
   responsiveOptions = [

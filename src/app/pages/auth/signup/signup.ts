@@ -131,8 +131,12 @@ if (signupForm.invalid) {
 
     if (signupForm.valid) {
       this.loading = true;
-      const payload = {...this.user};
-      //delete payload.confirmPassword;
+      const payload = {
+        username: this.user.username,
+        email: this.user.email,
+        password: this.user.password,
+        role: this.user.roles
+      };
       this.loginService.signup(payload).subscribe({
         next: (res) => {
           this.loading = false; 
