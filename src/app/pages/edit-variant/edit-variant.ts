@@ -87,6 +87,7 @@ export class EditVariant implements OnInit {
     barcode: '',
     tags: '',
     isFeatured: false,
+    active: true,
     seoTitle: '',
     seoDescription: '',
     categoryId: null,
@@ -124,9 +125,41 @@ export class EditVariant implements OnInit {
 
   loadCategories() {
     this.addProductService.getCategoryTree().subscribe({
-      next: (res: any) => { this.categories = res; },
+      next: (res: any) => {
+        this.categories = res;
+        this.applyCategorySelection();
+      },
       error: () => {}
     });
+  }
+
+  /**
+   * Category tree and product both load asynchronously and can resolve in
+   * either order, so preselection is attempted from both callbacks; it's a
+   * no-op until both `categories` and `product.categoryId` are available.
+   * Assigns the actual matching tree node's `data` object (not a freshly
+   * built one) since the treeselect's optionValue="data" binding needs a
+   * value that structurally matches an option it knows about.
+   */
+  applyCategorySelection() {
+    if (!this.product.categoryId || this.categories.length === 0) {
+      return;
+    }
+    const match = this.findCategoryNode(this.categories, this.product.categoryId);
+    if (match) {
+      this.selectedCategoryKey = match;
+    }
+  }
+
+  private findCategoryNode(nodes: TreeNode[], categoryId: number): TreeNode | undefined {
+    for (const node of nodes) {
+      if (node.data?.id === categoryId) return node;
+      if (node.children?.length) {
+        const found = this.findCategoryNode(node.children, categoryId);
+        if (found) return found;
+      }
+    }
+    return undefined;
   }
 
   loadProduct(productId: number) {
@@ -174,15 +207,14 @@ export class EditVariant implements OnInit {
       barcode: res.barcode || '',
       tags: res.tags || '',
       isFeatured: res.isFeatured || false,
+      active: res.active !== false,
       seoTitle: res.seoTitle || '',
       seoDescription: res.seoDescription || '',
       categoryId: res.categoryId || null,
       subCategoryId: res.subCategoryId || null
     };
 
-    if (res.categoryId && this.categories.length > 0) {
-      this.selectedCategoryKey = { id: res.categoryId, name: res.categoryName || '' };
-    }
+    this.applyCategorySelection();
 
     this.variants = [];
     if (res.variants) {
@@ -323,6 +355,7 @@ export class EditVariant implements OnInit {
       barcode: this.product.barcode,
       tags: this.product.tags,
       isFeatured: this.product.isFeatured,
+      active: this.product.active,
       seoTitle: this.product.seoTitle,
       seoDescription: this.product.seoDescription,
       categoryId: categoryId,

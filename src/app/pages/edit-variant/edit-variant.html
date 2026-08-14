@@ -41,7 +41,7 @@
           <p-treeselect
             [(ngModel)]="selectedCategoryKey" name="category"
             [options]="categories" placeholder="Select category"
-            optionLabel="label" optionValue="data" class="w-full" selectionMode="single"
+            optionLabel="label" class="w-full" selectionMode="single"
           ></p-treeselect>
         </div>
         <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4">
@@ -59,6 +59,10 @@
         <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 flex items-center">
           <p-checkbox [(ngModel)]="product.isFeatured" name="isFeatured" binary="true" inputId="isFeatured"></p-checkbox>
           <label for="isFeatured" class="ml-2">Featured</label>
+        </div>
+        <div class="w-full sm:w-1/2 lg:w-1/4 px-2 mb-4 flex items-center">
+          <p-checkbox [(ngModel)]="product.active" name="active" binary="true" inputId="active"></p-checkbox>
+          <label for="active" class="ml-2">Active (visible in store)</label>
         </div>
       </div>
       <div class="flex flex-wrap w-full">

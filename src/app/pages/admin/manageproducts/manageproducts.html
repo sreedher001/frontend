@@ -36,12 +36,13 @@
       <th>Wholesale Price</th>
       <th>Availability</th>
       <th>Status</th>
+      <th>Published</th>
       <th style="min-width: 12rem">Actions</th>
     </tr>
   </ng-template>
 
   <ng-template #body let-item>
-    <tr>
+    <tr [class.opacity-50]="!item.productActive">
       <td>
         <img [src]="item.image" [alt]="item.name" style="width: 48px; height: 48px" class="rounded object-cover" />
       </td>
@@ -55,6 +56,7 @@
       <td>&#8377;{{ item.wholesalePrice | number:'1.2-2' }}</td>
       <td><p-tag [value]="availabilityLabel(item)" [severity]="availabilitySeverity(item)" /></td>
       <td><p-tag [value]="item.status" [severity]="getSeverity(item.status)" /></td>
+      <td><p-tag [value]="item.productActive ? 'Active' : 'Inactive'" [severity]="item.productActive ? 'success' : 'danger'" /></td>
       <td>
         <div class="flex gap-1">
           <p-button icon="pi pi-pencil" label="Edit" severity="contrast" outlined size="small" (click)="editProduct(item)" />

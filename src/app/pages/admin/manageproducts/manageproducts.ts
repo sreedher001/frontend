@@ -83,7 +83,7 @@ export class Manageproducts implements OnInit {
   loadProducts() {
     if (this.loading || !this.hasMore) return;
     this.loading = true;
-    this.productService.getAllProducts(this.page, this.size).subscribe({
+    this.productService.getAllProductsForAdmin(this.page, this.size).subscribe({
       next: (res) => {
         const existing = this.products();
         const newProducts = res.content || [];
@@ -108,6 +108,7 @@ export class Manageproducts implements OnInit {
       (product.variants || []).map(variant => ({
         productId: product.productId,
         productNumericId: product.id,
+        productActive: product.active !== false,
         variantId: variant.id,
         name: product.name,
         category: product.categoryId,

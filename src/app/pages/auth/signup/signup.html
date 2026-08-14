@@ -18,11 +18,11 @@
         <div class="w-full sm:w-1/2 lg:w-1/3 px-2 mb-4">
           <p-floatlabel variant="on">
             <input pInputText id="username" name="username" [(ngModel)]="user.username" #username="ngModel" required
-              class="w-full" />
+              maxlength="20" class="w-full" />
             <label for="username">Username</label>
           </p-floatlabel>
           @if(username.invalid && username.touched){
-          <small class="p-error text-red-800">Username is required</small>
+          <small class="p-error text-red-800">Username is required (max 20 characters)</small>
           }
         </div>
 

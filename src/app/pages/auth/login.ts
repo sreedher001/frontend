@@ -246,8 +246,9 @@ export class LoginComponent implements OnInit {
                 this.email = '';
                 this.password = '';
             },
-            error: () => {
-                this.messageService.add({ key: 'global', severity: 'error', summary: 'Login Failed', detail: 'Invalid email or password' });
+            error: (err) => {
+                const detail = err?.error?.message || 'Invalid email or password';
+                this.messageService.add({ key: 'global', severity: 'error', summary: 'Login Failed', detail });
             }
         });
     }

@@ -48,6 +48,15 @@ export class ProductService {
     return this.http.get<ProductResponse>(`${this.apiUrl}/products/all-products`, { params });
   }
 
+  /** Admin-only: includes inactive/unpublished products. Requires ROLE_ADMIN. */
+  getAllProductsForAdmin(page: any, size: any): Observable<ProductResponse> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+
+    return this.http.get<ProductResponse>(`${this.apiUrl}/admin/products/list`, { params });
+  }
+
   getRelatedProductsByCategory(categoryId: number, page = 0, size = 10): Observable<ProductResponse> {
     const params = new HttpParams()
       .set('page', page)

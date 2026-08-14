@@ -139,16 +139,14 @@ if (signupForm.invalid) {
       };
       this.loginService.signup(payload).subscribe({
         next: (res) => {
-          this.loading = false; 
+          this.loading = false;
           this.messageService.add({
         key: 'global',
         severity: 'success',
         summary: 'Account Created!',
-        detail: res.message || 'Account created successfully. Please check your email to verify.',
+        detail: 'Enter the OTP sent to your email to verify your account.',
       });
-      this.router.navigate(['/auth/login'], {
-        queryParams: { email: this.user.email }
-      });
+      this.displayOtpDialog = true;
         },
         error: (err) => {
           this.loading = false;
