@@ -109,6 +109,7 @@ loading=true;
 showSizeSelector: boolean = false;
  isAdmin: boolean = false;
 showSignupPanel = false;
+showFloatingCta = false;
 showLogin = false;
 isLoggedIn:boolean =false;
 wishlistVariantIds: Set<number> = new Set(); // Store variant IDs in wishlist
@@ -255,6 +256,14 @@ closeFullscreen() {
   @HostListener('window:resize')
 onResize() {
   this.setThumbnailPosition();
+}
+
+@HostListener('window:scroll')
+onWindowScroll() {
+  // Keep the "Sign up / Sign in" nudge off-screen until the user has
+  // scrolled past the price/weight row, so it doesn't cover the buy info
+  // on initial load of this page on small screens.
+  this.showFloatingCta = window.scrollY > 300;
 }
 
 setThumbnailPosition() {

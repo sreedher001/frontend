@@ -37,7 +37,7 @@
       <th>Availability</th>
       <th>Status</th>
       <th>Published</th>
-      <th style="min-width: 12rem">Actions</th>
+      <th style="min-width: 12rem" class="sticky right-0 z-10 bg-[var(--p-datatable-header-cell-background)] shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.15)]">Actions</th>
     </tr>
   </ng-template>
 
@@ -57,7 +57,7 @@
       <td><p-tag [value]="availabilityLabel(item)" [severity]="availabilitySeverity(item)" /></td>
       <td><p-tag [value]="item.status" [severity]="getSeverity(item.status)" /></td>
       <td><p-tag [value]="item.productActive ? 'Active' : 'Inactive'" [severity]="item.productActive ? 'success' : 'danger'" /></td>
-      <td>
+      <td class="sticky right-0 z-10 bg-[var(--p-content-background)] shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.15)]">
         <div class="flex gap-1">
           <p-button icon="pi pi-pencil" label="Edit" severity="contrast" outlined size="small" (click)="editProduct(item)" />
           <p-button icon="pi pi-trash" severity="danger" outlined size="small" (click)="deleteProduct(item)" />

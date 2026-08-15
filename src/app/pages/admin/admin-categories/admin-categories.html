@@ -12,7 +12,7 @@
         <th>Parent</th>
         <th>Sort Order</th>
         <th>Status</th>
-        <th style="width: 10rem">Actions</th>
+        <th style="width: 10rem" class="sticky right-0 z-10 bg-[var(--p-datatable-header-cell-background)] shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.15)]">Actions</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-category>
@@ -24,7 +24,7 @@
         <td>
           <p-tag [value]="category.active ? 'Active' : 'Inactive'" [severity]="category.active ? 'success' : 'danger'" />
         </td>
-        <td>
+        <td class="sticky right-0 z-10 bg-[var(--p-content-background)] shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.15)]">
           <p-button icon="pi pi-pencil" severity="info" size="small" rounded outlined class="mr-2" (onClick)="openEdit(category)" pTooltip="Edit" />
           <p-button icon="pi pi-trash" severity="danger" size="small" rounded outlined (onClick)="delete(category)" pTooltip="Delete" />
         </td>

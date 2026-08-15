@@ -326,8 +326,8 @@
 </div>
 }
 
-<!-- Floating CTA Button (only if modal closed and not logged in) -->
-@if (!showSignupPanel && !isLoggedIn) {
+<!-- Floating CTA Button (only if modal closed and not logged in, and past the buy-info fold on mobile) -->
+@if (!showSignupPanel && !isLoggedIn && showFloatingCta) {
 <div class="fixed bottom-24 lg:bottom-6 left-1/2 transform -translate-x-1/2 z-40
          flex items-center gap-3 px-5 py-3 rounded-full
          shadow-md border border-black-400

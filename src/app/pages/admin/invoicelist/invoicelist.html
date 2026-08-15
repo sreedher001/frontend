@@ -30,7 +30,7 @@
         <th>Vendor</th>
         <th>Amount</th>
         <th>Invoice/purchase Date</th>
-        <th>Actions</th>
+        <th class="sticky right-0 z-10 bg-[var(--p-datatable-header-cell-background)] shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.15)]">Actions</th>
     </tr>
 </ng-template>
 
@@ -43,7 +43,7 @@
         <td>{{ invoice.vendorName }}</td>
         <td>₹{{ invoice.amount }}</td>
         <td>{{ invoice.invoiceDate | date:'mediumDate' }}</td>
-        <td>
+        <td class="sticky right-0 z-10 bg-[var(--p-content-background)] shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.15)]">
   <div class="flex items-center gap-2">
     <p-button icon="pi pi-eye"  rounded outlined raised (click)="viewInvoice(invoice)"></p-button>
 

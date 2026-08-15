@@ -46,7 +46,7 @@
         <th>Redirect URL</th>
         <th>Type</th>
         <th>Mode</th>
-        <th>Actions</th>
+        <th class="sticky right-0 z-10 bg-[var(--p-datatable-header-cell-background)] shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.15)]">Actions</th>
       </tr>
     </ng-template>
 
@@ -71,7 +71,7 @@
             }"
           >{{ (banner.purchaseType || 'BOTH') === 'BOTH' ? 'Both' : (banner.purchaseType === 'RETAIL' ? 'Retail' : 'Wholesale') }}</span>
         </td>
-        <td>
+        <td class="sticky right-0 z-10 bg-[var(--p-content-background)] shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.15)]">
           <button
             pButton
             icon="pi pi-pencil"

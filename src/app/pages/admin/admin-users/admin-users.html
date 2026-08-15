@@ -21,7 +21,7 @@
         <th>Purchase Mode</th>
         <th>Role</th>
         <th>Enabled</th>
-        <th style="width: 4rem">Actions</th>
+        <th style="width: 4rem" class="sticky right-0 z-10 bg-[var(--p-datatable-header-cell-background)] shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.15)]">Actions</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-user>
@@ -48,7 +48,7 @@
         <td>
           <p-toggleswitch [ngModel]="user.enabled" (ngModelChange)="toggleEnabled(user)" />
         </td>
-        <td>
+        <td class="sticky right-0 z-10 bg-[var(--p-content-background)] shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.15)]">
           <p-button icon="pi pi-trash" severity="danger" size="small" rounded outlined (onClick)="deleteUser(user)" pTooltip="Delete" />
         </td>
       </tr>
