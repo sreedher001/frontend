@@ -351,12 +351,23 @@ handleLoginSuccess($event:any) {
   const img = event.target as HTMLImageElement;
   img.classList.add('loaded');
 }
+// Wholesale orders enforce a per-variant minimum quantity on the backend
+// (rejected with 400 otherwise), so a wholesale add must start at that
+// minimum instead of the retail default of 1.
+private cartQuantityFor(variant: any): number {
+  const purchaseType = this.cartService.getPurchaseType();
+  if (purchaseType === 'WHOLESALE' && variant.minWholesaleQuantity > 0) {
+    return variant.minWholesaleQuantity;
+  }
+  return 1;
+}
+
 addToCart(variant: any, event: Event, navigateToCart: boolean = false): void {
   event.stopPropagation();
 
   this.cartService.addToCart({
     variantId: variant.id,
-    quantity: 1,
+    quantity: this.cartQuantityFor(variant),
     purchaseType: this.cartService.getPurchaseType(),
   }).subscribe({
     next: () => {
@@ -371,12 +382,12 @@ addToCart(variant: any, event: Event, navigateToCart: boolean = false): void {
         this.router.navigate(['/cart']);
       }
     },
-    error: () => {
+    error: (err) => {
       this.messageService.add({
         key: 'global',
         severity: 'error',
         summary: 'Add Failed',
-        detail: 'Could not add to cart. Please try again.'
+        detail: err?.error?.message || 'Could not add to cart. Please try again.'
       });
     }
   });
@@ -481,7 +492,7 @@ addToCart(variant: any, event: Event, navigateToCart: boolean = false): void {
 
     this.cartService.addToCart({
       variantId: variant.id,
-      quantity: 1,
+      quantity: this.cartQuantityFor(variant),
       purchaseType: this.cartService.getPurchaseType(),
     }).subscribe({
       next: () => {
@@ -491,12 +502,12 @@ addToCart(variant: any, event: Event, navigateToCart: boolean = false): void {
           this.router.navigate(['/auth/login']);
         }
       },
-      error: () => {
+      error: (err) => {
         this.messageService.add({
           key: 'global',
           severity: 'error',
           summary: 'Add Failed',
-          detail: 'Could not add to cart. Please try again.'
+          detail: err?.error?.message || 'Could not add to cart. Please try again.'
         });
       }
     });

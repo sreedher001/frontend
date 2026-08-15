@@ -365,6 +365,17 @@ selectSize(size: any) {
   // Auto add
  this.addToCart();
 }
+// Wholesale orders enforce a per-variant minimum quantity on the backend
+// (rejected with 400 otherwise), so a wholesale add must start at that
+// minimum instead of the retail default of 1.
+private cartQuantityFor(variant: any): number {
+  const purchaseType = this.cartService.getPurchaseType();
+  if (purchaseType === 'WHOLESALE' && variant.minWholesaleQuantity > 0) {
+    return variant.minWholesaleQuantity;
+  }
+  return 1;
+}
+
 addToCart() {
   if (!this.selectedVariant) return;
 
@@ -372,7 +383,7 @@ addToCart() {
 
   const payload = {
     variantId: variant.id,
-    quantity: 1,
+    quantity: this.cartQuantityFor(variant),
     purchaseType: this.cartService.getPurchaseType(),
   };
 
@@ -387,12 +398,12 @@ addToCart() {
 
       this.closeSizes();
     },
-    error: () => {
+    error: (err) => {
       this.messageService.add({
         key: 'global',
         severity: 'error',
         summary: 'Error',
-        detail: 'Failed to add item'
+        detail: err?.error?.message || 'Failed to add item'
       });
     }
   });
@@ -405,7 +416,7 @@ quickAdd(variant: ProductVariantResponseDto, event: Event) {
 
   const payload = {
     variantId: variant.id,
-    quantity: 1,
+    quantity: this.cartQuantityFor(variant),
     purchaseType: this.cartService.getPurchaseType(),
   };
 
@@ -418,12 +429,12 @@ quickAdd(variant: ProductVariantResponseDto, event: Event) {
         detail: `${variant.variantName} added successfully`
       });
     },
-    error: () => {
+    error: (err) => {
       this.messageService.add({
         key: 'global',
         severity: 'error',
         summary: 'Error',
-        detail: 'Failed to add item'
+        detail: err?.error?.message || 'Failed to add item'
       });
     }
   });
