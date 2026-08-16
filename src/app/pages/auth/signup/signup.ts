@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginService } from '../login.service';
+import { CartService } from '../../cart/cart.service';
+import { environment } from '../../../../environments/environment';
 import { PasswordModule } from 'primeng/password';
 
 import { InputTextModule } from 'primeng/inputtext';
@@ -39,6 +41,9 @@ import { DialogModule } from 'primeng/dialog';
 import { Divider, DividerModule } from 'primeng/divider';
 import { JwtHelper } from '@/jwt/jwt-helper';
 import { InputOtpModule } from 'primeng/inputotp';
+
+declare const google: any;
+
 @Component({
   selector: 'app-signup',
   imports: [CommonModule,ReactiveFormsModule,InputOtpModule,
@@ -75,7 +80,7 @@ import { InputOtpModule } from 'primeng/inputotp';
   styleUrl: './signup.scss'
 })
 
-export class Signup {
+export class Signup implements AfterViewInit {
 displayOtpDialog: boolean = false;
   otpValue: string = '';
 displayConfirmation: boolean = false;
@@ -98,13 +103,89 @@ acceptedTerms: boolean = false;
   constructor(
     private loginService: LoginService,
     private router: Router,
-    private messageService: MessageService,private jwtHelper:JwtHelper
+    private messageService: MessageService,private jwtHelper:JwtHelper,
+    private cartService: CartService
   ) {
 this.jwtHelper.getUserRoles().forEach(role=>{
   if(role==="ROLE_ADMIN"){
     this.isAdmin=true;
   }
 });
+  }
+
+  ngAfterViewInit(): void {
+    this.renderGoogleButton();
+  }
+
+  private renderGoogleButton(retriesLeft = 20): void {
+    if (typeof google === 'undefined' || !google.accounts?.id) {
+      // The GIS script loads async; give it a moment before giving up.
+      if (retriesLeft > 0) {
+        setTimeout(() => this.renderGoogleButton(retriesLeft - 1), 250);
+      }
+      return;
+    }
+
+    const target = document.getElementById('googleSignupBtn');
+    if (!target) {
+      return;
+    }
+
+    google.accounts.id.initialize({
+      client_id: environment.googleClientId,
+      callback: (response: { credential: string }) => this.handleGoogleCredential(response)
+    });
+
+    google.accounts.id.renderButton(target, {
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      text: 'signup_with',
+      shape: 'pill',
+      width: 320
+    });
+  }
+
+  private handleGoogleCredential(response: { credential: string }): void {
+    this.loginService.googleAuth(response.credential).subscribe({
+      next: (res: any) => {
+        const token = res?.token;
+        if (token) {
+          localStorage.setItem('authToken', token);
+          localStorage.setItem('isLoggedIn', 'true');
+          const userInfo = this.jwtHelper.getUserInfo();
+          localStorage.setItem('userName', userInfo?.name);
+        }
+
+        this.messageService.add({
+          key: 'global',
+          severity: 'success',
+          summary: 'Welcome!',
+          detail: 'Signed up with Google successfully'
+        });
+
+        this.cartService.mergeCart().subscribe({
+          next: () => this.cartService.getCart().subscribe(),
+          error: () => {}
+        });
+
+        const roles: string[] = res?.roles || this.jwtHelper.getUserRoles();
+        if (roles.includes('ROLE_ADMIN')) {
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          this.router.navigate(['/']);
+        }
+      },
+      error: (err) => {
+        this.messageService.add({
+          key: 'global',
+          severity: 'error',
+          summary: 'Google Sign-Up Failed',
+          detail: err?.error?.message || 'Could not sign up with Google. Please try again.',
+          sticky: true
+        });
+      }
+    });
   }
 
   onSubmit(signupForm: NgForm,) {

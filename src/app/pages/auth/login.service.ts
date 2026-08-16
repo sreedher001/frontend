@@ -44,6 +44,10 @@ export class LoginService {
     return this.http.post(this.baseUrl+"/auth/signup", payload);
   }
 
+  googleAuth(idToken: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(this.baseUrl + "/auth/google", { idToken });
+  }
+
 
 
 sendForgotOtp(email: string): Observable<any> {
