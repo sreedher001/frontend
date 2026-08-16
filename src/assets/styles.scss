@@ -42,22 +42,26 @@ button,
   background-color: #f3f4f6; /* hover:bg-gray-100 */
 }
 
+/*
+ * This used to zero out all padding/margin (including padding-top) with
+ * !important on these elements below 768px, as a blunt fix for horizontal
+ * overflow. That also wiped out the padding-top that keeps page content
+ * clear of the fixed topbar (see _main.scss), so the first ~120px of every
+ * mobile page - page titles, "Back" buttons, toolbar actions like "Add
+ * Product" - rendered underneath the topbar and became untappable. Horizontal
+ * overflow is still guarded by overflow-x: hidden below; the width/padding/
+ * margin overrides are gone so vertical spacing (and the topbar clearance)
+ * is whatever the rest of the layout already defines.
+ */
 @media (max-width: 768px) {
   .layout-wrapper,
   .layout-main-container,
   .layout-main {
-    margin-top: 5px !important;
-    margin-right: 8px;
-    padding: 0 !important;
-    width: 100vw;
-    max-width: 100vw;
+    max-width: 100%;
     overflow-x: hidden;
   }
 
   body, html {
-    padding: 0 !important;
-    margin-right: 2px !important;
-    width: 100%;
     overflow-x: hidden;
   }
 }

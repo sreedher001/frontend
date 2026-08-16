@@ -6,7 +6,6 @@ import { AppTopbar } from './app.topbar';
 import { AppSidebar } from './app.sidebar';
 import { AppFooter } from './app.footer';
 import { LayoutService } from '../service/layout.service';
-import { JwtHelper } from '@/jwt/jwt-helper';
 import { WhatsappFloatButton } from '@/shared/whatsapp-float-button/whatsapp-float-button';
 
 @Component({
@@ -22,7 +21,7 @@ import { WhatsappFloatButton } from '@/shared/whatsapp-float-button/whatsapp-flo
             </div>
             <app-footer></app-footer>
         </div>
-        <div class="layout-mask animate-fadein"></div>
+        <div class="layout-mask animate-fadein" (click)="hideMenu()"></div>
         <app-whatsapp-float-button></app-whatsapp-float-button>
     </div> `
 })
@@ -38,14 +37,16 @@ export class AppLayout {
     constructor(
         public layoutService: LayoutService,
         public renderer: Renderer2,
-        public router: Router,
-        private jwtHelper: JwtHelper
+        public router: Router
     ) {
+        // Same close-on-outside-click / close-on-navigate behavior for every
+        // role. It only ever touches overlayMenuActive/staticMenuMobileActive,
+        // which the desktop static sidebar (the default menu mode) doesn't
+        // read at all, so this is a no-op on desktop unless a user has opted
+        // into overlay mode - it was previously skipped entirely for admins,
+        // which is what left the mobile admin drawer stuck open with no way
+        // back to the page underneath it.
         this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {
-            const roles = this.jwtHelper.getUserRoles();
-            const isAdmin = roles && roles.includes('ROLE_ADMIN');
-            if (isAdmin) return;
-
             if (!this.menuOutsideClickListener) {
                 this.menuOutsideClickListener = this.renderer.listen('document', 'click', (event) => {
                     if (this.isOutsideClicked(event)) {
@@ -60,11 +61,7 @@ export class AppLayout {
         });
 
         this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-            const roles = this.jwtHelper.getUserRoles();
-            const isAdmin = roles && roles.includes('ROLE_ADMIN');
-            if (!isAdmin) {
-                this.hideMenu();
-            }
+            this.hideMenu();
         });
     }
 

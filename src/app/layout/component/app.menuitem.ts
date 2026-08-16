@@ -141,9 +141,15 @@ export class AppMenuitem {
             this.item.command({ originalEvent: event, item: this.item });
         }
 
-        // toggle active state
         if (this.item.items) {
+            // toggle active state - this is a submenu parent, not a page link,
+            // so the mobile drawer should stay open
             this.active = !this.active;
+        } else if (this.layoutService.isMobile()) {
+            // Leaf item selected on mobile: close the drawer right away
+            // instead of waiting on the route change to do it, so it never
+            // sits open over the page the user just navigated to.
+            this.layoutService.layoutState.update((prev) => ({ ...prev, overlayMenuActive: false, staticMenuMobileActive: false, menuHoverActive: false }));
         }
 
         this.layoutService.onMenuStateChange({ key: this.key });
