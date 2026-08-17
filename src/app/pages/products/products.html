@@ -8,12 +8,22 @@
       <span class="marquee-item">🚚 Free Shipping Above ₹999</span>
       <span class="marquee-item">💳 100% Secure Payments</span>
       <span class="marquee-item">🔥 Flash Sale Live Now</span>
+      @if(!isWholesaleMode){
+        @for(coupon of activeCoupons; track coupon.couponCode){
+          <span class="marquee-item">🎟️ {{ coupon.description }} &mdash; Use code {{ coupon.couponCode }}</span>
+        }
+      }
     </div>
 
     <div class="marquee-track">
       <span class="marquee-item">🚚 Free Shipping Above ₹999</span>
       <span class="marquee-item">💳 100% Secure Payments</span>
       <span class="marquee-item">🔥 Flash Sale Live Now</span>
+      @if(!isWholesaleMode){
+        @for(coupon of activeCoupons; track coupon.couponCode){
+          <span class="marquee-item">🎟️ {{ coupon.description }} &mdash; Use code {{ coupon.couponCode }}</span>
+        }
+      }
     </div>
   </div>
 

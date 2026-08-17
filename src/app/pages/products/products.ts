@@ -42,6 +42,7 @@ import { CommonService } from '@/layout/service/common';
 export class Products implements OnInit, OnDestroy {
   isWholesaleMode = false;
   private purchaseTypeSub!: Subscription;
+  activeCoupons: { couponCode: string; description: string }[] = [];
 
   showSizes = false;
 selectedSize: any = null; selectedVariant: any;
@@ -143,6 +144,10 @@ this.purchaseTypeSub = this.cartService.purchaseType$.subscribe(type => {
 this.getBanners();
     this.getBestSellers();
     this.startTaglineRotation();
+    this.productService.getActiveCoupons().subscribe({
+      next: (coupons) => this.activeCoupons = coupons,
+      error: () => this.activeCoupons = []
+    });
 
 if(localStorage.getItem("isLoggedIn")==="true"){
       this.isLoggedIn=true;}

@@ -205,6 +205,10 @@ export class ProductService {
     return this.http.get<Category[]>(`${this.apiUrl}/categories`);
   }
 
+  getActiveCoupons(): Observable<{ couponCode: string; description: string }[]> {
+    return this.http.get<{ couponCode: string; description: string }[]>(`${this.apiUrl}/promotions/active-coupons`);
+  }
+
   createCategory(category: Partial<Category>): Observable<Category> {
     return this.http.post<Category>(`${this.apiUrl}/categories`, category);
   }
