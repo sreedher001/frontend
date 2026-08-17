@@ -318,7 +318,7 @@
   <!-- Modal Content -->
   <div class="p-4 h-[calc(100%-64px)] overflow-y-auto">
     @if (showLogin) {
-    <app-login (loginSuccess)="handleLoginSuccess($event)" />
+    <app-login [suppressNavigation]="true" (loginSuccess)="handleLoginSuccess($event)" />
     } @else {
     <app-signup />
     }

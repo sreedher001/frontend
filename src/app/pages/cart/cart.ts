@@ -67,6 +67,14 @@ showCouponStamp = false;
 remainingTime: number = 0;
   displayTime: string = '';
   interval: any;
+  // Absolute target timestamp (ms since epoch). The countdown is always
+  // recomputed from this against the current clock on every tick, rather
+  // than decrementing a counter by a fixed 1000ms per tick - setInterval
+  // isn't guaranteed to fire exactly once a second (background tabs get
+  // throttled, the event loop can lag), so a decrementing counter drifts
+  // out of sync with the real time left. Recomputing from the absolute
+  // end time makes the display self-correcting on every tick.
+  private saleEndTimeMs: number = 0;
   
 
   constructor(private cartService: CartService, private productDetails: Productdetails, private prod: Products,
@@ -87,33 +95,44 @@ remainingTime: number = 0;
 
      let savedEndTime = localStorage.getItem('saleEndTime');
   const now = Date.now();
+  const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
 
-  if (savedEndTime) {
-    this.remainingTime = +savedEndTime - now;
+  this.saleEndTimeMs = savedEndTime ? +savedEndTime : 0;
 
-    // If timer expired, reset it for another 3 hours
-    if (this.remainingTime <= 0) {
-      const newEndTime = now + 3 * 60 * 60 * 1000; // 3 hours
-      localStorage.setItem('saleEndTime', newEndTime.toString());
-      this.remainingTime = 3 * 60 * 60 * 1000;
-    }
-  } else {
-    const endTime = now + 3 * 60 * 60 * 1000; // 3 hours
-    localStorage.setItem('saleEndTime', endTime.toString());
-    this.remainingTime = 3 * 60 * 60 * 1000;
+  // No saved end time, or it's already in the past: start a fresh 3-hour window
+  if (!this.saleEndTimeMs || this.saleEndTimeMs <= now) {
+    this.saleEndTimeMs = now + THREE_HOURS_MS;
+    localStorage.setItem('saleEndTime', this.saleEndTimeMs.toString());
   }
+
+  this.remainingTime = this.saleEndTimeMs - now;
+  this.displayTime = this.formatTime(this.remainingTime);
 
   this.startTimer();
-    
+
+  // setInterval is throttled/paused while the tab is backgrounded, so the
+  // displayed time can go stale until the next tick fires. Force an
+  // immediate resync as soon as the tab becomes visible again instead of
+  // waiting up to a second for that.
+  document.addEventListener('visibilitychange', this.onVisibilityChange);
 
   }
 
+  private onVisibilityChange = () => {
+    if (document.visibilityState === 'visible' && this.saleEndTimeMs) {
+      this.remainingTime = this.saleEndTimeMs - Date.now();
+      this.displayTime = this.remainingTime > 0 ? this.formatTime(this.remainingTime) : '00h : 00m : 00s';
+    }
+  };
+
   startTimer() {
+    clearInterval(this.interval);
     this.interval = setInterval(() => {
-      this.remainingTime -= 1000;
+      this.remainingTime = this.saleEndTimeMs - Date.now();
 
       if (this.remainingTime <= 0) {
         clearInterval(this.interval);
+        this.remainingTime = 0;
         this.displayTime = '00h : 00m : 00s';
         return;
       }
@@ -138,6 +157,7 @@ remainingTime: number = 0;
 
   ngOnDestroy() {
     clearInterval(this.interval);
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
   }
   // ---------- Helper functions for guest cart ----------
   private guestCartKey = 'guestCart';
@@ -341,15 +361,11 @@ remainingTime: number = 0;
   }
 
   goToCheckout(): void {
-    if (this.isLoggedIn) {
-      this.cartService.closeDrawer();
-      this.router.navigate(['/checkout']);
-    }
-    else {
-     // this.toggleSignupPanel();
-      this.router.navigate(['/auth/login']);
-      this.cartService.closeDrawer();
-    }
+    // Checkout itself now prompts for sign-in only at the final step
+    // (selecting an address / placing the order), so guests can go
+    // straight there - no separate login gate here.
+    this.cartService.closeDrawer();
+    this.router.navigate(['/checkout']);
   }
   removeItem(productId: number): void {
     this.cartService.removeItem(productId).subscribe(() => {

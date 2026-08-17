@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -38,6 +38,7 @@ import { StoreSettingsService } from '@/store-settings/store-settings.service';
           (click)="loginMode = 'email'">
           Email & Password
         </button>
+        @if(allowPhoneLogin) {
         <button class="flex-1 py-2 text-sm font-medium rounded-md transition-all"
           [class.bg-white]="loginMode === 'phone'"
           [class.shadow]="loginMode === 'phone'"
@@ -46,6 +47,7 @@ import { StoreSettingsService } from '@/store-settings/store-settings.service';
           (click)="loginMode = 'phone'">
           Phone OTP
         </button>
+        }
       </div>
 
       <!-- Email + Password Mode -->
@@ -170,6 +172,12 @@ import { StoreSettingsService } from '@/store-settings/store-settings.service';
     `
 })
 export class LoginComponent implements OnInit {
+    // For embedding this form inline elsewhere (e.g. a login-gated final
+    // checkout step) rather than as the standalone /auth/signin page.
+    @Input() allowPhoneLogin = true;
+    @Input() suppressNavigation = false;
+    @Output() loginSuccess = new EventEmitter<any>();
+
     email = '';
     password = '';
     checked = false;
@@ -224,6 +232,11 @@ export class LoginComponent implements OnInit {
             next: () => this.cartService.getCart().subscribe(),
             error: () => {}
         });
+
+        if (this.suppressNavigation) {
+            this.loginSuccess.emit(res);
+            return;
+        }
 
         const roles: string[] = res?.roles || this.jwtHelper.getUserRoles();
         if (roles.includes('ROLE_ADMIN')) {

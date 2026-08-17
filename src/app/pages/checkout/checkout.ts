@@ -13,6 +13,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { Router } from '@angular/router';
 import { StoreSettingsService } from '@/store-settings/store-settings.service';
+import { LoginComponent } from '../auth/login';
 declare var Razorpay: any;
 
 interface Address {
@@ -28,7 +29,7 @@ interface Address {
 }
 @Component({
   selector: 'app-checkout',
-  imports: [ButtonModule,FormsModule,RadioButtonModule, FloatLabelModule,ConfirmDialogModule, CommonModule, InputGroupAddonModule, ReactiveFormsModule, DialogModule],
+  imports: [ButtonModule,FormsModule,RadioButtonModule, FloatLabelModule,ConfirmDialogModule, CommonModule, InputGroupAddonModule, ReactiveFormsModule, DialogModule, LoginComponent],
   templateUrl: './checkout.html',
   styleUrl: './checkout.scss'
 })
@@ -73,15 +74,33 @@ editingAddressId: any =0;
     //   }
     // ];
   }
+  isLoggedIn = false;
+
   ngOnInit(): void {
     this.userInfo = this.jwtHelper.getUserInfo();
-    if (!this.userInfo) {
-      this.route.navigate(['/auth/login']);
-      return;
+    this.isLoggedIn = !!this.userInfo;
+
+    if (this.isLoggedIn) {
+      this.userId = this.userInfo.id;
+      this.getAllShippingAddress(this.userId);
     }
-    this.userId = this.userInfo.id;
-    this.getAllShippingAddress(this.userId);
+
+    // Needed regardless of auth state so it's ready the moment a guest
+    // signs in and reaches the payment step.
     this.loadRazorpayScriptN();
+  }
+
+  // Fired by the embedded <app-login> once a guest signs in from the final
+  // checkout step. The guest's cart is merged into their account (handled
+  // inside LoginComponent), so all that's left is to load this now-real
+  // user's saved addresses and reveal the rest of the checkout page.
+  onGuestLoginSuccess(): void {
+    this.userInfo = this.jwtHelper.getUserInfo();
+    this.isLoggedIn = !!this.userInfo;
+    if (this.isLoggedIn) {
+      this.userId = this.userInfo.id;
+      this.getAllShippingAddress(this.userId);
+    }
   }
 
   loadRazorpayScriptN() {

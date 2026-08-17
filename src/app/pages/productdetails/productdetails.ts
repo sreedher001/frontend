@@ -496,11 +496,13 @@ addToCart(variant: any, event: Event, navigateToCart: boolean = false): void {
       purchaseType: this.cartService.getPurchaseType(),
     }).subscribe({
       next: () => {
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-          this.router.navigate(['/checkout']);
-        } else {
-          this.router.navigate(['/auth/login']);
-        }
+        // addToCart() always opens the cart drawer as a side effect; close
+        // it before navigating so its mask doesn't linger over checkout.
+        this.cartService.closeDrawer();
+        // Checkout itself now prompts for sign-in only at the final step
+        // (selecting an address / placing the order), so guests can go
+        // straight there - no separate login gate here.
+        this.router.navigate(['/checkout']);
       },
       error: (err) => {
         this.messageService.add({
