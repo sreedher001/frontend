@@ -33,3 +33,30 @@
 ::-webkit-scrollbar {
   display: none;
 }
+
+// The banner carousel's prev/next buttons default to sitting inline beside
+// the slide (PrimeNG's stock layout), which on narrow screens eats enough
+// width that the banner image renders as a small, letterboxed strip.
+// Overlay them on top of the slide instead so the image spans full width.
+::ng-deep .p-carousel-content {
+  position: relative;
+}
+::ng-deep .p-carousel-viewport {
+  width: 100%;
+}
+::ng-deep .p-carousel-prev-button,
+::ng-deep .p-carousel-next-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 9999px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+::ng-deep .p-carousel-prev-button {
+  left: 0.5rem;
+}
+::ng-deep .p-carousel-next-button {
+  right: 0.5rem;
+}
