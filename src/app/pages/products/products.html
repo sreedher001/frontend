@@ -45,12 +45,14 @@
 
   <!-- Banner Carousel -->
   <p-carousel [value]="visibleBanners" [numVisible]="1" [numScroll]="1" [circular]="true" [autoplayInterval]="4000"
-    [showIndicators]="true" [showNavigators]="true" class="w-full relative z-10" contentClass="gap-3">
+    [showIndicators]="true" [showNavigators]="true" class="w-full relative z-10 -mx-4 sm:mx-0" contentClass="gap-3">
     <ng-template let-banner pTemplate="item">
-      <div class=" bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50 
+      <div class=" bg-gradient-to-br from-yellow-50 via-orange-50 to-green-50
         shadow-md overflow-hidden transition-transform duration-500 transform hover:scale-105 cursor-pointer">
 
-        <img [src]="resolveImageUrl(banner.imageUrl)" alt="{{ banner.title }}" class="w-full aspect-[3/1] object-cover" />
+        <!-- Mobile crop: falls back to the desktop image when no mobile-specific image is set -->
+        <img [src]="resolveImageUrl(banner.mobileImageUrl || banner.imageUrl)" alt="{{ banner.title }}" class="w-full aspect-[4/3] object-cover sm:hidden" />
+        <img [src]="resolveImageUrl(banner.imageUrl)" alt="{{ banner.title }}" class="w-full aspect-[3/1] object-cover hidden sm:block" />
 
         <!-- <div class="p-3 text-center">
           <p class="font-semibold text-yellow-900 text-base sm:text-lg">

@@ -49,6 +49,7 @@ export class BannerComponent implements OnInit {
   showGuidelines = true;
   displayDialog = false;
   selectedFiles: File[] = [];
+  selectedMobileFile: File | null = null;
   selectedBannerId: number | null = null;
   bannerForm: BannerUploadDto = { title: '', redirectUrl: '', bannerType: '', purchaseType: 'BOTH' };
 
@@ -90,6 +91,7 @@ export class BannerComponent implements OnInit {
     this.selectedBannerId = null;
     this.bannerForm = { title: '', redirectUrl: '', bannerType: '', purchaseType: 'BOTH' };
     this.selectedFiles = [];
+    this.selectedMobileFile = null;
     this.displayDialog = true;
   }
 
@@ -109,6 +111,26 @@ export class BannerComponent implements OnInit {
     }
 
     this.selectedFiles = valid;
+  }
+
+  //  Mobile-crop file select handler (optional, single file)
+  onMobileFileSelect(event: any) {
+    const file: File | undefined = event.target.files[0];
+    if (!file) {
+      this.selectedMobileFile = null;
+      return;
+    }
+    if (!isAllowedImageFile(file)) {
+      this.messageService.add({
+        key: 'global',
+        severity: 'warn',
+        summary: 'Unsupported file',
+        detail: `${file.name} isn't JPG, PNG, or WEBP`
+      });
+      this.selectedMobileFile = null;
+      return;
+    }
+    this.selectedMobileFile = file;
   }
 
   //  Filter banner types for autocomplete
@@ -134,7 +156,7 @@ export class BannerComponent implements OnInit {
     if (this.selectedBannerId) {
       // Update existing banner
       this.bannerService
-        .updateBanner(this.selectedBannerId, this.bannerForm)
+        .updateBanner(this.selectedBannerId, this.bannerForm, this.selectedFiles[0] || null, this.selectedMobileFile)
         .subscribe({
           next: () => {
             this.messageService.add({
@@ -169,7 +191,7 @@ export class BannerComponent implements OnInit {
       }
 
       this.bannerService
-        .uploadBanner(this.selectedFiles, this.bannerForm)
+        .uploadBanner(this.selectedFiles, this.bannerForm, this.selectedMobileFile)
         .subscribe({
           next: () => {
             this.messageService.add({
@@ -203,6 +225,8 @@ export class BannerComponent implements OnInit {
       bannerType: banner.bannerType,
       purchaseType: banner.purchaseType || 'BOTH',
     };
+    this.selectedFiles = [];
+    this.selectedMobileFile = null;
     this.displayDialog = true;
   }
 

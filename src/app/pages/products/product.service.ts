@@ -8,6 +8,7 @@ import { CommonService } from '@/layout/service/common';
 export interface Banner {
   id: number;
   imageUrl: string;
+  mobileImageUrl?: string;
   title: string;
   redirectUrl: string;
   bannerType: string;

@@ -7,6 +7,7 @@ import { CommonService } from '@/layout/service/common';
 export interface Banner {
   id: number;
   imageUrl: string;
+  mobileImageUrl?: string;
   title: string;
   redirectUrl: string;
   bannerType: string;
@@ -32,7 +33,7 @@ export class BannerService {
     return this.http.get<Banner[]>(`${this.apiUrl}/banners/all-banners`);
   }
 
-  uploadBanner(files: File[], metadata: any): Observable<any> {
+  uploadBanner(files: File[], metadata: any, mobileFile?: File | null): Observable<any> {
     const formData = new FormData();
 
     // append files (multiple supported)
@@ -40,18 +41,30 @@ export class BannerService {
       formData.append('file', file);
     });
 
+    if (mobileFile) {
+      formData.append('mobileFile', mobileFile);
+    }
+
     // append metadata JSON string
     formData.append('metadata', JSON.stringify(metadata));
 
-    
+
 
     return this.http.post(`${this.apiUrl}/banners/upload`, formData);
   }
 
- 
 
-  updateBanner(id: number, dto: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/banners/update/${id}`, dto);
+
+  updateBanner(id: number, dto: any, file?: File | null, mobileFile?: File | null): Observable<any> {
+    const formData = new FormData();
+    if (file) {
+      formData.append('file', file);
+    }
+    if (mobileFile) {
+      formData.append('mobileFile', mobileFile);
+    }
+    formData.append('metadata', JSON.stringify(dto));
+    return this.http.post(`${this.apiUrl}/banners/update/${id}`, formData);
   }
 
   deleteBanner(id: number): Observable<any> {

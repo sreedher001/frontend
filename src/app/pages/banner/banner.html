@@ -27,7 +27,8 @@
     <i class="pi pi-eye text-yellow-700 mt-0.5"></i>
     <div class="flex flex-col gap-1">
       <p class="font-semibold text-gray-900">Banner Upload Guidelines</p>
-      <p><span class="font-medium">Recommended size:</span> 1200 x 400 px (3:1 aspect ratio)</p>
+      <p><span class="font-medium">Desktop image:</span> 1200 x 400 px (3:1 aspect ratio)</p>
+      <p><span class="font-medium">Mobile image (optional):</span> 800 x 800 px (1:1 or 4:3) - a separate crop shown on phones instead of stretching the wide desktop banner. Leave blank to reuse the desktop image.</p>
       <p><span class="font-medium">Preferred format:</span> WEBP for the best quality-to-size balance. JPG and PNG are also supported.</p>
       <p><span class="font-medium">Max file size:</span> 5 MB</p>
     </div>
@@ -42,6 +43,7 @@
     <ng-template pTemplate="header">
       <tr>
         <th>Image</th>
+        <th>Mobile Image</th>
         <th>Title</th>
         <th>Redirect URL</th>
         <th>Type</th>
@@ -57,6 +59,14 @@
             [src]="resolveImageUrl(banner.imageUrl)"
             class="w-20 h-12 rounded-lg object-cover"
           />
+        </td>
+        <td>
+          <img
+            *ngIf="banner.mobileImageUrl"
+            [src]="resolveImageUrl(banner.mobileImageUrl)"
+            class="w-12 h-12 rounded-lg object-cover"
+          />
+          <span *ngIf="!banner.mobileImageUrl" class="text-xs text-gray-400">Uses desktop</span>
         </td>
         <td>{{ banner.title }}</td>
         <td>{{ banner.redirectUrl }}</td>
@@ -99,14 +109,26 @@
   [contentStyle]="{ height: '500px', overflowY: 'auto' }"
 >
     <div class="flex flex-col gap-3">
-      <input
-        type="file"
-        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-        multiple
-        (change)="onFileSelect($event)"
-        *ngIf="!selectedBannerId"
-      />
-      <p class="text-xs text-gray-400 -mt-2" *ngIf="!selectedBannerId">JPG, PNG, or WEBP</p>
+      <div>
+        <label class="block text-xs text-gray-500 mb-1">Desktop Image{{ selectedBannerId ? ' (leave blank to keep current)' : '' }}</label>
+        <input
+          type="file"
+          accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+          [multiple]="!selectedBannerId"
+          (change)="onFileSelect($event)"
+        />
+        <p class="text-xs text-gray-400 mt-1">JPG, PNG, or WEBP &middot; 1200x400 recommended</p>
+      </div>
+
+      <div>
+        <label class="block text-xs text-gray-500 mb-1">Mobile Image (optional){{ selectedBannerId ? ' - leave blank to keep current' : '' }}</label>
+        <input
+          type="file"
+          accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+          (change)="onMobileFileSelect($event)"
+        />
+        <p class="text-xs text-gray-400 mt-1">Shown on phones instead of the desktop image &middot; 800x800 or 4:3 recommended</p>
+      </div>
 
       <input
         pInputText
